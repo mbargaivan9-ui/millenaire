@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'dashboard' => 'Tableau de Bord',
+    'welcome' => 'Bienvenue',
+    'dashboard_subtitle' => 'Gérez votre système scolaire',
+    'management' => 'Gestion',
+    'search' => 'Rechercher...',
+    'search_placeholder' => 'Rechercher...',
+    'toggle_theme' => 'Changer le thème',
+    'notifications' => 'Notifications',
+    'mark_all_read' => 'Marquer tout comme lu',
+    'apps' => 'Applications',
+    'user_menu' => 'Menu utilisateur',
+    'profile' => 'Profil',
+    'logout' => 'Déconnexion',
+    'total_users' => 'Total Utilisateurs',
+    'total_students' => 'Total Étudiants',
+    'total_teachers' => 'Total Enseignants',
+    'total_classes' => 'Total Classes', 
+    'recent_activities' => 'Activités Récentes',
+    'view_all' => 'Voir tout',
+    'no_activities' => 'Aucune activité',
+    'team_members' => 'Membres de l\'Équipe',
+    'manage' => 'Gérer',
+    'no_members' => 'Aucun membre',
+];

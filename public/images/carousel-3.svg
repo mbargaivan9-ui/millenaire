@@ -1,0 +1,17 @@
+<svg width="1200" height="500" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+    <rect width="1200" height="500" fill="url(#grad3)"/>
+    <text x="600" y="180" font-family="'Segoe UI', Arial, sans-serif" font-size="64" font-weight="bold" fill="white" text-anchor="middle">
+        Gestion Complète
+    </text>
+    <text x="600" y="280" font-family="'Segoe UI', Arial, sans-serif" font-size="32" fill="rgba(255,255,255,0.9)" text-anchor="middle">
+        Notes, absences, paiements et bulletins en un seul endroit
+    </text>
+    <circle cx="120" cy="80" r="32" fill="rgba(255,255,255,0.1)"/>
+    <circle cx="1080" cy="420" r="38" fill="rgba(255,255,255,0.1)"/>
+</svg>

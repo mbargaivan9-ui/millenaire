@@ -1,0 +1,171 @@
+<?php
+// resources/lang/fr/app.php — Traductions Françaises
+return [
+
+    // Navigation
+    'nav' => [
+        'home'        => 'Accueil',
+        'about'       => 'À Propos',
+        'instructors' => 'Enseignants',
+        'staff'       => 'Personnel',
+        'login'       => 'Connexion',
+        'logout'      => 'Déconnexion',
+        'dashboard'   => 'Tableau de Bord',
+        'profile'     => 'Mon Profil',
+        'settings'    => 'Paramètres',
+        'chat'        => 'Messagerie',
+        'notifications' => 'Notifications',
+    ],
+
+    // Auth
+    'auth' => [
+        'login'          => 'Se connecter',
+        'logout'         => 'Se déconnecter',
+        'email'          => 'Adresse e-mail',
+        'password'       => 'Mot de passe',
+        'remember_me'    => 'Se souvenir de moi',
+        'forgot_password'=> 'Mot de passe oublié ?',
+        'reset_password' => 'Réinitialiser le mot de passe',
+        'failed'         => 'Ces identifiants ne correspondent pas à nos enregistrements.',
+        'throttle'       => 'Trop de tentatives de connexion. Veuillez réessayer dans :seconds secondes.',
+    ],
+
+    // Dashboard
+    'dashboard' => [
+        'welcome'      => 'Bienvenue,',
+        'students'     => 'Élèves',
+        'teachers'     => 'Enseignants',
+        'classes'      => 'Classes',
+        'bulletins'    => 'Bulletins',
+        'absences'     => 'Absences',
+        'payments'     => 'Paiements',
+        'announcements'=> 'Annonces',
+    ],
+
+    // Grades
+    'grades' => [
+        'title'        => 'Grille de Saisie',
+        'subject'      => 'Matière',
+        'student'      => 'Élève',
+        'score'        => 'Note',
+        'average'      => 'Moyenne',
+        'rank'         => 'Rang',
+        'appreciation' => 'Appréciation',
+        'saving'       => 'Sauvegarde...',
+        'saved'        => 'Sauvegardé',
+        'error'        => 'Erreur',
+        'autosave_info'=> 'Les notes sont sauvegardées automatiquement',
+        'import'       => 'Importer',
+        'export'       => 'Exporter',
+        'insufficient' => 'Insuffisant',
+        'fair'         => 'Assez Bien',
+        'good'         => 'Bien',
+        'very_good'    => 'Très Bien',
+        'excellent'    => 'Excellent',
+        'next_student' => 'Élève Suivant',
+        'prev_student' => 'Élève Précédent',
+    ],
+
+    // Bulletin
+    'bulletin' => [
+        'title'        => 'Bulletin Scolaire',
+        'draft'        => 'Brouillon',
+        'submitted'    => 'Soumis',
+        'validated'    => 'Validé',
+        'published'    => 'Publié',
+        'download_pdf' => 'Télécharger le PDF',
+        'verify'       => 'Vérifier l\'authenticité',
+        'term'         => 'Trimestre',
+        'sequence'     => 'Séquence',
+        'class_avg'    => 'Moyenne de la Classe',
+        'general_avg'  => 'Moyenne Générale',
+    ],
+
+    // Payments
+    'payment' => [
+        'title'        => 'Paiement Mobile Money',
+        'choose_op'    => 'Choisir votre opérateur',
+        'phone_number' => 'Numéro de téléphone',
+        'amount'       => 'Montant',
+        'confirm'      => 'Confirmer',
+        'initiate'     => 'Lancer le paiement',
+        'processing'   => 'Traitement en cours...',
+        'success'      => 'Paiement confirmé !',
+        'failed'       => 'Paiement échoué',
+        'receipt'      => 'Télécharger le reçu',
+        'retry'        => 'Réessayer',
+        'fees'         => 'Frais de Scolarité',
+    ],
+
+    // Chat
+    'chat' => [
+        'title'         => 'Messagerie',
+        'new_message'   => 'Nouveau message',
+        'type_message'  => 'Écrire un message...',
+        'send'          => 'Envoyer',
+        'call'          => 'Appeler',
+        'video_call'    => 'Appel vidéo',
+        'online'        => 'En ligne',
+        'offline'       => 'Hors ligne',
+        'typing'        => 'est en train d\'écrire...',
+        'read'          => 'Lu',
+        'edit_message'  => 'Modifier le message',
+        'delete_message'=> 'Supprimer le message',
+        'no_conversations' => 'Aucune conversation',
+    ],
+
+    // Appointments
+    'appointment' => [
+        'title'      => 'Rendez-Vous',
+        'request'    => 'Demander un RDV',
+        'confirm'    => 'Confirmer',
+        'cancel'     => 'Annuler',
+        'done'       => 'Effectué',
+        'pending'    => 'En attente',
+        'date_time'  => 'Date et Heure',
+        'with'       => 'Avec',
+        'reason'     => 'Motif',
+    ],
+
+    // Common
+    'common' => [
+        'save'    => 'Enregistrer',
+        'cancel'  => 'Annuler',
+        'delete'  => 'Supprimer',
+        'edit'    => 'Modifier',
+        'add'     => 'Ajouter',
+        'view'    => 'Voir',
+        'download'=> 'Télécharger',
+        'upload'  => 'Importer',
+        'search'  => 'Rechercher',
+        'filter'  => 'Filtrer',
+        'loading' => 'Chargement...',
+        'no_data' => 'Aucune donnée.',
+        'success' => 'Succès !',
+        'error'   => 'Erreur !',
+        'confirm_delete' => 'Êtes-vous sûr de vouloir supprimer cet élément ?',
+        'required'=> 'Ce champ est requis.',
+        'back'    => 'Retour',
+        'next'    => 'Suivant',
+        'previous'=> 'Précédent',
+        'yes'     => 'Oui',
+        'no'      => 'Non',
+        'all'     => 'Tous',
+        'active'  => 'Actif',
+        'inactive'=> 'Inactif',
+        'francophone' => 'Francophone',
+        'anglophone'  => 'Anglophone',
+    ],
+
+    // Validation messages
+    'validation' => [
+        'required'  => 'Le champ :attribute est obligatoire.',
+        'email'     => 'Le champ :attribute doit être une adresse e-mail valide.',
+        'min'       => 'Le champ :attribute doit comporter au moins :min caractères.',
+        'max'       => 'Le champ :attribute ne peut pas dépasser :max caractères.',
+        'unique'    => 'La valeur du champ :attribute est déjà utilisée.',
+        'confirmed' => 'La confirmation du champ :attribute ne correspond pas.',
+        'numeric'   => 'Le champ :attribute doit être un nombre.',
+        'between'   => 'Le champ :attribute doit être compris entre :min et :max.',
+    ],
+];
