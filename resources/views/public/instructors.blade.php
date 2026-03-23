@@ -8,7 +8,7 @@
 @extends('layouts.public')
 
 @php
-  $pageTitle = $pageTitle ?? (app()->getLocale() === 'fr' ? 'Nos Enseignants' : 'Our Teachers');
+  $pageTitle = $pageTitle ?? __('public.teachers_title');
 @endphp
 
 @section('title', $pageTitle)
@@ -16,14 +16,14 @@
 
 @section('content')
 
-@php $isFr = app()->getLocale() === 'fr'; @endphp
+@endphp
 
 <div class="page-title" style="background:linear-gradient(135deg,#0d9488,#0f766e);padding:3rem 0;text-align:center;color:#fff;">
     <div class="container">
         <h1 style="font-family:'Raleway',sans-serif;font-weight:800;font-size:2.2rem;margin-bottom:.5rem">
-            {{ $isFr ? 'Nos Enseignants' : 'Our Teachers' }}
+            {{ __('public.teachers_title') }}
         </h1>
-        <p style="opacity:.85">{{ $isFr ? 'Une équipe pédagogique qualifiée et passionnée' : 'A qualified and passionate teaching team' }}</p>
+        <p style="opacity:.85">{{ __('public.instructors_qualified_team') }}</p>
     </div>
 </div>
 
@@ -51,20 +51,20 @@
                         <div class="overlay-content">
                             <div class="course-count">
                                 <i class="bi bi-book me-1"></i>
-                                {{ $teacher->subjects->count() }} {{ $isFr ? 'matière(s)' : 'subject(s)' }}
+                                {{ $teacher->subjects->count() }} {{ __('public.teacher_subjects_count') }}
                             </div>
                         </div>
                     </div>
                     <div class="instructor-info">
                         <h5>{{ $teacher->user->display_name ?? $teacher->user->name }}</h5>
                         <p class="specialty">
-                            {{ $teacher->subjects->pluck('name')->take(2)->implode(', ') ?: ($isFr ? 'Enseignant' : 'Teacher') }}
+                            {{ $teacher->subjects->pluck('name')->take(2)->implode(', ') ?: __('public.teacher_label') }}
                         </p>
                         @if($teacher->is_prof_principal)
                         <p class="mb-2">
                             <span class="badge" style="background:#0d9488;font-size:.7rem;padding:.35rem .75rem;border-radius:20px;color:white">
                                 <i class="bi bi-star-fill me-1"></i>
-                                {{ $isFr ? 'Professeur Principal' : 'Head Teacher' }}
+                                {{ __('public.teacher_head') }}
                             </span>
                         </p>
                         @endif
@@ -76,7 +76,7 @@
                         @endif
                         <div class="action-buttons">
                             <a href="{{ route('public.teacher.profile', $teacher->id) }}" class="btn-view">
-                                {{ $isFr ? 'Voir Profil' : 'View Profile' }}
+                                {{ __('public.teacher_view_profile') }}
                             </a>
                         </div>
                     </div>
@@ -85,7 +85,7 @@
             @empty
             <div class="col-12 text-center py-5">
                 <i class="bi bi-people" style="font-size:4rem;color:#0d9488;opacity:.3"></i>
-                <p class="mt-3 text-muted">{{ $isFr ? 'Aucun enseignant affiché pour le moment.' : 'No teachers to display at the moment.' }}</p>
+                <p class="mt-3 text-muted">{{ __('public.no_teachers_available') }}</p>
             </div>
             @endforelse
         </div>

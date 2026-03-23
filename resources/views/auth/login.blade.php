@@ -1,210 +1,207 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ app()->getLocale() === 'fr' ? 'Connexion' : 'Login' }} — {{ \App\Models\EstablishmentSetting::getInstance()->platform_name ?? 'Millénaire Connect' }}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
-    <style>
-    :root {
-        --primary: {{ \App\Models\EstablishmentSetting::getInstance()->primary_color ?? '#0d9488' }};
-        --primary-dark: {{ \App\Models\EstablishmentSetting::getInstance()->secondary_color ?? '#0f766e' }};
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-        font-family: 'Inter', system-ui, sans-serif;
-        min-height: 100vh;
-        display: flex;
-        background: #f1f5f9;
-    }
+@extends('layouts.auth')
+@section('title', __('auth.login'))
 
-    /* ─── Left panel ─────────────────────────────────────────────────────── */
-    .auth-left {
-        flex: 1;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        display: flex; flex-direction: column;
-        justify-content: center; align-items: center;
-        padding: 3rem;
-        color: #fff;
-        position: relative;
-        overflow: hidden;
-    }
-    .auth-left::before {
-        content: '';
-        position: absolute; inset: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    }
-    .auth-logo {
-        width: 80px; height: 80px; border-radius: 20px;
-        background: rgba(255,255,255,.15);
-        display: flex; align-items: center; justify-content: center;
-        margin-bottom: 1.5rem;
-        backdrop-filter: blur(8px);
-    }
-    .auth-left h1 { font-size: 1.8rem; font-weight: 900; margin-bottom: .5rem; position: relative; }
-    .auth-left p  { opacity: .8; font-size: .9rem; position: relative; max-width: 320px; text-align: center; }
+@section('content')
+<div class="auth-wrapper">
 
-    .auth-features { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-top: 2rem; width: 100%; max-width: 380px; position: relative; }
-    .auth-feature {
-        background: rgba(255,255,255,.1);
-        border: 1px solid rgba(255,255,255,.15);
-        border-radius: 12px; padding: .9rem;
-        backdrop-filter: blur(4px);
-    }
-    .auth-feature-icon { font-size: 1.5rem; margin-bottom: .4rem; }
-    .auth-feature-label { font-size: .75rem; font-weight: 600; opacity: .9; }
-
-    /* ─── Right panel ────────────────────────────────────────────────────── */
-    .auth-right {
-        width: 480px;
-        background: #fff;
-        display: flex; flex-direction: column;
-        justify-content: center;
-        padding: 3rem;
-    }
-
-    .auth-form-title { font-size: 1.4rem; font-weight: 800; color: #0f172a; margin-bottom: .4rem; }
-    .auth-form-sub   { font-size: .85rem; color: #94a3b8; margin-bottom: 2rem; }
-
-    .form-group { margin-bottom: 1.1rem; }
-    .form-label { display: block; font-size: .82rem; font-weight: 600; color: #475569; margin-bottom: .4rem; }
-    .form-control {
-        width: 100%; padding: .65rem .9rem;
-        border: 1.5px solid #e2e8f0; border-radius: 10px;
-        font-size: .88rem; color: #0f172a; background: #fff;
-        transition: all .15s ease;
-    }
-    .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13,148,136,.1); }
-    .form-control.is-invalid { border-color: #ef4444; }
-
-    .input-wrap { position: relative; }
-    .input-icon { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: #94a3b8; }
-    .input-wrap .form-control { padding-left: 2.5rem; }
-    .toggle-pw { position: absolute; right: .85rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; background: none; border: none; }
-
-    .btn-auth {
-        width: 100%; padding: .75rem; border-radius: 10px;
-        background: var(--primary); color: #fff;
-        border: none; font-size: .9rem; font-weight: 700;
-        cursor: pointer; transition: all .2s ease;
-        display: flex; align-items: center; justify-content: center; gap: .5rem;
-    }
-    .btn-auth:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 15px rgba(13,148,136,.3); }
-
-    .role-pills { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-    .role-pill {
-        padding: .3rem .85rem; border-radius: 20px;
-        border: 1.5px solid #e2e8f0; cursor: pointer;
-        font-size: .78rem; font-weight: 600; color: #64748b;
-        transition: all .15s ease;
-    }
-    .role-pill:hover, .role-pill.active { border-color: var(--primary); background: rgba(13,148,136,.06); color: var(--primary); }
-
-    .auth-footer { text-align: center; margin-top: 1.5rem; font-size: .82rem; color: #94a3b8; }
-    .auth-footer a { color: var(--primary); font-weight: 600; text-decoration: none; }
-
-    @media (max-width: 768px) {
-        .auth-left { display: none; }
-        .auth-right { width: 100%; }
-    }
-    </style>
-</head>
-<body>
-
-<div class="auth-left">
-    <div class="auth-logo">
+  {{-- Left Panel --}}
+  <div class="auth-panel">
+    <div class="auth-brand">
+      <div class="auth-brand-logo">
         @php $settings = \App\Models\EstablishmentSetting::getInstance(); @endphp
         @if($settings->logo_path)
-            <img src="{{ asset($settings->logo_path) }}" style="width:50px;height:50px;object-fit:contain" alt="Logo">
+          <img src="{{ asset($settings->logo_path) }}" alt="Logo" style="width: 48px; height: 48px; object-fit: contain; filter: brightness(0) invert(1);">
         @else
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
-            </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 48px; height: 48px;">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
         @endif
-    </div>
-    <h1>{{ $settings->platform_name ?? 'Millénaire Connect' }}</h1>
-    <p>{{ $settings->slogan ?? (app()->getLocale() === 'fr' ? 'La plateforme digitale du Collège Millénaire Bilingue' : 'The digital platform of Collège Millénaire Bilingue') }}</p>
-
-    <div class="auth-features">
-        <div class="auth-feature"><div class="auth-feature-icon">📊</div><div class="auth-feature-label">{{ app()->getLocale() === 'fr' ? 'Bulletins numériques' : 'Digital report cards' }}</div></div>
-        <div class="auth-feature"><div class="auth-feature-icon">📅</div><div class="auth-feature-label">{{ app()->getLocale() === 'fr' ? 'Emplois du temps' : 'Schedules' }}</div></div>
-        <div class="auth-feature"><div class="auth-feature-icon">💬</div><div class="auth-feature-label">{{ app()->getLocale() === 'fr' ? 'Messagerie temps réel' : 'Real-time messaging' }}</div></div>
-        <div class="auth-feature"><div class="auth-feature-icon">💰</div><div class="auth-feature-label">{{ app()->getLocale() === 'fr' ? 'Paiements Mobile Money' : 'Mobile Money payments' }}</div></div>
-    </div>
-</div>
-
-<div class="auth-right">
-
-    {{-- Language switcher --}}
-    <div style="text-align:right;margin-bottom:1.5rem">
-        <a href="{{ route('lang.switch', 'fr') }}" style="font-size:.78rem;font-weight:700;color:{{ app()->getLocale()==='fr' ? 'var(--primary)' : '#94a3b8' }};text-decoration:none;margin-right:.75rem">🇫🇷 FR</a>
-        <a href="{{ route('lang.switch', 'en') }}" style="font-size:.78rem;font-weight:700;color:{{ app()->getLocale()==='en' ? 'var(--primary)' : '#94a3b8' }};text-decoration:none">🇺🇸 EN</a>
+      </div>
+      <div>
+        <span class="auth-brand-name">{{ $settings->platform_name ?? 'Millénaire Connect' }}</span>
+        <span class="auth-brand-tag">{{ __('public.welcome_subtitle') }}</span>
+      </div>
     </div>
 
-    <div class="auth-form-title">{{ app()->getLocale() === 'fr' ? 'Connexion' : 'Sign in' }}</div>
-    <div class="auth-form-sub">{{ app()->getLocale() === 'fr' ? 'Bienvenue ! Connectez-vous pour accéder à votre espace.' : 'Welcome back! Sign in to access your space.' }}</div>
+    <h1 class="auth-panel-title">{{ __('auth.welcome_title') }}</h1>
+    <p class="auth-panel-desc">{{ __('auth.welcome_message') }}</p>
 
-    {{-- Errors --}}
-    @if($errors->any())
-    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:.75rem 1rem;margin-bottom:1.25rem;font-size:.83rem;color:#dc2626">
-        {{ $errors->first() }}
-    </div>
-    @endif
+    <ul class="auth-panel-features">
+      <li><i data-lucide="bar-chart-3"></i><span>{{ __('common.report_cards') }}</span></li>
+      <li><i data-lucide="calendar"></i><span>{{ __('common.schedule') }}</span></li>
+      <li><i data-lucide="message-circle"></i><span>{{ __('common.messaging') }}</span></li>
+      <li><i data-lucide="credit-card"></i><span>{{ __('common.mobile_payments') }}</span></li>
+    </ul>
 
-    <form method="POST" action="{{ route('login.post') }}">
+    <div class="auth-meta">© {{ date('Y') }} {{ config('app.name') }}. {{ __('auth.rights_reserved') }}</div>
+  </div>
+
+  {{-- Form --}}
+  <div class="auth-form-area">
+    <div class="auth-card">
+      <div style="margin-bottom: 32px;">
+        <h2 class="auth-title" style="font-size: 28px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">{{ __('auth.login') }}</h2>
+        <p class="auth-subtitle" style="font-size: 14px; color: #64748b; margin: 0;">{{ __('auth.login_subtitle') }}</p>
+      </div>
+
+      @if($errors->any())
+      <div style="background-color: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 13px; color: #991b1b; font-weight: 500; display: flex; gap: 10px; align-items: flex-start;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+          <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <div>
+          <strong>{{ __('common.error') }}:</strong> {{ $errors->first() }}
+        </div>
+      </div>
+      @endif
+
+      <form method="POST" action="{{ route('login.post') }}" autocomplete="on" novalidate>
         @csrf
 
-        <div class="form-group">
-            <label class="form-label">{{ app()->getLocale() === 'fr' ? 'Adresse email' : 'Email address' }}</label>
-            <div class="input-wrap">
-                <svg class="input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                <input type="email" name="email" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
-                       value="{{ old('email') }}"
-                       placeholder="vous@exemple.com" required autofocus>
-            </div>
+        <div class="form-group" style="margin-bottom: 18px;">
+          <label class="form-label" for="email" style="display: block; font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">{{ __('common.email') }}</label>
+          <div style="position: relative;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" 
+                 stroke="currentColor" stroke-width="2" style="position: absolute; left: 14px; top: 50%; 
+                 transform: translateY(-50%); color: #94a3b8; pointer-events: none;">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            <input type="email" id="email" name="email" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
+                   value="{{ old('email') }}"
+                   style="padding-left: 44px; height: 44px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: all 0.3s ease;"
+                   placeholder="votre@email.com" required autofocus autocomplete="email">
+          </div>
+          @if($errors->has('email'))
+            <small style="color: #dc2626; font-size: 12px; margin-top: 6px; display: block;">{{ $errors->first('email') }}</small>
+          @endif
         </div>
 
-        <div class="form-group">
-            <div class="d-flex justify-content-between align-items-center" style="margin-bottom:.4rem">
-                <label class="form-label mb-0">{{ app()->getLocale() === 'fr' ? 'Mot de passe' : 'Password' }}</label>
-                <a href="{{ route('password.request') }}" style="font-size:.78rem;color:var(--primary);text-decoration:none">
-                    {{ app()->getLocale() === 'fr' ? 'Mot de passe oublié ?' : 'Forgot password?' }}
-                </a>
-            </div>
-            <div class="input-wrap">
-                <svg class="input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                <input type="password" name="password" id="pw-input" class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
-                       placeholder="••••••••" required>
-                <button type="button" class="toggle-pw" onclick="togglePw()" title="{{ app()->getLocale() === 'fr' ? 'Afficher/masquer' : 'Show/hide' }}">
-                    <svg id="eye-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                </button>
-            </div>
+        <div class="form-group" style="margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px;">
+            <label class="form-label" for="password" style="font-size: 14px; font-weight: 600; color: #1e293b; margin: 0;">{{ __('common.password') }}</label>
+            <a href="{{ route('password.request') }}" style="font-size: 13px; color: #0d9488; text-decoration: none; font-weight: 600; hover: text-decoration: underline;">
+              {{ __('auth.forgot_password') }}
+            </a>
+          </div>
+          <div style="position: relative;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" style="position: absolute; left: 14px; top: 50%;
+                 transform: translateY(-50%); color: #94a3b8; pointer-events: none;">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <input type="password" id="password" name="password" class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
+                   style="padding-left: 44px; padding-right: 44px; height: 44px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: all 0.3s ease;"
+                   placeholder="••••••••" required autocomplete="current-password">
+            <button type="button" class="input-group-icon" data-toggle-password="password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; padding: 4px; cursor: pointer; color: #64748b; display: flex; align-items: center; justify-content: center;" title="{{ __('auth.toggle_password') }}">
+              <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg class="icon-eye-off hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+          @if($errors->has('password'))
+            <small style="color: #dc2626; font-size: 12px; margin-top: 6px; display: block;">{{ $errors->first('password') }}</small>
+          @endif
         </div>
 
-        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1.5rem">
-            <input type="checkbox" name="remember" id="remember" style="accent-color:var(--primary);width:16px;height:16px">
-            <label for="remember" style="font-size:.83rem;color:#64748b;cursor:pointer">
-                {{ app()->getLocale() === 'fr' ? 'Se souvenir de moi' : 'Remember me' }}
-            </label>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px; margin-top: 18px;">
+          <input type="checkbox" id="remember" name="remember" value="1" @if(old('remember')) checked @endif 
+                 style="width: 18px; height: 18px; accent-color: #0d9488; border-radius: 4px; cursor: pointer; border: 1.5px solid #cbd5e1;">
+          <label for="remember" style="font-size: 13px; color: #475569; cursor: pointer; margin: 0; user-select: none; font-weight: 500;">
+            {{ __('auth.remember_me') }}
+          </label>
         </div>
 
-        <button type="submit" class="btn-auth">
-            {{ app()->getLocale() === 'fr' ? 'Se connecter' : 'Sign in' }}
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <button type="submit" style="width: 100%; height: 44px; background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3); hover: box-shadow: 0 6px 16px rgba(13, 148, 136, 0.4);">
+          {{ __('auth.sign_in') }}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
         </button>
-    </form>
+      </form>
 
-    <div class="auth-footer">
-        <a href="{{ route('home') }}">← {{ app()->getLocale() === 'fr' ? 'Retour au site' : 'Back to website' }}</a>
+      <div style="text-align: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
+        <p style="font-size: 13px; color: #64748b; margin: 0;">
+          {{ __('auth.no_account') }}
+          <a href="{{ route('register') }}" style="color: #0d9488; font-weight: 600; text-decoration: none;">
+            {{ __('auth.create_one') }}
+          </a>
+        </p>
+      </div>
+
+      <div style="text-align: center; margin-top: 16px; font-size: 12px;">
+        <a href="{{ route('home') }}" style="color: #0d9488; font-weight: 600; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          {{ __('auth.back_to_website') }}
+        </a>
+      </div>
     </div>
+  </div>
+
 </div>
 
+<style>
+  .input-group-icon:hover {
+    color: #334155 !important;
+  }
+
+  button[type="submit"]:hover {
+    transform: translateY(-2px);
+  }
+
+  button[type="submit"]:active {
+    transform: translateY(0);
+  }
+
+  .form-control:focus {
+    border-color: #0d9488;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+  }
+
+  .form-control.is-invalid {
+    border-color: #dc2626;
+  }
+
+  .form-control.is-invalid:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  }
+</style>
+
 <script>
-function togglePw() {
-    const inp  = document.getElementById('pw-input');
-    inp.type = inp.type === 'password' ? 'text' : 'password';
-}
+  document.addEventListener('DOMContentLoaded', function() {
+    // Password Toggle
+    const toggleButtons = document.querySelectorAll('[data-toggle-password]');
+    toggleButtons.forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.dataset.togglePassword;
+        const input = document.getElementById(targetId);
+        const iconEye = this.querySelector('.icon-eye');
+        const iconEyeOff = this.querySelector('.icon-eye-off');
+        
+        if (input.type === 'password') {
+          input.type = 'text';
+          iconEye.classList.add('hidden');
+          iconEyeOff.classList.remove('hidden');
+        } else {
+          input.type = 'password';
+          iconEye.classList.remove('hidden');
+          iconEyeOff.classList.add('hidden');
+        }
+      });
+    });
+
+    // Load lucide icons
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  });
 </script>
-</body>
-</html>
+@endsection

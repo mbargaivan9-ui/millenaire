@@ -76,8 +76,41 @@ return [
             'delay_minutes' => 5,
         ],
 
-        /**
-         * Payment status check interval (in minutes)
+    /**
+     * Payment Status Check Configuration (PHASE 10)
+     */
+    'polling' => [
+        'interval' => (int) env('PAYMENT_POLLING_INTERVAL', 3),      // Seconds
+        'timeout' => (int) env('PAYMENT_POLLING_TIMEOUT', 120),      // Seconds (2 minutes)
+        'max_attempts' => (int) env('PAYMENT_POLLING_TIMEOUT', 120) / (int) env('PAYMENT_POLLING_INTERVAL', 3),
+    ],
+
+    /**
+     * Webhook Configuration (PHASE 10: 11.2 Sécurité)
+     */
+    'webhook' => [
+        'secret' => env('PAYMENT_WEBHOOK_SECRET', 'test-secret-min-32-chars'),
+        'timeout' => (int) env('PAYMENT_WEBHOOK_TIMEOUT', 120),
+        'retry_max' => (int) env('PAYMENT_WEBHOOK_RETRY', 3),
+        'signature_header' => 'X-Webhook-Signature',
+        'algorithm' => 'sha256',
+    ],
+
+    /**
+     * Payment Simulation Mode (PHASE 10: 11.1.3 Simulation Sandbox)
+     * - 90% success rate, 10% failure
+     * - Random delay 2-5 seconds
+     */
+    'simulation' => [
+        'enabled' => env('PAYMENT_PROVIDER') === 'simulation',
+        'success_rate' => 90,           // 90% success
+        'min_delay' => 2,               // Minimum 2 seconds
+        'max_delay' => 5,               // Maximum 5 seconds
+        'mode' => env('PAYMENT_MODE', 'sandbox'),
+    ],
+
+    /**
+     * Payment status check interval (in minutes)
          */
         'status_check_interval' => 5,
 

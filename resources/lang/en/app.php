@@ -148,6 +148,53 @@ return [
         'anglophone'  => 'Anglophone',
     ],
 
+    // Language & Localization
+    'select_language'   => 'Select Language',
+    'french'            => 'Français',
+    'english'           => 'English',
+    'france'            => 'France',
+    'united_states'     => 'United States',
+    'language'          => 'Language',
+    'change_language'   => 'Change Language',
+
+    // System Messages
+    'toggle_theme'      => 'Toggle Theme',
+    'notifications'     => 'Notifications',
+    'messages'          => 'Messages',
+    'no_notifications'  => 'No notifications',
+    'view_all_notifications' => 'View All Notifications',
+    'view_all'          => 'View All',
+    'open_inbox'        => 'Open Inbox',
+    'no_messages'       => 'No new messages',
+    'back_to_home'      => 'Back to Home',
+    'home'              => 'Home',
+    'please_wait'       => 'Please wait...',
+    'loading'           => 'Loading...',
+
+    // Navigation & UI
+    'menu'              => 'Menu',
+    'account'           => 'Account',
+    'profile'           => 'Profile',
+    'my_account'        => 'My Account',
+    'profile_settings'  => 'Profile Settings',
+    'security'          => 'Security',
+    'privacy'           => 'Privacy',
+    'help'              => 'Help & Support',
+    'logout_confirm'    => 'Are you sure you want to log out?',
+    'sign_out'          => 'Sign out',
+    'language_changed'  => 'Language changed successfully',
+
+    // Common Phrases
+    'select_all'  => 'Select All',
+    'deselect_all'=> 'Deselect All',
+    'show_more'   => 'Show More',
+    'show_less'   => 'Show Less',
+    'copy_to_clipboard' => 'Copy to Clipboard',
+    'copied'      => 'Copied!',
+    'not_available' => 'Not Available',
+    'coming_soon' => 'Coming Soon',
+    'maintenance_mode' => 'Under Maintenance',
+
     'validation' => [
         'required'  => 'The :attribute field is required.',
         'email'     => 'The :attribute must be a valid email address.',

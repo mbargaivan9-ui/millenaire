@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AdminAPIController;
+use App\Http\Controllers\Admin\Api\SpecializedRoleApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,4 +55,38 @@ Route::middleware(['auth:sanctum', 'role:admin|censeur'])->prefix('api/admin')->
     Route::get('/charts/{type}', [AdminAPIController::class, 'getChartData'])
         ->name('charts.data');
 
+    /**
+     * Settings Management API
+     */
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\Api\SettingsApiController::class, 'getAll'])
+            ->name('get-all');
+        Route::put('/{section}', [\App\Http\Controllers\Admin\Api\SettingsApiController::class, 'updateSection'])
+            ->name('update-section');
+    });
+
+    /**
+     * Specialized Roles API
+     */
+    Route::prefix('specialized-roles')->name('specialized-roles.')->group(function () {
+        Route::get('/sections', [SpecializedRoleApiController::class, 'getAccessibleSections'])
+            ->name('sections');
+        Route::get('/dashboard', [SpecializedRoleApiController::class, 'getDashboardData'])
+            ->name('dashboard');
+        Route::get('/activity-logs', [SpecializedRoleApiController::class, 'getSectionActivityLogs'])
+            ->name('activity-logs');
+    });
+
+    /**
+     * Notifications API
+     */
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/unread-count', [SpecializedRoleApiController::class, 'getUnreadNotificationsCount'])
+            ->name('unread-count');
+        Route::post('/{notification}/read', [SpecializedRoleApiController::class, 'markNotificationAsRead'])
+            ->name('mark-read');
+        Route::post('/mark-all-read', [SpecializedRoleApiController::class, 'markAllNotificationsAsRead'])
+            ->name('mark-all-read');
+    });
 });
+

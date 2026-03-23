@@ -88,7 +88,7 @@ class FixLoginIssues extends Command
             
             Teacher::create([
                 'user_id' => $teacher->id,
-                'specialty' => 'Mathématiques',
+                'qualification' => 'Mathématiques',
                 'is_active' => true,
             ]);
             $this->line("  ✅ Enseignant: teacher@millenaire.test / teacher@123");
@@ -106,7 +106,7 @@ class FixLoginIssues extends Command
             
             Guardian::create([
                 'user_id' => $parent->id,
-                'relationship' => 'Père',
+                'profession' => 'Ingénieur',
             ]);
             $this->line("  ✅ Parent: parent@millenaire.test / parent@123");
 

@@ -26,7 +26,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * Display payment dashboard for parent
+     * Display payment dashboard for parent (from payment folder)
      */
     public function index(): View
     {
@@ -45,14 +45,14 @@ class PaymentController extends Controller
             ];
         }
 
-        return view('parent.payments.index', [
+        return view('payment.index', [
             'children' => $children,
             'paymentsSummary' => $paymentsSummary,
         ]);
     }
 
     /**
-     * Show payment initiation form
+     * Show payment details for a student (from payment folder)
      */
     public function show(Student $student): View
     {
@@ -68,7 +68,7 @@ class PaymentController extends Controller
         $totalDue = $student->getTotalAmountDue();
         $totalPaid = $student->getTotalAmountPaid();
 
-        return view('parent.payments.show', [
+        return view('payment.show', [
             'student' => $student,
             'payments' => $payments,
             'financialStatus' => $financialStatus,
@@ -273,6 +273,88 @@ class PaymentController extends Controller
         return response()->json([
             'success' => true,
             'data' => $stats,
+        ]);
+    }
+
+    /**
+     * Display mobile money premium payment form
+     */
+    public function mobileMoneyIndex(): View
+    {
+        $parent = Auth::user();
+        $children = $parent->children ?? collect();
+
+        // If no children, redirect to show all children
+        if ($children->isEmpty()) {
+            return view('parent.payments.mobile-money-hub', [
+                'children' => $children,
+            ]);
+        }
+
+        // Show premium form for the first child by default
+        $student = $children->first();
+        $amount = $student->getTotalAmountDue() ?? 0;
+
+        return view('parent.payments.mobile-money-premium', [
+            'student' => $student,
+            'amount' => $amount,
+        ]);
+    }
+
+    /**
+     * Display mobile money premium payment form for a specific student
+     */
+    public function mobileMoneyShow(Student $student): View
+    {
+        // Verify parent owns this student
+        $this->authorizeParentStudent($student);
+
+        // Load relationships for view display
+        $student->load('user', 'classe');
+
+        $amount = $student->getTotalAmountDue() ?? 0;
+
+        return view('parent.payments.mobile-money-premium', [
+            'student' => $student,
+            'amount' => $amount,
+        ]);
+    }
+
+    /**
+     * Display receipts list
+     */
+    public function receiptsIndex(): View
+    {
+        $parent = Auth::user();
+        $children = $parent->children ?? collect();
+
+        $childIds = $children->pluck('id')->toArray();
+        
+        $receipts = PaymentReceipt::whereIn('payment_id',
+            Payment::whereIn('student_id', $childIds)->pluck('id')
+        )->orderBy('created_at', 'desc')->paginate(15);
+
+        return view('payment.receipts', [
+            'receipts' => $receipts,
+            'children' => $children,
+        ]);
+    }
+
+    /**
+     * Display a specific receipt
+     */
+    public function receipt(Payment $payment): View
+    {
+        $this->authorizeParentStudent($payment->student);
+
+        $receipt = $payment->receipt;
+        if (!$receipt) {
+            abort(404, 'Receipt not found');
+        }
+
+        return view('payment.receipt', [
+            'payment' => $payment,
+            'receipt' => $receipt,
         ]);
     }
 

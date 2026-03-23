@@ -68,7 +68,7 @@
     {{-- ── RÉSUMÉ GÉNÉRAL ── --}}
     <div class="row g-3 mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                 <div class="card-body p-4">
                     <div class="row align-items-center g-3">
                         <div class="col-md-5">
@@ -78,7 +78,7 @@
                         <div class="col-md-7">
                             <div class="row g-2 text-center">
                                 <div class="col-3">
-                                    <div class="stat-mini" style="background: rgba(255,255,255,.15)">
+                                    <div class="stat-mini" style="background: rgba(255,255,255,.15); border-radius: 12px; padding: 16px;">
                                         <div class="h4 fw-bold mb-0" id="summaryAvg">
                                             {{ $dashboardData['summary']['term_average'] ? number_format($dashboardData['summary']['term_average'], 2) : '—' }}
                                         </div>
@@ -86,19 +86,19 @@
                                     </div>
                                 </div>
                                 <div class="col-3">
-                                    <div class="stat-mini" style="background: rgba(255,255,255,.15)">
+                                    <div class="stat-mini" style="background: rgba(255,255,255,.15); border-radius: 12px; padding: 16px;">
                                         <div class="h4 fw-bold mb-0" id="summaryRank">{{ $dashboardData['summary']['rank_display'] }}</div>
                                         <small class="opacity-75">Rang</small>
                                     </div>
                                 </div>
                                 <div class="col-3">
-                                    <div class="stat-mini" style="background: rgba(255,255,255,.15)">
+                                    <div class="stat-mini" style="background: rgba(255,255,255,.15); border-radius: 12px; padding: 16px;">
                                         <div class="h4 fw-bold mb-0" id="classAvg">{{ $dashboardData['class_avg'] }}/20</div>
                                         <small class="opacity-75">Moy. Classe</small>
                                     </div>
                                 </div>
                                 <div class="col-3">
-                                    <div class="stat-mini" style="background: rgba(255,255,255,.15)">
+                                    <div class="stat-mini" style="background: rgba(255,255,255,.15); border-radius: 12px; padding: 16px;">
                                         @if($dashboardData['trend'])
                                             <div class="h4 fw-bold mb-0 {{ $dashboardData['trend']['direction'] == 'up' ? '' : '' }}">
                                                 {{ $dashboardData['trend']['label'] }}

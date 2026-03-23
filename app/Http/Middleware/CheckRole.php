@@ -27,8 +27,8 @@ class CheckRole
         
         foreach ($roles as $role) {
             if ($role === 'prof_principal') {
-                // Check if user is a professor principal (teacher with is_prof_principal flag)
-                if ($userRole === 'teacher' && $user->teacher?->is_prof_principal) {
+                // Use the isProfPrincipal() method which handles data freshness
+                if ($user->isProfPrincipal()) {
                     $hasAccess = true;
                     break;
                 }

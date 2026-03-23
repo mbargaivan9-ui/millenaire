@@ -15,6 +15,10 @@ class SubjectController extends Controller
             $query->where('name', 'like', "%{$request->search}%")
                   ->orWhere('code', 'like', "%{$request->search}%");
         }
+
+        if ($request->section) {
+            $query->where('section', $request->section);
+        }
         
         $subjects = $query->paginate(50);
         
@@ -33,8 +37,9 @@ class SubjectController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:100|unique:subjects',
             'code' => 'required|string|max:10|unique:subjects',
+            'section' => 'required|in:francophone,anglophone',
             'description' => 'nullable|string',
-            'coefficient' => 'nullable|numeric|min:0.5|max:10',
+            'coefficient' => 'required|numeric|min:0.5|max:10',
             'department' => 'nullable|string',
             'is_active' => 'boolean'
         ]);
@@ -44,7 +49,7 @@ class SubjectController extends Controller
         ]);
         
         return redirect()->route('admin.subjects.index')
-                        ->with('success', 'Matière créée');
+                        ->with('success', 'Matière créée avec succès');
     }
     
     public function edit(Subject $subject)
@@ -59,8 +64,9 @@ class SubjectController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:100|unique:subjects,name,' . $subject->id,
             'code' => 'required|string|max:10|unique:subjects,code,' . $subject->id,
+            'section' => 'required|in:francophone,anglophone',
             'description' => 'nullable|string',
-            'coefficient' => 'nullable|numeric|min:0.5|max:10',
+            'coefficient' => 'required|numeric|min:0.5|max:10',
             'department' => 'nullable|string',
             'is_active' => 'boolean'
         ]);
@@ -70,7 +76,7 @@ class SubjectController extends Controller
         ]);
         
         return redirect()->route('admin.subjects.index')
-                        ->with('success', 'Matière mise à jour');
+                        ->with('success', 'Matière mise à jour avec succès');
     }
     
     public function destroy(Subject $subject)

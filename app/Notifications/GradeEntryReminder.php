@@ -32,7 +32,7 @@ class GradeEntryReminder extends Notification implements ShouldQueue
             ->subject("Rappel: Saisie des notes — {$this->class->name} — {$this->subject->name}")
             ->greeting("Bonjour {$notifiable->name},")
             ->line("Rappel: vous n'avez pas encore saisi les notes de **{$this->subject->name}** pour la classe **{$this->class->name}** (Trimestre {$this->term}, Séquence {$this->sequence}).")
-            ->action('Saisir les notes maintenant', route('teacher.bulletin.grid', $this->class->id))
+            ->action('Saisir les notes maintenant', route('teacher.marks.index'))
             ->line('Merci de le faire dès que possible.')
             ->salutation('L\'équipe pédagogique de ' . config('app.name'));
     }
@@ -46,7 +46,7 @@ class GradeEntryReminder extends Notification implements ShouldQueue
             'subject_id' => $this->subject->id,
             'term'       => $this->term,
             'sequence'   => $this->sequence,
-            'action_url' => route('teacher.bulletin.grid', $this->class->id),
+            'action_url' => route('teacher.marks.index'),
         ];
     }
 

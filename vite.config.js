@@ -7,7 +7,7 @@ export default defineConfig({
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.js'],
-            refresh: true,
+            refresh: ['resources/views/**', 'app/**', 'config/**'],
         }),
         tailwindcss(),
         vue({
@@ -20,8 +20,20 @@ export default defineConfig({
         }),
     ],
     server: {
+        host: '0.0.0.0',
+        port: 5173,
+        hmr: process.env.APP_ENV === 'local' ? {
+            host: 'localhost',
+            port: 5173,
+        } : undefined,
         watch: {
-            ignored: ['**/storage/framework/views/**'],
+            usePolling: true,
+            ignored: ['**/storage/framework/views/**', '**/vendor/**', '**/node_modules/**'],
         },
+    },
+    build: {
+        manifest: true,
+        outDir: 'public/build',
+        assetsDir: 'assets',
     },
 });

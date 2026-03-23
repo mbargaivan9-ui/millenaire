@@ -175,7 +175,7 @@ class WebPushService
     {
         $this->sendToUser($parentUserId, [
             'title' => '⚠️ Alerte résultat scolaire',
-            'body'  => "{$studentName} a obtenu {$score}/20 en {$subject}. Consultez le bulletin.",
+            'body'  => "{$studentName} a obtenu {$score}/20 en {$subject}.",
             'url'   => '/parent/monitoring',
             'icon'  => '/icons/icon-192.png',
         ]);
@@ -188,17 +188,6 @@ class WebPushService
             'title' => '📢 Nouvelle annonce',
             'body'  => $title,
             'url'   => '/announcements',
-            'icon'  => '/icons/icon-192.png',
-        ]);
-    }
-
-    /** Notification : bulletin disponible */
-    public function notifyBulletinReady(array $userIds, string $className, int $term): void
-    {
-        $this->sendToUsers($userIds, [
-            'title' => '📋 Bulletin disponible',
-            'body'  => "Le bulletin du Trimestre {$term} pour la classe {$className} est prêt.",
-            'url'   => '/parent/monitoring',
             'icon'  => '/icons/icon-192.png',
         ]);
     }

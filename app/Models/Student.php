@@ -78,4 +78,43 @@ class Student extends Model
     {
         return $this->matricule ?? 'N/A';
     }
+
+    // ─── Payment Calculation Methods ───────────────────────────────────────
+
+    /**
+     * Get total amount due for this student (pending + processing)
+     */
+    public function getTotalAmountDue(): int
+    {
+        return (int) $this->payments()
+            ->whereIn('status', ['pending', 'processing'])
+            ->sum('amount');
+    }
+
+    /**
+     * Get total amount paid by this student (success + completed)
+     */
+    public function getTotalAmountPaid(): int
+    {
+        return (int) $this->payments()
+            ->whereIn('status', ['success', 'completed'])
+            ->sum('amount');
+    }
+
+    /**
+     * Get financial status for this student
+     */
+    public function getFinancialStatus(): string
+    {
+        $due = $this->getTotalAmountDue();
+        $paid = $this->getTotalAmountPaid();
+
+        if ($due == 0 && $paid > 0) {
+            return 'paid';
+        } elseif ($due > 0) {
+            return 'pending';
+        } else {
+            return 'none';
+        }
+    }
 }

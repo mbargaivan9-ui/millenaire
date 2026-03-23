@@ -16,7 +16,6 @@
 @php
     $settings = $settings ?? App\Models\EstablishmentSetting::getInstance();
     $locale   = app()->getLocale();
-    $isFr     = $locale === 'fr';
 @endphp
 
 {{-- ════════════════════════════════════════════════════════════
@@ -30,52 +29,27 @@
 
                 <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
                     <div class="hero-text">
+                        @if($settings->logo_path)
+                        <div style="margin-bottom: 1.5rem;">
+                            <img src="{{ asset($settings->logo_path) }}" alt="{{ $settings->platform_name ?? 'Logo' }}" style="max-height: 80px; object-fit: contain;">
+                        </div>
+                        @endif
                         <h1>
-                            {{ $settings->hero_title
-                                ?? ($isFr
-                                    ? 'L\'Excellence Académique au Bout des Doigts'
-                                    : 'Academic Excellence at Your Fingertips') }}
+                            {{ $settings->hero_title ?? __('Welcome to millénaire  connect') }}
                         </h1>
                         <p>
-                            {{ $settings->hero_subtitle
-                                ?? ($isFr
-                                    ? 'Millénaire Connect digitalise entièrement votre établissement — notes, présences, paiements, bulletins et communication en temps réel pour le Collège Millénaire Bilingue de Douala.'
-                                    : 'Millénaire Connect fully digitalizes your school — grades, attendance, payments, report cards and real-time communication for Collège Millénaire Bilingue, Douala.') }}
+                            {{ $settings->hero_subtitle ?? __('For a better world') }}
                         </p>
 
-                        {{-- Stats dynamiques --}}
-                        <div class="hero-stats">
-                            <div class="stat-item">
-                                <span class="number purecounter"
-                                    data-purecounter-start="0"
-                                    data-purecounter-end="{{ $stats['students'] ?? 500 }}"
-                                    data-purecounter-duration="2"></span>
-                                <span class="label">{{ $isFr ? 'Élèves Inscrits' : 'Enrolled Students' }}</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="number purecounter"
-                                    data-purecounter-start="0"
-                                    data-purecounter-end="{{ $stats['teachers'] ?? 40 }}"
-                                    data-purecounter-duration="2"></span>
-                                <span class="label">{{ $isFr ? 'Enseignants' : 'Teachers' }}</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="number purecounter"
-                                    data-purecounter-start="0"
-                                    data-purecounter-end="{{ $settings->years_existence ?? 10 }}"
-                                    data-purecounter-duration="2"></span>
-                                <span class="label">{{ $isFr ? "Ans d'Excellence" : 'Years of Excellence' }}</span>
-                            </div>
-                        </div>
-
+                        
                         {{-- CTA Buttons --}}
                         <div class="hero-buttons">
                             <a href="{{ route('login') }}" class="btn btn-primary">
                                 <i class="bi bi-box-arrow-in-right me-2"></i>
-                                {{ $settings->hero_cta_text ?? ($isFr ? 'Espace Connexion' : 'Login Portal') }}
+                                {{ __('Login') }}
                             </a>
                             <a href="#about" class="btn btn-outline">
-                                {{ $isFr ? 'En Savoir Plus' : 'Learn More' }}
+                                {{ __('Learn more') }}
                             </a>
                         </div>
 
@@ -83,15 +57,15 @@
                         <div class="hero-features">
                             <div class="feature">
                                 <i class="bi bi-shield-check"></i>
-                                <span>{{ $isFr ? 'Sécurisé & Fiable' : 'Secure & Reliable' }}</span>
+                                <span>{{ __('Security') ?? (app()->getLocale() === 'fr' ? 'Sécurisé & Fiable' : 'Secure & Reliable') }}</span>
                             </div>
                             <div class="feature">
                                 <i class="bi bi-phone"></i>
-                                <span>{{ $isFr ? 'Mobile Money' : 'Mobile Money' }}</span>
+                                <span>{{ __('Mobile payments') }}</span>
                             </div>
                             <div class="feature">
                                 <i class="bi bi-translate"></i>
-                                <span>{{ $isFr ? 'Bilingue FR/EN' : 'Bilingual FR/EN' }}</span>
+                                <span>{{ __('Language') }}</span>
                             </div>
                         </div>
                     </div>
@@ -141,12 +115,12 @@
             <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" 
                 style="background: rgba(13, 148, 136, 0.6); width: 60px; border-radius: 5px; left: 20px;">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">{{ $isFr ? 'Précédent' : 'Previous' }}</span>
+                <span class="visually-hidden">{{ __('public.carousel_previous') }}</span>
             </button>
             <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" 
                 style="background: rgba(13, 148, 136, 0.6); width: 60px; border-radius: 5px; right: 20px;">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">{{ $isFr ? 'Suivant' : 'Next' }}</span>
+                <span class="visually-hidden">{{ __('public.carousel_next') }}</span>
             </button>
 
         @else
@@ -163,8 +137,8 @@
                     <img src="{{ asset('images/Capture d’écran 2026-02-16 160044.png') }}" class="d-block w-100" alt="Excellence Académique" 
                         style="width: 100%; height: 100%; object-fit: cover;">
                     <div class="carousel-caption d-none d-md-block" style="background: rgba(13, 148, 136, 0.85); padding: 2rem; border-radius: 10px; bottom: 30px;">
-                        <h5 style="font-size: 2rem; font-weight: 700; margin-bottom: .5rem;">{{ $isFr ? 'Excellence Académique' : 'Academic Excellence' }}</h5>
-                        <p style="font-size: 1.1rem; margin-bottom: 0;">{{ $isFr ? 'Votre établissement est transformez  avec la technologie' : 'Your school is transform with the technology' }}</p>
+                        <h5 style="font-size: 2rem; font-weight: 700; margin-bottom: .5rem;">{{ __('public.carousel_academic_excellence') }}</h5>
+                        <p style="font-size: 1.1rem; margin-bottom: 0;">{{ __('public.carousel_academic_excellence_desc') }}</p>
                     </div>
                 </div>
 
@@ -173,8 +147,8 @@
                     <img src="{{ asset('images/images (1).png') }}" class="d-block w-100" alt="Communication Sécurisée" 
                         style="width: 100%; height: 100%; object-fit: cover;">
                     <div class="carousel-caption d-none d-md-block" style="background: rgba(13, 148, 136, 0.85); padding: 2rem; border-radius: 10px; bottom: 30px;">
-                        <h5 style="font-size: 2rem; font-weight: 700; margin-bottom: .5rem;">{{ $isFr ? 'Communication Sécurisée' : 'Secure Communication' }}</h5>
-                        <p style="font-size: 1.1rem; margin-bottom: 0;">{{ $isFr ? 'Connectez parents, enseignants et élèves en temps réel' : 'Connect parents, teachers and students in real-time' }}</p>
+                        <h5 style="font-size: 2rem; font-weight: 700; margin-bottom: .5rem;">{{ __('public.carousel_secure_communication') }}</h5>
+                        <p style="font-size: 1.1rem; margin-bottom: 0;">{{ __('public.carousel_secure_communication_desc') }}</p>
                     </div>
                 </div>
 
@@ -183,8 +157,8 @@
                     <img src="{{ asset('images/carousel-3.svg') }}" class="d-block w-100" alt="Gestion Complète" 
                         style="width: 100%; height: 100%; object-fit: cover;">
                     <div class="carousel-caption d-none d-md-block" style="background: rgba(13, 148, 136, 0.85); padding: 2rem; border-radius: 10px; bottom: 30px;">
-                        <h5 style="font-size: 2rem; font-weight: 700; margin-bottom: .5rem;">{{ $isFr ? 'Gestion Complète' : 'Complete Management' }}</h5>
-                        <p style="font-size: 1.1rem; margin-bottom: 0;">{{ $isFr ? 'Notes, absences, paiements et bulletins en un seul endroit' : 'Grades, attendance, payments and reports in one place' }}</p>
+                        <h5 style="font-size: 2rem; font-weight: 700; margin-bottom: .5rem;">{{ __('public.carousel_complete_management') }}</h5>
+                        <p style="font-size: 1.1rem; margin-bottom: 0;">{{ __('public.carousel_complete_management_desc') }}</p>
                     </div>
                 </div>
             </div>
@@ -192,12 +166,12 @@
             <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" 
                 style="background: rgba(13, 148, 136, 0.6); width: 60px; border-radius: 5px; left: 20px;">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">{{ $isFr ? 'Précédent' : 'Previous' }}</span>
+                <span class="visually-hidden">{{ __('public.carousel_previous') }}</span>
             </button>
             <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" 
                 style="background: rgba(13, 148, 136, 0.6); width: 60px; border-radius: 5px; right: 20px;">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">{{ $isFr ? 'Suivant' : 'Next' }}</span>
+                <span class="visually-hidden">{{ __('public.carousel_next') }}</span>
             </button>
         @endif
     </div>
@@ -276,8 +250,8 @@
 <section id="featured-courses" class="featured-courses section">
 
     <div class="container section-title" data-aos="fade-up">
-        <h2>{{ $isFr ? 'Annonces de l\'Établissement' : 'School Announcements' }}</h2>
-        <p>{{ $isFr ? 'Dernières nouvelles et informations importantes du Collège Millénaire Bilingue' : 'Latest news and important information from Collège Millénaire Bilingue' }}</p>
+        <h2>{{ __('public.announcements_title') }}</h2>
+        <p>{{ __('public.announcements_subtitle') }}</p>
     </div>
 
     <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -290,8 +264,8 @@
                 <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 + 200 }}">
                     <div class="course-card announcement-card">
                         <div class="course-image">
-                            @if($announcement->image)
-                                <img src="{{ asset('storage/' . $announcement->image) }}" alt="{{ $announcement->title }}" class="img-fluid">
+                            @if($announcement->cover_image)
+                                <img src="{{ asset('storage/' . $announcement->cover_image) }}" alt="{{ $announcement->title }}" class="img-fluid">
                             @else
                                 <div class="announcement-placeholder-img d-flex align-items-center justify-content-center"
                                      style="height:200px; background: linear-gradient(135deg,#f0fdfa,#ccfbf1)">
@@ -308,12 +282,12 @@
                                     <i class="bi bi-calendar3 me-1"></i>
                                     {{ $announcement->published_at?->format('d/m/Y') ?? $announcement->created_at->format('d/m/Y') }}
                                 </span>
-                                <span class="duration">{{ $isFr ? 'Annonce' : 'Announcement' }}</span>
+                                <span class="duration">{{ __('announcements') }}</span>
                             </div>
                             <h3><a href="{{ route('announcements.show', $announcement->slug ?? $announcement->id) }}">{{ $announcement->title }}</a></h3>
                             <p>{{ Str::limit(strip_tags($announcement->content), 150) }}</p>
                             <a href="{{ route('announcements.show', $announcement->slug ?? $announcement->id) }}" class="btn-course">
-                                {{ $isFr ? 'Lire la suite' : 'Read More' }}
+                                {{ __('read more') }}
                             </a>
                         </div>
                     </div>
@@ -323,7 +297,7 @@
                 <div class="col-12 text-center py-5" data-aos="fade-up">
                     <div class="empty-announcements">
                         <i class="bi bi-megaphone" style="font-size:3rem;color:#0d9488;opacity:.4;"></i>
-                        <p class="mt-3 text-muted">{{ $isFr ? 'Aucune annonce pour le moment.' : 'No announcements at the moment.' }}</p>
+                        <p class="mt-3 text-muted">{{ __('No announcements') }}</p>
                     </div>
                 </div>
                 @endforelse
@@ -333,7 +307,7 @@
 
         <div class="more-courses text-center" data-aos="fade-up" data-aos-delay="500">
             <a href="{{ route('announcements.index') }}" class="btn-more">
-                {{ $isFr ? 'Voir Toutes les Annonces' : 'View All Announcements' }}
+                {{ __('View all announcements') }}
             </a>
         </div>
 
@@ -342,14 +316,11 @@
 </section><!-- /Announcements Section -->
 
 
-{{-- ════════════════════════════════════════════════════════════
-     SECTION FONCTIONNALITÉS (remplace Course Categories)
-     ════════════════════════════════════════════════════════════ --}}
 <section id="course-categories" class="course-categories section">
 
     <div class="container section-title" data-aos="fade-up">
-        <h2>{{ $isFr ? 'Fonctionnalités de la Plateforme' : 'Platform Features' }}</h2>
-        <p>{{ $isFr ? 'Tout ce dont votre établissement a besoin pour fonctionner à l\'ère numérique' : 'Everything your school needs to thrive in the digital age' }}</p>
+        <h2>{{ __('Features') }}</h2>
+        <p>{{ __('Features subtitle') }}</p>
     </div>
 
     <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -360,19 +331,28 @@
                 [
                     'icon'  => 'bi-bar-chart-line-fill',
                     'color' => '#0d9488',
-                    'title_fr' => 'Gestion des Bulletins',
-                    'title_en' => 'Report Cards',
-                    'desc_fr'  => 'Saisie et suivi des notes en temps réel avec calcul automatique des moyennes et export PDF.',
-                    'desc_en'  => 'Real-time grade entry with automatic average calculation and PDF export.',
-                    'count_fr' => 'Notes saisies',
-                    'count_en' => 'Grades entered',
+                    'title_fr' => __('report_cards'),
+                    'title_en' => __('preport_cards'),
+                    'desc_fr'  => __('report cards desc'),
+                    'desc_en'  => __('report cards count'),
+                    'count_en' => __('report cardscount'),
                 ],
                 [
                     'icon'  => 'bi-calendar3',
                     'color' => '#3b82f6',
-                    'title_fr' => 'Emploi du Temps',
-                    'title_en' => 'Schedule',
-                    'desc_fr'  => 'Emplois du temps interactifs avec détection de conflits en temps réel.',
+                    'title_fr' => __('public.feature_schedule_title'),
+                    'title_en' => __('public.feature_schedule_title'),
+                    'desc_fr'  => __('public.feature_schedule_title_desc'),
+                    'desc_en'  => __('public.feature_schedule_title_desc'),
+                    'count_fr' => __('public.feature_schedule_count'),
+                    'count_en' => __('public.feature_schedule_count'),
+                ],
+                [
+                    'icon'  => 'bi-list-task',
+                    'color' => '#8b5cf6',
+                    'title_fr' => 'Gestion des Classes',
+                    'title_en' => 'Classes Management',
+                    'desc_fr'  => 'Organisation et suivi des classes avec gestion des emplois du temps.',
                     'desc_en'  => 'Interactive schedules with real-time conflict detection.',
                     'count_fr' => 'Classes gérées',
                     'count_en' => 'Classes managed',
@@ -427,10 +407,10 @@
                         <i class="{{ $feature['icon'] }}" style="font-size:1.6rem;color:{{ $feature['color'] }}"></i>
                     </div>
                     <h5 class="mb-1" style="font-size:.9rem;font-weight:600;color:#223a58">
-                        {{ $isFr ? $feature['title_fr'] : $feature['title_en'] }}
+                        {{ $feature['title_en'] }}
                     </h5>
                     <p style="font-size:.78rem;color:#64748b;line-height:1.4">
-                        {{ $isFr ? $feature['desc_fr'] : $feature['desc_en'] }}
+                        {{ $feature['desc_en'] }}
                     </p>
                 </div>
             </div>
@@ -448,8 +428,8 @@
 <section id="featured-instructors" class="featured-instructors section">
 
     <div class="container section-title" data-aos="fade-up">
-        <h2>{{ $isFr ? 'Nos Enseignants' : 'Our Teachers' }}</h2>
-        <p>{{ $isFr ? 'Une équipe pédagogique qualifiée et passionnée au service de la réussite des élèves' : 'A qualified and passionate teaching team dedicated to student success' }}</p>
+        <h2>{{ __('public.teachers_title') }}</h2>
+        <p>{{ __('public.teachers_subtitle') }}</p>
     </div>
 
     <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -473,25 +453,25 @@
                         <div class="overlay-content">
                             <div class="course-count">
                                 <i class="bi bi-book"></i>
-                                <span>{{ $teacher->subjects_count ?? $teacher->subjects()->count() }} {{ $isFr ? 'matières' : 'subjects' }}</span>
+                                <span>{{ $teacher->subjects_count ?? $teacher->subjects()->count() }} {{ __('public.teacher_subjects_label') }}</span>
                             </div>
                         </div>
                     </div>
                     <div class="instructor-info">
                         <h5>{{ $teacher->user->display_name ?? $teacher->user->name }}</h5>
                         <p class="specialty">
-                            {{ $teacher->subjects->pluck('name')->take(2)->implode(', ') ?: ($isFr ? 'Enseignant' : 'Teacher') }}
+                            {{ $teacher->subjects->pluck('name')->take(2)->implode(', ') ?: __('public.teacher_label') }}
                         </p>
                         @if($teacher->is_prof_principal)
                         <p class="description">
                             <span class="badge" style="background:#0d9488;font-size:.7rem">
-                                {{ $isFr ? 'Professeur Principal' : 'Head Teacher' }}
+                                {{ __('public.teacher_head') }}
                             </span>
                         </p>
                         @endif
                         <div class="action-buttons">
                             <a href="{{ route('public.teacher.profile', $teacher->id) }}" class="btn-view">
-                                {{ $isFr ? 'Voir Profil' : 'View Profile' }}
+                                {{ __('public.teacher_view_profile') }}
                             </a>
                         </div>
                     </div>
@@ -499,7 +479,7 @@
             </div>
             @empty
             <div class="col-12 text-center py-4">
-                <p class="text-muted">{{ $isFr ? 'Informations enseignants bientôt disponibles.' : 'Teacher information coming soon.' }}</p>
+                <p class="text-muted">{{ __('public.teachers_empty') }}</p>
             </div>
             @endforelse
 
@@ -507,7 +487,7 @@
 
         <div class="more-courses text-center mt-5" data-aos="fade-up">
             <a href="{{ route('public.instructors') }}" class="btn-more">
-                {{ $isFr ? 'Voir Tous les Enseignants' : 'View All Teachers' }}
+                {{ __('public.teachers_view_all') }}
             </a>
         </div>
     </div>
@@ -521,8 +501,8 @@
 <section id="testimonials" class="testimonials section">
 
     <div class="container section-title" data-aos="fade-up">
-        <h2>{{ $isFr ? 'Témoignages' : 'Testimonials' }}</h2>
-        <p>{{ $isFr ? 'Ce que disent les familles et le corps enseignant de la plateforme' : 'What families and teachers say about the platform' }}</p>
+        <h2>{{ __('public.testimonials_title') }}</h2>
+        <p>{{ __('public.testimonials_subtitle') }}</p>
     </div>
 
     <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -570,11 +550,14 @@
                             </div>
                             @empty
                             {{-- Témoignages par défaut --}}
-                            @foreach([
-                                ['name' => 'Marie Nguema', 'role' => $isFr ? 'Parent d\'élève' : 'Parent', 'content' => $isFr ? 'Millénaire Connect a transformé ma relation avec l\'école. Je reçois les notes de mon fils en temps réel et je peux payer les frais scolaires depuis mon téléphone.' : 'Millénaire Connect transformed my relationship with the school. I receive my son\'s grades in real-time and can pay fees from my phone.'],
-                                ['name' => 'Prof. Etoga Jean', 'role' => $isFr ? 'Enseignant de Maths' : 'Math Teacher', 'content' => $isFr ? 'La saisie des notes n\'a jamais été aussi simple. L\'auto-save AJAX m\'évite de perdre mes données et les bulletins se génèrent automatiquement.' : 'Grade entry has never been easier. Auto-save AJAX prevents data loss and report cards generate automatically.'],
-                                ['name' => 'Amina Bello', 'role' => $isFr ? 'Élève, Terminale' : 'Student, Final Year', 'content' => $isFr ? 'Je peux suivre mes performances, accéder aux cours en ligne et contacter mes professeurs directement depuis la plateforme. Vraiment révolutionnaire !' : 'I can track my performance, access online courses and contact my teachers directly from the platform. Truly revolutionary!'],
-                            ] as $defTest)
+                            @php
+                            $defaultTestimonials = [
+                                ['name' => 'Marie Nguema', 'role' => __('public.testimonial_parent_role'), 'content' => __('public.testimonial_parent_content')],
+                                ['name' => 'Prof. Etoga Jean', 'role' => __('public.testimonial_teacher_role'), 'content' => __('public.testimonial_teacher_content')],
+                                ['name' => 'Amina Bello', 'role' => __('public.testimonial_student_role'), 'content' => __('public.testimonial_student_content')],
+                            ];
+                            @endphp
+                            @foreach($defaultTestimonials as $defTest)
                             <div class="swiper-slide">
                                 <div class="testimonial-item">
                                     <div class="stars">
@@ -617,19 +600,22 @@
 
             <div class="col-lg-6" data-aos="fade-right" data-aos-delay="200">
                 <div class="cta-content">
-                    <h2>{{ $isFr ? 'Accédez à Votre Espace Personnel' : 'Access Your Personal Space' }}</h2>
-                    <p>{{ $isFr ? 'Chaque acteur de l\'établissement dispose d\'un espace dédié avec les outils adaptés à son rôle.' : 'Every member of the school community has a dedicated space with tools tailored to their role.' }}</p>
+                    <h2>{{ __('public.personal_space_title') }}</h2>
+                    <p>{{ __('public.personal_space_subtitle') }}</p>
 
                     <div class="features-list">
-                        @foreach([
-                            ['icon' => 'bi-person-badge', 'fr' => 'Admin — Gestion totale de l\'établissement', 'en' => 'Admin — Full school management'],
-                            ['icon' => 'bi-person-workspace', 'fr' => 'Enseignants — Saisie des notes & bulletins', 'en' => 'Teachers — Grade entry & report cards'],
-                            ['icon' => 'bi-people', 'fr' => 'Parents — Suivi de vos enfants en temps réel', 'en' => 'Parents — Real-time children monitoring'],
-                            ['icon' => 'bi-mortarboard', 'fr' => 'Élèves — Performance & E-Learning', 'en' => 'Students — Performance & E-Learning'],
-                        ] as $item)
+                        @php
+                        $roleitems = [
+                            ['icon' => 'bi-person-badge', 'text' => 'Admin — ' . __('public.role_admin')],
+                            ['icon' => 'bi-person-workspace', 'text' => 'Enseignants — ' . __('public.role_teacher')],
+                            ['icon' => 'bi-people', 'text' => 'Parents — ' . __('public.role_parent')],
+                            ['icon' => 'bi-mortarboard', 'text' => 'Élèves — ' . __('public.role_student')],
+                        ];
+                        @endphp
+                        @foreach($roleitems as $item)
                         <div class="feature-item" data-aos="fade-up" data-aos-delay="300">
                             <i class="bi bi-check-circle-fill"></i>
-                            <span><i class="{{ $item['icon'] }} me-1"></i> {{ $isFr ? $item['fr'] : $item['en'] }}</span>
+                            <span><i class="{{ $item['icon'] }} me-1"></i> {{ $item['text'] }}</span>
                         </div>
                         @endforeach
                     </div>
@@ -637,10 +623,10 @@
                     <div class="cta-actions" data-aos="fade-up" data-aos-delay="500">
                         <a href="{{ route('login') }}" class="btn btn-primary">
                             <i class="bi bi-box-arrow-in-right me-2"></i>
-                            {{ $isFr ? 'Se Connecter' : 'Sign In' }}
+                            {{ __('public.sign_in') }}
                         </a>
                         <a href="{{ route('public.about') }}" class="btn btn-outline">
-                            {{ $isFr ? 'En Savoir Plus' : 'Learn More' }}
+                            {{ __('public.learn_more_detail') }}
                         </a>
                     </div>
                 </div>
@@ -656,21 +642,21 @@
                                     <span data-purecounter-start="0" data-purecounter-end="{{ $stats['students'] ?? 500 }}"
                                           data-purecounter-duration="2" class="purecounter"></span>+
                                 </h3>
-                                <p class="mb-0 small">{{ $isFr ? 'Élèves' : 'Students' }}</p>
+                                <p class="mb-0 small">{{ __('public.stat_students') }}</p>
                             </div>
                             <div class="stat-item text-center">
                                 <h3 class="mb-0" style="color:#0d9488">
                                     <span data-purecounter-start="0" data-purecounter-end="{{ $stats['teachers'] ?? 40 }}"
                                           data-purecounter-duration="2" class="purecounter"></span>+
                                 </h3>
-                                <p class="mb-0 small">{{ $isFr ? 'Enseignants' : 'Teachers' }}</p>
+                                <p class="mb-0 small">{{ __('public.stat_teachers') }}</p>
                             </div>
                             <div class="stat-item text-center">
                                 <h3 class="mb-0" style="color:#0d9488">
                                     <span data-purecounter-start="0" data-purecounter-end="{{ $stats['classes'] ?? 15 }}"
                                           data-purecounter-duration="2" class="purecounter"></span>
                                 </h3>
-                                <p class="mb-0 small">{{ $isFr ? 'Classes' : 'Classes' }}</p>
+                                <p class="mb-0 small">{{ __('public.stat_classes') }}</p>
                             </div>
                         </div>
 
@@ -681,7 +667,7 @@
                                 </div>
                                 <div class="text-start">
                                     <strong style="color:#0f172a">Orange Money & MTN MoMo</strong>
-                                    <p class="mb-0 small text-muted">{{ $isFr ? 'Paiement sécurisé depuis votre mobile' : 'Secure payment from your mobile' }}</p>
+                                    <p class="mb-0 small text-muted">{{ __('public.payment_description') }}</p>
                                 </div>
                             </div>
                             <div class="d-flex gap-2">

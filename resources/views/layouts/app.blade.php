@@ -15,11 +15,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-  {{-- App CSS --}}
-  <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+  {{-- Vite CSS & JS --}}
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-  {{-- DataTables CSS --}}
-  <link rel="stylesheet" href="//cdn.datatables.net/2.3.7/css/dataTables.dataTables.min.css">
+  {{-- Premium Tables CSS from Cloudflare CDN --}}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net-dt@2.1.0/css/dataTables.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   @stack('styles')
 </head>
@@ -46,44 +47,27 @@
 
   {{-- ─── MAIN CONTENT ───────────────────────────────── --}}
   <div class="main-content" id="main-content">
-
-    {{-- Topbar --}}
-    @include('layouts.partials.topbar')
-
     {{-- Page Content --}}
     <main class="page-content">
       @yield('content')
     </main>
 
+    {{-- Topbar --}}
+    @include('layouts.partials.topbar')
+
+
   </div>{{-- end main-content --}}
 
 </div>{{-- end app-wrapper --}}
 
-{{-- App Scripts --}}
-<script src="{{ asset('js/app.js') }}"></script>
-
-{{-- jQuery (required for DataTables) --}}
+{{-- jQuery --}}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
-{{-- DataTables JS --}}
-<script src="//cdn.datatables.net/2.3.7/js/dataTables.min.js"></script>
+{{-- DataTables from Cloudflare CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/datatables.net@2.1.0/js/dataTables.min.js"></script>
 
-<script>
-  // Initialize DataTables for all tables with 'data-table' or 'table' class
-  $(document).ready(function() {
-    $('table.data-table, table.table').each(function() {
-      if (!$.fn.dataTable.isDataTable(this)) {
-        $(this).DataTable({
-          paging: true,
-          searching: true,
-          ordering: true,
-          responsive: true,
-          pageLength: 10
-        });
-      }
-    });
-  });
-</script>
+{{-- Premium Tables Manager --}}
+<script src="{{ asset('js/tables-premium.js') }}"></script>
 
 {{-- PWA Service Worker --}}
 <script src="{{ asset('js/pwa.js') }}"></script>

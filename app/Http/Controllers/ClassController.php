@@ -9,17 +9,26 @@ use Illuminate\Http\Request;
 
 class ClassController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $classes = Classes::with([
+        $query = Classes::with([
             'students', 
             'profPrincipal', 
             'headTeacher.user',
             'headTeacher.classSubjectTeachers.subject',
             'subjects'
         ])
-            ->withCount('students')
-            ->paginate(15);
+            ->withCount('students');
+
+        if ($request->search) {
+            $query->where('name', 'like', "%{$request->search}%");
+        }
+
+        if ($request->section) {
+            $query->where('section', $request->section);
+        }
+        
+        $classes = $query->paginate(15);
         
         return view('admin.classes.index', [
             'classes' => $classes
@@ -46,6 +55,10 @@ class ClassController extends Controller
             'prof_principal_id' => 'nullable|exists:users,id',
             'teacher_subject_id' => 'nullable|exists:subjects,id|required_if:prof_principal_id,!null'
         ]);
+        
+        // Extract level from class name (e.g., "6ème A" -> "6ème")
+        $level = trim(explode(' ', $validated['name'])[0]);
+        $validated['level'] = $level;
         
         // Créer la classe
         $class = Classes::create($validated);
@@ -93,6 +106,10 @@ class ClassController extends Controller
             'prof_principal_id' => 'nullable|exists:users,id',
             'teacher_subject_id' => 'nullable|exists:subjects,id|required_if:prof_principal_id,!null'
         ]);
+        
+        // Extract level from class name (e.g., "6ème A" -> "6ème")
+        $level = trim(explode(' ', $validated['name'])[0]);
+        $validated['level'] = $level;
         
         $oldProfId = $class->prof_principal_id;
         $class->update($validated);

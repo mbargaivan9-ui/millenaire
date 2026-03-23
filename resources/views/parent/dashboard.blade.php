@@ -117,7 +117,7 @@
 @if($selected)
 
 {{-- ─── KPI Cards ────────────────────────────────────────────────────────────── --}}
-<div class="row gy-3 mb-4">
+<div class="row g-3 mb-4">
     @php
         $moyenne = $bulletinData['moyenne'] ?? null;
         $rang    = $bulletinData['rang'] ?? null;
@@ -125,46 +125,69 @@
         $pendingAmt = $payments->sum('amount_due');
     @endphp
 
-    <div class="col-md-3 col-6">
-        <div class="stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#0d9488,#14b8a6)">
-                <i data-lucide="bar-chart-2"></i>
+    {{-- Overall Average --}}
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1">{{ $isFr ? 'Moyenne Générale' : 'Overall Average' }}</p>
+                        <h2 class="fw-bold mb-0">{{ $moyenne !== null ? number_format((float)$moyenne, 2) : '—' }}<small style="font-size:0.6em">/20</small></h2>
+                    </div>
+                    <div class="kpi-icon bg-primary bg-opacity-10 text-primary">📊</div>
+                </div>
+                <div class="mt-2 small text-muted">{{ $isFr ? 'Performance' : 'Performance' }}</div>
             </div>
-            <div class="stat-value">
-                {{ $moyenne !== null ? number_format((float)$moyenne, 2) : '—' }}<small>/20</small>
-            </div>
-            <div class="stat-label">{{ $isFr ? 'Moyenne Générale' : 'Overall Average' }}</div>
         </div>
     </div>
-    <div class="col-md-3 col-6">
-        <div class="stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#3b82f6,#2563eb)">
-                <i data-lucide="award"></i>
+
+    {{-- Class Rank --}}
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1">{{ $isFr ? 'Rang dans la Classe' : 'Class Rank' }}</p>
+                        <h2 class="fw-bold mb-0">{{ $rang ? $rang . 'e' : '—' }}</h2>
+                    </div>
+                    <div class="kpi-icon bg-warning bg-opacity-10 text-warning">🏆</div>
+                </div>
+                <div class="mt-2 small text-muted">{{ $isFr ? 'Classement' : 'Ranking' }}</div>
             </div>
-            <div class="stat-value">
-                {{ $rang ? $rang . 'e' : '—' }}
-            </div>
-            <div class="stat-label">{{ $isFr ? 'Rang dans la Classe' : 'Class Rank' }}</div>
         </div>
     </div>
-    <div class="col-md-3 col-6">
-        <div class="stat-card">
-            <div class="stat-icon" style="{{ $absencesCount > 3 ? 'background:linear-gradient(135deg,#ef4444,#dc2626)' : 'background:linear-gradient(135deg,#10b981,#059669)' }}">
-                <i data-lucide="calendar-x"></i>
+
+    {{-- Absences --}}
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1">{{ $isFr ? 'Absences (mois)' : 'Absences (month)' }}</p>
+                        <h2 class="fw-bold mb-0 {{ $absencesCount > 3 ? 'text-danger' : 'text-success' }}">{{ $absencesCount }}</h2>
+                    </div>
+                    <div class="kpi-icon {{ $absencesCount > 3 ? 'bg-danger bg-opacity-10 text-danger' : 'bg-success bg-opacity-10 text-success' }}">📅</div>
+                </div>
+                <div class="mt-2 small text-muted">{{ $isFr ? 'Ce mois-ci' : 'This month' }}</div>
             </div>
-            <div class="stat-value">{{ $absencesCount }}</div>
-            <div class="stat-label">{{ $isFr ? 'Absences (ce mois)' : 'Absences (this month)' }}</div>
         </div>
     </div>
-    <div class="col-md-3 col-6">
-        <div class="stat-card">
-            <div class="stat-icon" style="{{ $pendingAmt > 0 ? 'background:linear-gradient(135deg,#f59e0b,#d97706)' : 'background:linear-gradient(135deg,#10b981,#059669)' }}">
-                <i data-lucide="wallet"></i>
+
+    {{-- Pending Fees --}}
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1">{{ $isFr ? 'Frais en attente' : 'Pending fees' }}</p>
+                        <h2 class="fw-bold mb-0 {{ $pendingAmt > 0 ? 'text-warning' : 'text-success' }}">
+                            {{ $pendingAmt > 0 ? number_format($pendingAmt, 0) : '✅' }}
+                        </h2>
+                    </div>
+                    <div class="kpi-icon {{ $pendingAmt > 0 ? 'bg-warning bg-opacity-10 text-warning' : 'bg-success bg-opacity-10 text-success' }}">💰</div>
+                </div>
+                <div class="mt-2 small text-muted">{{ $pendingAmt > 0 ? 'FCFA' : ($isFr ? 'Payé' : 'Paid') }}</div>
             </div>
-            <div class="stat-value" style="font-size:1rem">
-                {{ $pendingAmt > 0 ? 'XAF ' . number_format($pendingAmt, 0, ',', ' ') : '✅' }}
-            </div>
-            <div class="stat-label">{{ $isFr ? 'Frais en attente' : 'Pending fees' }}</div>
         </div>
     </div>
 </div>

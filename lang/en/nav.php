@@ -50,4 +50,23 @@ return [
     'kpi' => 'KPI',
     'reports' => 'Reports',
     'roles' => 'Roles',
+    
+    // Communication Section
+    'communication' => 'Communication',
+    'chat' => 'Messages',
+    'messages' => 'Messages',
+    'notifications' => 'Notifications',
+    
+    // Additional Navigation Items
+    'ocr_wizard' => 'OCR Digitizer',
+    'bulletin_ocr' => 'OCR Structures',
+    'children' => 'Children',
+    'monitoring' => 'Academic Monitoring',
+    'report_cards' => 'Report Cards',
+    'payment' => 'Payment',
+    'appointments' => 'Appointments',
+    'my_marks' => 'Marks',
+    'progress' => 'Progress',
+    'learning' => 'Learning',
+    'student' => 'Student',
 ];

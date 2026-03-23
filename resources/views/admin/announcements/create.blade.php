@@ -31,7 +31,8 @@
 <div class="card-body">
 
 <form method="POST"
-      action="{{ $editing ? route('admin.announcements.update', $announcement->id) : route('admin.announcements.store') }}">
+      action="{{ $editing ? route('admin.announcements.update', $announcement->id) : route('admin.announcements.store') }}"
+      enctype="multipart/form-data">
     @csrf
     @if($editing) @method('PUT') @endif
 
@@ -98,6 +99,106 @@
                   style="resize:vertical">{{ old('content', $announcement->content ?? '') }}</textarea>
         <div style="font-size:.72rem;color:var(--text-muted);margin-top:.3rem">
             {{ $isFr ? 'Supports le Markdown basique (gras, italique, listes).' : 'Supports basic Markdown (bold, italic, lists).' }}
+        </div>
+    </div>
+
+    {{-- Photo de Couverture & Fichiers --}}
+    <div class="mb-4">
+        <h6 class="fw-semibold mb-3">
+            <svg class="me-2" style="width:16px;height:16px;display:inline" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
+            </svg>
+            {{ $isFr ? 'Médias & Fichiers' : 'Media & Files' }}
+        </h6>
+
+        {{-- Photo de Couverture --}}
+        <div class="card mb-3">
+            <div class="card-body">
+                <label class="form-label fw-semibold mb-2">
+                    <i class="fas fa-image text-primary me-2"></i>
+                    {{ $isFr ? 'Photo de Couverture' : 'Cover Image' }}
+                </label>
+                <p style="font-size:.8rem;color:var(--text-muted)">
+                    {{ $isFr ? 'JPG, PNG, GIF, WebP - Max 5MB' : 'JPG, PNG, GIF, WebP - Max 5MB' }}
+                </p>
+
+                {{-- Image actuelle --}}
+                @if($editing && $announcement->cover_image)
+                <div class="mb-3" style="position:relative;display:inline-block">
+                    <img src="{{ asset('storage/' . $announcement->cover_image) }}" 
+                         alt="Cover" 
+                         style="height:150px;width:auto;border-radius:8px;border:2px solid var(--border);object-fit:cover">
+                    <label style="cursor:pointer;position:absolute;top:5px;right:5px">
+                        <input type="checkbox" name="remove_cover" value="1" style="accent-color:var(--primary)">
+                        <span style="font-size:.75rem;background:var(--danger);color:white;padding:4px 8px;border-radius:4px;display:inline-block;margin-left:4px">{{ $isFr ? 'Supprimer' : 'Delete' }}</span>
+                    </label>
+                </div>
+                @endif
+
+                {{-- Upload --}}
+                <input type="file" 
+                       name="cover_image" 
+                       accept="image/jpeg,image/png,image/gif,image/webp"
+                       class="form-control form-control-sm"
+                       id="coverImage">
+                @error('cover_image')
+                <div class="text-danger" style="font-size:.8rem;margin-top:5px">{{ $message }}</div>
+                @enderror
+                <div id="coverPreview" class="mt-2"></div>
+            </div>
+        </div>
+
+        {{-- Fichier Joint --}}
+        <div class="card">
+            <div class="card-body">
+                <label class="form-label fw-semibold mb-2">
+                    <i class="fas fa-paperclip text-success me-2"></i>
+                    {{ $isFr ? 'Fichier Joint (Optionnel)' : 'Attached File (Optional)' }}
+                </label>
+                <p style="font-size:.8rem;color:var(--text-muted)">
+                    {{ $isFr ? 'PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, ZIP - Max 10MB' : 'PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, ZIP - Max 10MB' }}
+                </p>
+
+                {{-- Fichier actuel --}}
+                @if($editing && $announcement->attached_file)
+                <div class="mb-3 p-3" style="background:var(--surface-2);border-radius:8px">
+                    <div style="display:flex;align-items:center;gap:10px">
+                        <span style="font-size:1.5rem">
+                            @php
+                                $ext = strtolower(pathinfo($announcement->attachment_name ?? '', PATHINFO_EXTENSION));
+                                echo match($ext) {
+                                    'pdf' => '📄',
+                                    'doc', 'docx' => '📝',
+                                    'xls', 'xlsx' => '📊',
+                                    'ppt', 'pptx' => '🎬',
+                                    'zip' => '📦',
+                                    default => '📎',
+                                };
+                            @endphp
+                        </span>
+                        <div style="flex:1">
+                            <div style="font-weight:600;font-size:.9rem">{{ $announcement->attachment_name }}</div>
+                            <div style="font-size:.8rem;color:var(--text-muted)">{{ number_format($announcement->attachment_size / 1024, 1) }} KB</div>
+                        </div>
+                        <label style="cursor:pointer">
+                            <input type="checkbox" name="remove_file" value="1" style="accent-color:var(--danger)">
+                            <span style="font-size:.75rem;background:var(--danger);color:white;padding:4px 8px;border-radius:4px;display:inline-block">{{ $isFr ? 'Supprimer' : 'Delete' }}</span>
+                        </label>
+                    </div>
+                </div>
+                @endif
+
+                {{-- Upload --}}
+                <input type="file" 
+                       name="attached_file" 
+                       accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip"
+                       class="form-control form-control-sm"
+                       id="attachedFile">
+                @error('attached_file')
+                <div class="text-danger" style="font-size:.8rem;margin-top:5px">{{ $message }}</div>
+                @enderror
+                <div id="filePreview" class="mt-2"></div>
+            </div>
         </div>
     </div>
 
@@ -177,7 +278,65 @@
 
 @push('scripts')
 <script>
-// Category selection
+// ════════════════════════════════════════════════════════════════════════════
+// Aperçus des fichiers
+// ════════════════════════════════════════════════════════════════════════════
+
+// Aperçu image de couverture
+document.getElementById('coverImage')?.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('coverPreview');
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            preview.innerHTML = `
+                <div style="position:relative;display:inline-block;margin-top:10px">
+                    <img src="${event.target.result}" 
+                         alt="Preview" 
+                         style="height:150px;width:auto;border-radius:8px;border:2px solid var(--primary);object-fit:cover">
+                    <div style="margin-top:8px;font-size:.8rem;color:var(--text-secondary)">
+                        ✓ ${file.name} (${(file.size/1024).toFixed(1)} KB)
+                    </div>
+                </div>`;
+        };
+        reader.readAsDataURL(file);
+    } else {
+        preview.innerHTML = '';
+    }
+});
+
+// Aperçu fichier joint
+document.getElementById('attachedFile')?.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('filePreview');
+    
+    if (file) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        const icons = {
+            'pdf': '📄', 'doc': '📝', 'docx': '📝',
+            'xls': '📊', 'xlsx': '📊',
+            'ppt': '🎬', 'pptx': '🎬',
+            'zip': '📦'
+        };
+        const icon = icons[ext] || '📎';
+        
+        preview.innerHTML = `
+            <div style="padding:12px;background:var(--surface-2);border-radius:6px;margin-top:10px">
+                <div style="display:flex;align-items:center;gap:10px">
+                    <span style="font-size:1.5rem">${icon}</span>
+                    <div>
+                        <div style="font-weight:600;font-size:.9rem">✓ ${file.name}</div>
+                        <div style="font-size:.8rem;color:var(--text-muted)">${(file.size/1024).toFixed(1)} KB</div>
+                    </div>
+                </div>
+            </div>`;
+    } else {
+        preview.innerHTML = '';
+    }
+});
+
+// ════════════════════════════════════════════════════════════════════════════
 window.selectCat = function(val) {
     document.querySelectorAll('.cat-pill').forEach(p => {
         p.style.borderColor = 'var(--border)';

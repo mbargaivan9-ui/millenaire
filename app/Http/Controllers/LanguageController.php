@@ -24,7 +24,7 @@ class LanguageController extends Controller
 
         // Persist to user if authenticated
         if ($user = Auth::user()) {
-            $user->update(['locale' => $lang]);
+            $user->update(['preferred_language' => $lang]);
         }
 
         return back();

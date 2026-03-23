@@ -73,41 +73,68 @@
 </div>
 
 {{-- KPI --}}
-<div class="row gy-3 mb-4">
-    <div class="col-6 col-md-3">
-        <div class="stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#0d9488,#14b8a6)">
-                <i data-lucide="trending-up"></i>
+<div class="row g-3 mb-4">
+    {{-- Overall Average --}}
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1">{{ $isFr ? 'Moyenne Générale' : 'Overall Average' }}</p>
+                        <h2 class="fw-bold mb-0">{{ $moyenne !== null ? number_format((float)$moyenne, 2) : '—' }}<small style="font-size:0.6em">/20</small></h2>
+                    </div>
+                    <div class="kpi-icon bg-primary bg-opacity-10 text-primary">📊</div>
+                </div>
+                <div class="mt-2 small text-muted">{{ $isFr ? 'Performance' : 'Performance' }}</div>
             </div>
-            <div class="stat-value">{{ $moyenne !== null ? number_format((float)$moyenne, 2) : '—' }}<small>/20</small></div>
-            <div class="stat-label">{{ $isFr ? 'Moyenne Générale' : 'Overall Average' }}</div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
-                <i data-lucide="award"></i>
+
+    {{-- Rank --}}
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1">{{ $isFr ? 'Rang' : 'Rank' }}</p>
+                        <h2 class="fw-bold mb-0">{{ $rang ? $rang . 'e' : '—' }}</h2>
+                    </div>
+                    <div class="kpi-icon bg-warning bg-opacity-10 text-warning">🏆</div>
+                </div>
+                <div class="mt-2 small text-muted">{{ $isFr ? 'Classement' : 'Ranking' }}</div>
             </div>
-            <div class="stat-value">{{ $rang ? $rang . 'e' : '—' }}</div>
-            <div class="stat-label">{{ $isFr ? 'Rang' : 'Rank' }}</div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed)">
-                <i data-lucide="book-open"></i>
+
+    {{-- Available Courses --}}
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1">{{ $isFr ? 'Cours disponibles' : 'Available courses' }}</p>
+                        <h2 class="fw-bold mb-0">{{ $courses->count() }}</h2>
+                    </div>
+                    <div class="kpi-icon bg-info bg-opacity-10 text-info">📚</div>
+                </div>
+                <div class="mt-2 small text-muted">{{ $isFr ? 'À étudier' : 'To study' }}</div>
             </div>
-            <div class="stat-value">{{ $courses->count() }}</div>
-            <div class="stat-label">{{ $isFr ? 'Cours disponibles' : 'Available courses' }}</div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#10b981,#059669)">
-                <i data-lucide="check-circle"></i>
+
+    {{-- Quizzes Passed --}}
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1">{{ $isFr ? 'Quiz réussis' : 'Quizzes passed' }}</p>
+                        <h2 class="fw-bold mb-0">{{ $quizzesPassed ?? 0 }}</h2>
+                    </div>
+                    <div class="kpi-icon bg-success bg-opacity-10 text-success">✓</div>
+                </div>
+                <div class="mt-2 small text-muted">{{ $isFr ? 'Réussis' : 'Passed' }}</div>
             </div>
-            <div class="stat-value">{{ $quizzesPassed ?? 0 }}</div>
-            <div class="stat-label">{{ $isFr ? 'Quiz réussis' : 'Quizzes passed' }}</div>
         </div>
     </div>
 </div>

@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\BulletinEntry;
-use App\Models\BulletinSummary;
 use App\Models\Classe;
 use App\Models\ClassSubjectTeacher;
 use App\Models\ClassTermLock;

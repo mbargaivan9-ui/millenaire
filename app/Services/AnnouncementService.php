@@ -92,17 +92,13 @@ class AnnouncementService implements AnnouncementServiceInterface
      */
     public function getPublished(int $limit = 10): array
     {
-        $announcements = Announcement::where('is_active', true)
+        $announcements = Announcement::where('is_published', true)
             ->where(function ($query) {
-                $query->whereNull('expires_at')
-                    ->orWhere('expires_at', '>=', now());
+                $query->whereNull('published_at')
+                    ->orWhere('published_at', '<=', now());
             })
-            ->where(function ($query) {
-                $query->whereNull('published_date')
-                    ->orWhere('published_date', '<=', now());
-            })
-            ->orderByDesc('is_pinned')
-            ->orderByDesc('published_date')
+            ->orderByDesc('is_featured')
+            ->orderByDesc('published_at')
             ->limit($limit)
             ->get()
             ->map(fn(Announcement $a) => AnnouncementResponseDTO::fromModel($a))
@@ -126,13 +122,13 @@ class AnnouncementService implements AnnouncementServiceInterface
      */
     public function getPinned(): array
     {
-        $announcements = Announcement::where('is_pinned', true)
-            ->where('is_active', true)
+        $announcements = Announcement::where('is_featured', true)
+            ->where('is_published', true)
             ->where(function ($query) {
                 $query->whereNull('expires_at')
                     ->orWhere('expires_at', '>=', now());
             })
-            ->orderByDesc('published_date')
+            ->orderByDesc('published_at')
             ->get()
             ->map(fn(Announcement $a) => AnnouncementResponseDTO::fromModel($a))
             ->toArray();

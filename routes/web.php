@@ -1,13 +1,8 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 
-// ═══════════════════════════════════════════════════════════════
-// Include Bulletin Management Routes (OCR + Template + Grades)
-// ═══════════════════════════════════════════════════════════════
-require __DIR__ . '/bulletins.php';
 use App\Http\Controllers\DiagnosticController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\AnnouncementController;
@@ -27,35 +22,26 @@ use App\Http\Controllers\DisciplineController;
 use App\Http\Controllers\GuardianController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\ScheduleController;
-use App\Http\Controllers\BulletinTemplateController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\MessageAttachmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\HealthCheckController;
-use App\Http\Controllers\BulletinVerifyController;
-use App\Http\Controllers\Admin\BulletinAdminController;
-use App\Http\Controllers\Admin\BulletinStructureValidationController;
-use App\Http\Controllers\Parent\BulletinController as ParentBulletinController;
-use App\Http\Controllers\Student\BulletinController as StudentBulletinController;
+
 // Admin
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\Admin\KpiDashboardController;
 use App\Http\Controllers\Admin\TeacherAbsenceController;
-use App\Http\Controllers\Admin\DynamicBulletinController;
+
 // Teacher
 use App\Http\Controllers\Teacher\DashboardController as TeacherDashboardController;
 use App\Http\Controllers\Teacher\MarksController;
 use App\Http\Controllers\Teacher\AttendanceController as TeacherAttendanceController;
-use App\Http\Controllers\Teacher\BulletinController;
-use App\Http\Controllers\Teacher\BulletinTemplateController as TeacherBulletinTemplateController;
-use App\Http\Controllers\Teacher\GradeEntryController;
-use App\Http\Controllers\Teacher\TeacherAdvancedController;
+use App\Http\Controllers\Teacher\StudentAbsenceController;
 use App\Http\Controllers\Teacher\PrincipalStudentAbsenceController;
-use App\Http\Controllers\Teacher\BulletinStructureOCRController;
-use App\Http\Controllers\Teacher\BulletinOCRAPIController;
+use App\Http\Controllers\Teacher\BulletinNgController;
+
 use App\Http\Controllers\Teacher\ParentManagementController;
 // Parent
 use App\Http\Controllers\Parent\DashboardController as ParentDashboardController;
@@ -83,7 +69,17 @@ Route::get('/health/detailed', [HealthCheckController::class, 'detailed'])->name
 // Public announcements
 Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
 Route::get('/announcements/{slug}', [AnnouncementController::class, 'show'])->name('announcements.show');
-Route::get('/api/announcements/latest', [\App\Http\Controllers\Api\AnnouncementApiController::class, 'latest'])->name('api.announcements.latest');
+Route::get('/announcements/{id}/download', [\App\Http\Controllers\Api\AnnouncementApiController::class, 'downloadAttachment'])->name('announcements.downloadAttachment');
+
+// API Announcements - Phase 11
+Route::prefix('/api/announcements')->name('api.announcements.')->group(function () {
+    Route::get('/latest', [\App\Http\Controllers\Api\AnnouncementApiController::class, 'latest'])->name('latest');
+    Route::get('/featured', [\App\Http\Controllers\Api\AnnouncementApiController::class, 'featured'])->name('featured');
+    Route::get('/categories', [\App\Http\Controllers\Api\AnnouncementApiController::class, 'categories'])->name('categories');
+    Route::get('/', [\App\Http\Controllers\Api\AnnouncementApiController::class, 'index'])->name('index');
+    Route::get('/{id}', [\App\Http\Controllers\Api\AnnouncementApiController::class, 'show'])->name('show');
+    Route::get('/{id}/download', [\App\Http\Controllers\Api\AnnouncementApiController::class, 'downloadAttachment'])->name('download');
+});
 
 // Public pages
 Route::get('/about', [HomeController::class, 'about'])->name('public.about');
@@ -103,7 +99,6 @@ Route::prefix('webhooks')->name('webhooks.')->group(function () {
 
 // QR Code Verification (public)
 Route::get('verify/receipt/{token}', [MobileMoneyController::class, 'verifyQr'])->name('payment.verify-qr');
-Route::get('bulletin/verify/{token}', [BulletinVerifyController::class, 'verify'])->name('bulletin.verify');
 Route::get('/offline', fn() => view('pwa.offline'))->name('pwa.offline');
 
 // Push VAPID key (public — needed by JS before auth)
@@ -261,14 +256,6 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-        // KPI Dashboard (Phase 3)
-        Route::get('kpi', [KpiDashboardController::class, 'index'])->name('kpi.index');
-        Route::get('kpi/refresh', [KpiDashboardController::class, 'refreshKpis'])->name('kpi.refresh');
-        Route::get('kpi/class/{classe}', [KpiDashboardController::class, 'getClassDetails'])->name('kpi.class-details');
-        Route::post('kpi/assign-teacher', [KpiDashboardController::class, 'assignTeacher'])->name('kpi.assign-teacher');
-        Route::post('kpi/unassign-teacher', [KpiDashboardController::class, 'unassignTeacher'])->name('kpi.unassign-teacher');
-        Route::get('kpi/export-csv', [KpiDashboardController::class, 'exportCsv'])->name('kpi.export-csv');
-
         // Users
         Route::resource('users', UserController::class)->except('show');
         Route::post('users/import', [UserController::class, 'import'])->name('users.import');
@@ -306,6 +293,13 @@ Route::middleware('auth')->group(function () {
         Route::post('fees/assign-to-class', [\App\Http\Controllers\Admin\FeeController::class, 'assignToClass'])->name('fees.assignToClass');
         Route::get('fees/report', [\App\Http\Controllers\Admin\FeeController::class, 'report'])->name('fees.report');
         Route::resource('fees', \App\Http\Controllers\Admin\FeeController::class, ['except' => ['show']]);
+
+        // KPI & Reports Export
+        Route::prefix('kpi')->name('kpi.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\KpiController::class, 'index'])->name('index');
+            Route::get('export/{bulletinConfig}', [\App\Http\Controllers\Admin\KpiController::class, 'export'])->name('export');
+            Route::get('export-csv', [\App\Http\Controllers\Admin\KpiController::class, 'exportCsv'])->name('export-csv');
+        });
 
         // Finance
         Route::prefix('finance')->name('finance.')->group(function () {
@@ -355,10 +349,12 @@ Route::middleware('auth')->group(function () {
 
         // Announcements
         Route::resource('announcements', \App\Http\Controllers\Admin\AnnouncementController::class);
+        Route::patch('announcements/{id}/publish', [\App\Http\Controllers\Admin\AnnouncementController::class, 'publish'])->name('announcements.publish');
 
         // Settings
         Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
         Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
+        Route::get('settings/diagnostic', [\App\Http\Controllers\Admin\DiagnosticSettingsController::class, 'diagnostic'])->name('settings.diagnostic');
         Route::post('settings/carousel', [SettingsController::class, 'updateCarousel'])->name('settings.carousel.store');
         Route::post('settings/exam-results', [SettingsController::class, 'storeExamResult'])->name('settings.exam-results.store');
         Route::put('settings/exam-results/{id}', [SettingsController::class, 'updateExamResult'])->name('settings.exam-results.update');
@@ -384,54 +380,8 @@ Route::middleware('auth')->group(function () {
         // Payment history (admin view)
         Route::get('payments/history', [MobileMoneyController::class, 'adminHistory'])->name('payments.history');
 
-        // Bulletins Validation & Publishing (Phase 6)
-        Route::prefix('bulletins')->name('bulletins.')->group(function () {
-            Route::get('/', [BulletinAdminController::class, 'index'])->name('index');
-            Route::post('{bulletin}/validate', [BulletinAdminController::class, 'validate'])->name('validate');
-            Route::post('{bulletin}/publish', [BulletinAdminController::class, 'publish'])->name('publish');
-            Route::post('{bulletin}/reject', [BulletinAdminController::class, 'reject'])->name('reject');
-            Route::get('{bulletin}', [BulletinAdminController::class, 'show'])->name('show');
-        });
-
-        // Dynamic Bulletin OCR (Phase 4)
-        Route::prefix('bulletin')->name('bulletin.')->group(function () {
-            Route::get('/{classe}', [DynamicBulletinController::class, 'index'])->name('index');
-            Route::get('/{classe}/upload', [DynamicBulletinController::class, 'uploadForm'])->name('uploadForm');
-            Route::post('/{classe}/upload', [DynamicBulletinController::class, 'processUpload'])->name('processUpload');
-            Route::get('/structure/{structure}/review', [DynamicBulletinController::class, 'review'])->name('review');
-            Route::post('/structure/{structure}/update', [DynamicBulletinController::class, 'update'])->name('update');
-            Route::post('/structure/{structure}/validate', [DynamicBulletinController::class, 'validateStructure'])->name('validate');
-            Route::post('/structure/{structure}/activate', [DynamicBulletinController::class, 'activate'])->name('activate');
-            Route::get('/structure/{structure}/preview', [DynamicBulletinController::class, 'preview'])->name('preview');
-            Route::get('/structure/{structure}/history', [DynamicBulletinController::class, 'history'])->name('history');
-            Route::post('/structure/{structure}/revision/{revision}/revert', [DynamicBulletinController::class, 'revertToRevision'])->name('revertToRevision');
-            Route::get('/structure/{structure}/export', [DynamicBulletinController::class, 'export'])->name('export');
-            Route::post('/structure/{structure}/archive', [DynamicBulletinController::class, 'archive'])->name('archive');
-            Route::delete('/structure/{structure}', [DynamicBulletinController::class, 'delete'])->name('delete');
-            
-            // PDF Export Routes (Phase 9)
-            Route::get('/structure/{structure}/student/{student}/bulletin-pdf', [DynamicBulletinController::class, 'downloadBulletinPDF'])->name('downloadBulletinPDF');
-            Route::get('/structure/{structure}/bulk-pdf', [DynamicBulletinController::class, 'downloadBulkBulletinsPDF'])->name('downloadBulkBulletinsPDF');
-            Route::get('/structure/{structure}/student/{student}/preview-html', [DynamicBulletinController::class, 'previewBulletinHTML'])->name('previewBulletinHTML');
-            Route::post('/structure/{structure}/save-bulletins', [DynamicBulletinController::class, 'saveBulletinsToStorage'])->name('saveBulletinsToStorage');
-        });
-
-        // Bulletin Structure Validation (OCR Admin Interface)
-        Route::prefix('bulletin-structure')->name('bulletin-structure.')->group(function () {
-            Route::prefix('validation')->name('validation.')->group(function () {
-                Route::get('/', [BulletinStructureValidationController::class, 'index'])->name('index');
-                Route::get('stats', [BulletinStructureValidationController::class, 'stats'])->name('stats');
-                Route::get('{structure}', [BulletinStructureValidationController::class, 'show'])->name('show');
-                Route::get('{structure}/edit', [BulletinStructureValidationController::class, 'edit'])->name('edit');
-                Route::put('{structure}', [BulletinStructureValidationController::class, 'update'])->name('update');
-                Route::post('{structure}/approve', [BulletinStructureValidationController::class, 'approve'])->name('approve');
-                Route::post('{structure}/reject', [BulletinStructureValidationController::class, 'reject'])->name('reject');
-                Route::post('{structure}/activate', [BulletinStructureValidationController::class, 'activate'])->name('activate');
-                Route::post('{structure}/deactivate', [BulletinStructureValidationController::class, 'deactivate'])->name('deactivate');
-                Route::get('{structure}/export', [BulletinStructureValidationController::class, 'export'])->name('export');
-                Route::post('bulk-verify', [BulletinStructureValidationController::class, 'bulkVerify'])->name('bulk-verify');
-            });
-        });
+       
+       
 
         // Teachers CRUD (admin)
         Route::resource('teachers', \App\Http\Controllers\Admin\TeacherController::class);
@@ -446,10 +396,6 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/', [TeacherDashboardController::class, 'index'])->name('dashboard');
 
-        // Advanced dashboard (Phase 3)
-        Route::get('advanced', [TeacherAdvancedController::class, 'dashboard'])->name('advanced.dashboard');
-        Route::get('my-summary', [TeacherAdvancedController::class, 'mySummary'])->name('my-summary');
-
         // Marks & Attendance
         Route::resource('marks', MarksController::class);
         Route::resource('attendance', AttendanceController::class);
@@ -463,87 +409,7 @@ Route::middleware('auth')->group(function () {
             Route::get('{classSubjectTeacher}/export', [GradeEntryController::class, 'exportGrades'])->name('entry.export');
         });
 
-        // ─── Bulletin Vivant Module ───
-        Route::prefix('bulletin')->name('bulletin.')->group(function () {
-            // OCR API endpoints (authenticated teachers only)
-            Route::middleware('auth:sanctum,web')->prefix('ocr')->name('ocr.')->group(function () {
-                Route::post('upload', [BulletinOCRAPIController::class, 'processUpload'])->name('upload');
-                Route::post('save-structure', [BulletinOCRAPIController::class, 'saveStructure'])->name('save-structure');
-            });
-
-            // Template Grid — Prof Principal (NEW) — MUST BE BEFORE parametrized routes
-            Route::middleware('role:prof_principal,admin')->group(function () {
-                Route::get('template-grid', [BulletinController::class, 'templateGrid'])->name('template-grid');
-                Route::get('ocr-wizard', [BulletinController::class, 'ocrWizard'])->name('ocr-wizard');
-                Route::get('api/student/{student}/stats', [BulletinController::class, 'getStudentStats'])->name('api.student-stats');
-                Route::get('api/class/{classe}/stats', [BulletinController::class, 'getClassStats'])->name('api.class-stats');
-            });
-
-            Route::get('/', [BulletinController::class, 'index'])->name('index');
-            Route::get('{classSubjectTeacher}/grid', [BulletinController::class, 'grid'])->name('grid');
-            Route::get('{classSubjectTeacher}/student/{student}', [BulletinController::class, 'show'])->name('show');
-            Route::post('save', [BulletinController::class, 'save'])->name('save'); // AJAX
-            Route::get('completion', [BulletinController::class, 'completion'])->name('completion');
-            Route::post('{classe}/lock', [BulletinController::class, 'lock'])->name('lock');
-            Route::post('{classe}/unlock', [BulletinController::class, 'unlock'])->name('unlock');
-
-            // Advanced (Phase 3)
-            Route::get('stats/{classSubjectTeacher}', [TeacherAdvancedController::class, 'getSubjectStats'])->name('stats');
-            Route::post('bulk-save', [TeacherAdvancedController::class, 'bulkSave'])->name('bulk-save');
-            Route::get('{classe}/export-pdf', [TeacherAdvancedController::class, 'exportClasseBulletins'])->name('export-pdf');
-
-            // PDF export (Phase 3 view)
-            Route::get('{student}/pdf', [BulletinController::class, 'exportPdf'])->name('pdf');
-        });
-
-        // Report Cards (Prof Principal)
-        Route::middleware('role:prof_principal,admin')->group(function () {
-            Route::get('report-cards', [TeacherDashboardController::class, 'reportCards'])->name('report-cards');
-            Route::get('report-cards/{reportCard}', [TeacherDashboardController::class, 'showReportCard'])->name('report-cards.show');
-            Route::get('report-cards/{reportCard}/edit', [TeacherDashboardController::class, 'editReportCard'])->name('report-cards.edit');
-            Route::put('report-cards/{reportCard}', [TeacherDashboardController::class, 'updateReportCard'])->name('report-cards.update');
-            Route::get('report-cards/{reportCard}/pdf', [TeacherDashboardController::class, 'downloadPDF'])->name('report-cards.pdf');
-            Route::resource('bulletin-templates', TeacherBulletinTemplateController::class);
-
-            // Bulletin Structure OCR (NEW)
-            Route::prefix('bulletin-structure-ocr')->name('bulletin-structure-ocr.')->group(function () {
-                Route::get('create/{classe}', [BulletinStructureOCRController::class, 'createForm'])->name('create');
-                Route::post('upload/{classe}', [BulletinStructureOCRController::class, 'processUpload'])->name('upload');
-                Route::get('verify/{classe}', [BulletinStructureOCRController::class, 'showVerification'])->name('verify');
-                Route::post('save/{classe}', [BulletinStructureOCRController::class, 'saveStructure'])->name('save');
-                Route::get('/', [BulletinStructureOCRController::class, 'index'])->name('index');
-                Route::get('{bulletinStructure}', [BulletinStructureOCRController::class, 'show'])->name('show');
-                Route::get('{bulletinStructure}/edit', [BulletinStructureOCRController::class, 'edit'])->name('edit');
-                Route::put('{bulletinStructure}', [BulletinStructureOCRController::class, 'update'])->name('update');
-                Route::delete('{bulletinStructure}', [BulletinStructureOCRController::class, 'destroy'])->name('destroy');
-            });
-
-            // Student Absences (Prof Principal)
-            Route::resource('student-absences', PrincipalStudentAbsenceController::class);
-            Route::get('student-absences/bulk-create', [PrincipalStudentAbsenceController::class, 'bulkCreateForm'])->name('student-absences.bulk-create-form');
-            Route::post('student-absences/bulk-create', [PrincipalStudentAbsenceController::class, 'bulkCreate'])->name('student-absences.bulk-create');
-            Route::post('student-absences/{studentAbsence}/justify', [PrincipalStudentAbsenceController::class, 'justify'])->name('student-absences.justify');
-            Route::get('student-absences/report', [PrincipalStudentAbsenceController::class, 'report'])->name('student-absences.report');
-
-            // Parent Management (Prof Principal) — Full CRUD + Token Management
-            Route::prefix('parent-management')->name('parent-management.')->group(function () {
-                // CRUD Routes
-                Route::get('{class}', [ParentManagementController::class, 'index'])->name('index');
-                Route::get('{class}/create', [ParentManagementController::class, 'create'])->name('create');
-                Route::post('{class}', [ParentManagementController::class, 'store'])->name('store');
-                Route::get('{parent}/edit', [ParentManagementController::class, 'edit'])->name('edit');
-                Route::put('{parent}', [ParentManagementController::class, 'update'])->name('update');
-                Route::delete('{parent}', [ParentManagementController::class, 'destroy'])->name('destroy');
-                
-                // Token Management Routes
-                Route::get('{class}/generate-tokens', [ParentManagementController::class, 'generateTokensForm'])->name('generate-tokens');
-                Route::post('{class}/store-tokens', [ParentManagementController::class, 'storeTokens'])->name('store-tokens');
-                Route::get('{class}/tokens', [ParentManagementController::class, 'listTokens'])->name('tokens');
-                Route::delete('{token}/revoke', [ParentManagementController::class, 'revokeToken'])->name('revoke-token');
-                Route::get('{class}/export-tokens', [ParentManagementController::class, 'exportTokensCSV'])->name('export-tokens');
-            });
-        });
-
+        
         Route::get('courses', [TeacherDashboardController::class, 'courses'])->name('courses');
         Route::get('assignments', [TeacherDashboardController::class, 'assignments'])->name('assignments');
 
@@ -571,8 +437,29 @@ Route::middleware('auth')->group(function () {
             Route::delete('{material}', [\App\Http\Controllers\Teacher\MaterialController::class, 'destroy'])->name('destroy');
         });
 
+        // Parent Management
+        Route::prefix('parent-management')->name('parent-management.')->group(function () {
+            Route::get('/{class?}', [\App\Http\Controllers\Teacher\ParentManagementController::class, 'index'])->name('index');
+            Route::post('/', [\App\Http\Controllers\Teacher\ParentManagementController::class, 'store'])->name('store');
+            Route::get('/{parent}/edit', [\App\Http\Controllers\Teacher\ParentManagementController::class, 'edit'])->name('edit');
+            Route::put('/{parent}', [\App\Http\Controllers\Teacher\ParentManagementController::class, 'update'])->name('update');
+            Route::delete('/{parent}', [\App\Http\Controllers\Teacher\ParentManagementController::class, 'destroy'])->name('destroy');
+        });
+
         // Schedule
         Route::get('schedule', [\App\Http\Controllers\Teacher\ScheduleController::class, 'index'])->name('schedule');
+
+        // Student Absences
+        Route::prefix('student-absences')->name('student-absences.')->group(function () {
+            Route::get('/', [StudentAbsenceController::class, 'index'])->name('index');
+            Route::get('create', [StudentAbsenceController::class, 'create'])->name('create');
+            Route::post('/', [StudentAbsenceController::class, 'store'])->name('store');
+            Route::get('{absence}', [StudentAbsenceController::class, 'show'])->name('show');
+            Route::get('{absence}/edit', [StudentAbsenceController::class, 'edit'])->name('edit');
+            Route::put('{absence}', [StudentAbsenceController::class, 'update'])->name('update');
+            Route::delete('{absence}', [StudentAbsenceController::class, 'destroy'])->name('destroy');
+            Route::get('/report', [StudentAbsenceController::class, 'report'])->name('report');
+        });
 
         // Appointments & Availability
         Route::prefix('appointments')->name('appointments.')->group(function () {
@@ -586,6 +473,47 @@ Route::middleware('auth')->group(function () {
             Route::delete('{availability}', [\App\Http\Controllers\Teacher\AvailabilityController::class, 'destroy'])->name('destroy');
         });
         Route::get('availabilities', [\App\Http\Controllers\Teacher\AvailabilityController::class, 'index'])->name('availabilities');
+
+        // ── Bulletin / Grades Dashboard ──
+        // Quick access to bulletin/grades for a specific class
+        Route::get('bulletin/{class}', [TeacherDashboardController::class, 'bulletinDashboard'])->name('bulletin.dashboard');
+
+        // ── Bulletin NG (Système de génération de bulletins) ──
+        // Accessible uniquement aux professeurs principaux et admins
+        Route::middleware('role:prof_principal,admin')
+            ->prefix('bulletin-ng')->name('bulletin_ng.')->group(function () {
+            // Dashboard sessions
+            Route::get('/', [BulletinNgController::class, 'index'])->name('index');
+
+            // ── Wizard Étapes (GET)
+            Route::get('step1',                  [BulletinNgController::class, 'step1Section'])->name('step1');
+            Route::get('step2',                  [BulletinNgController::class, 'step2Config'])->name('step2');
+            Route::get('{config}/step3',         [BulletinNgController::class, 'step3Subjects'])->name('step3');
+            Route::get('{config}/step4',         [BulletinNgController::class, 'step4Students'])->name('step4');
+            Route::get('{config}/step5',         [BulletinNgController::class, 'step5Notes'])->name('step5');
+            Route::get('{config}/step6',         [BulletinNgController::class, 'step6Conduite'])->name('step6');
+            Route::get('{config}/step7',         [BulletinNgController::class, 'step7Generate'])->name('step7');
+
+            // ── Actions POST (formulaires)
+            Route::post('store-config',                  [BulletinNgController::class, 'storeConfig'])->name('store-config');
+            Route::post('{config}/store-subjects',       [BulletinNgController::class, 'storeSubjects'])->name('store-subjects');
+            Route::post('{config}/finaliser-conduite',   [BulletinNgController::class, 'finaliserConduite'])->name('finaliser-conduite');
+
+            // ── API JSON (AJAX - temps réel)
+            Route::post('{config}/students',             [BulletinNgController::class, 'storeStudent'])->name('students.store');
+            Route::delete('{config}/students/{student}', [BulletinNgController::class, 'deleteStudent'])->name('students.delete');
+            Route::post('{config}/ouvrir-saisie',        [BulletinNgController::class, 'ouvrirSaisie'])->name('ouvrir-saisie');
+            Route::post('{config}/save-note',            [BulletinNgController::class, 'saveNote'])->name('save-note');
+            Route::post('{config}/verrouiller',          [BulletinNgController::class, 'verrouillerNotes'])->name('verrouiller');
+            Route::post('{config}/students/{student}/conduite', [BulletinNgController::class, 'saveConduite'])->name('save-conduite');
+            Route::get('{config}/api/stats',             [BulletinNgController::class, 'apiStats'])->name('api.stats');
+            Route::get('{config}/students/{student}/notes', [BulletinNgController::class, 'apiStudentNotes'])->name('api.student-notes');
+
+            // ── PDF & Export
+            Route::get('{config}/students/{student}/pdf',  [BulletinNgController::class, 'pdfStudent'])->name('pdf.student');
+            Route::get('{config}/pdf-all',                 [BulletinNgController::class, 'pdfAll'])->name('pdf.all');
+            Route::get('{config}/students/{student}/preview', [BulletinNgController::class, 'previewStudent'])->name('preview.student');
+        });
     });
 
     // ════════════════════════════════════════════════
@@ -606,11 +534,24 @@ Route::middleware('auth')->group(function () {
         Route::post('notifications/read', [ParentMonitoringController::class, 'markNotificationsRead'])->name('notifications.read');
 
         // Payments
-        Route::get('payments', [ParentPaymentController::class, 'index'])->name('payments');
+        Route::prefix('payments')->name('payments.')->group(function () {
+            Route::get('/', [ParentPaymentController::class, 'index'])->name('index');
+            Route::get('mobile-money', [ParentPaymentController::class, 'mobileMoneyIndex'])->name('mobile-money');
+            Route::get('receipts', [ParentPaymentController::class, 'receiptsIndex'])->name('receipts');
+            Route::post('initiate', [ParentPaymentController::class, 'initiate'])->name('initiate');
+            Route::get('{payment}/status', [ParentPaymentController::class, 'checkStatus'])->name('status');
+            Route::get('{payment}/receipt', [ParentPaymentController::class, 'receipt'])->name('receipt');
+            Route::get('{receipt}/download', [ParentPaymentController::class, 'downloadReceipt'])->name('download');
+            Route::get('statistics', [ParentPaymentController::class, 'statistics'])->name('statistics');
+        });
+        
+        // Mobile Money alias routes (same as payments show)
+        Route::prefix('mobile-money')->name('mobile-money.')->group(function () {
+            Route::get('student/{student}', [ParentPaymentController::class, 'mobileMoneyShow'])->name('show');
+        });
+        
+        // Legacy child payment route
         Route::get('children/{student}/payments', [ParentPaymentController::class, 'show'])->name('child.payments');
-        Route::post('payments/initiate', [ParentPaymentController::class, 'initiate'])->name('payments.initiate');
-        Route::get('payments/{payment}/status', [ParentPaymentController::class, 'checkStatus'])->name('payments.status');
-        Route::get('receipts/{receipt}/download', [ParentPaymentController::class, 'downloadReceipt'])->name('receipts.download');
 
         // Appointments (parent side)
         Route::prefix('appointments')->name('appointments.')->group(function () {
@@ -620,12 +561,7 @@ Route::middleware('auth')->group(function () {
             Route::delete('{appointment}', [\App\Http\Controllers\Parent\AppointmentController::class, 'destroy'])->name('destroy');
         });
 
-        // Bulletins (Report Cards)
-        Route::prefix('bulletins')->name('bulletins.')->group(function () {
-            Route::get('/', [ParentBulletinController::class, 'index'])->name('index');
-            Route::get('{bulletin}', [ParentBulletinController::class, 'show'])->name('show');
-            Route::get('{bulletin}/pdf', [ParentBulletinController::class, 'pdf'])->name('pdf');
-        });
+       
     });
 
     // ════════════════════════════════════════════════
@@ -638,7 +574,7 @@ Route::middleware('auth')->group(function () {
         Route::get('attendance', [StudentDashboardController::class, 'attendance'])->name('attendance');
         Route::get('schedule', [StudentDashboardController::class, 'schedule'])->name('schedule');
         Route::get('assignments', [StudentDashboardController::class, 'assignments'])->name('assignments');
-        Route::get('report-cards', [StudentDashboardController::class, 'reportCards'])->name('report-cards');
+        
         Route::get('courses', [StudentCourseController::class, 'index'])->name('courses.index');
 
         // Progress (Phase 3)
@@ -646,12 +582,24 @@ Route::middleware('auth')->group(function () {
         Route::get('progress/data', [StudentProgressController::class, 'getProgressData'])->name('progress.data');
         Route::get('progress/chart', [StudentProgressController::class, 'getChartData'])->name('progress.chart');
 
-        // Bulletins (Report Cards)
-        Route::prefix('bulletins')->name('bulletins.')->group(function () {
-            Route::get('/', [StudentBulletinController::class, 'index'])->name('index');
-            Route::get('{bulletin}', [StudentBulletinController::class, 'show'])->name('show');
-            Route::get('{bulletin}/pdf', [StudentBulletinController::class, 'pdf'])->name('pdf');
+        // E-Learning
+        Route::prefix('e-learning')->name('e-learning.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Student\QuizController::class, 'index'])->name('index');
         });
+
+        // Quiz - Take & Results
+        Route::prefix('quiz-take')->name('quiz-take.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Student\QuizController::class, 'index'])->name('index');
+            Route::get('{quiz}/start', [\App\Http\Controllers\Student\QuizController::class, 'start'])->name('start');
+            Route::post('{quiz}/submit', [\App\Http\Controllers\Student\QuizController::class, 'submit'])->name('submit');
+        });
+
+        Route::prefix('quiz-result')->name('quiz-result.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Student\DashboardController::class, 'quizResults'])->name('index');
+            Route::get('{submission}', [\App\Http\Controllers\Student\QuizController::class, 'result'])->name('show');
+        });
+
+      
     });
 
     // ─── Shared Resources (all authenticated) ───
@@ -668,7 +616,7 @@ Route::middleware('auth')->group(function () {
     Route::post('conversations/{conversation}/archive', [ConversationController::class, 'archive'])->name('conversations.archive');
     Route::resource('schedules', ScheduleController::class);
     Route::get('schedules/class/{classe}', [ScheduleController::class, 'viewClass'])->name('schedules.viewClass');
-    Route::resource('bulletin-templates', BulletinTemplateController::class);
+
     Route::post('message-attachments/{message}', [MessageAttachmentController::class, 'store'])->name('message-attachments.store');
     Route::get('message-attachments/{attachment}/download', [MessageAttachmentController::class, 'download'])->name('message-attachments.download');
     Route::delete('message-attachments/{attachment}', [MessageAttachmentController::class, 'destroy'])->name('message-attachments.destroy');

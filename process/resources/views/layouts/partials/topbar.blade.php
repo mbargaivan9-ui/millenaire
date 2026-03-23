@@ -19,6 +19,12 @@
     <span class="topbar-kbd">/</span>
   </div>
 
+  {{-- Home Link --}}
+  <a href="{{ route('home') }}" class="topbar-btn" title="{{ app()->getLocale() === 'fr' ? 'Retour à l\'accueil' : 'Back to Home' }}" style="gap: 6px;">
+    <i data-lucide="home"></i>
+    <span style="font-size: 12px; font-weight: 600; display: none; margin-right: 4px;">{{ app()->getLocale() === 'fr' ? 'Accueil' : 'Home' }}</span>
+  </a>
+
   {{-- Actions --}}
   <div class="topbar-actions">
 

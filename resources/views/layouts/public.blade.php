@@ -36,7 +36,7 @@
         <div class="container-fluid container-xl position-relative d-flex align-items-center">
 
             <a href="{{ route('home') }}" class="logo d-flex align-items-center me-auto">
-                @php $settings = App\Models\EstablishmentSetting::getInstance(); @endphp
+                @php $settings = $globalSettings ?? App\Models\EstablishmentSetting::getInstance(); @endphp
                 @if($settings->logo_path)
                     <img src="{{ asset($settings->logo_path) }}" alt="{{ $settings->platform_name ?? 'Millénaire Connect' }}" height="40" class="me-2">
                 @endif
@@ -60,24 +60,76 @@
 
                     {{-- Language Switcher --}}
                     <li class="lang-switcher">
-                        @if(app()->getLocale() === 'fr')
-                            <a href="{{ route('lang.switch', 'en') }}" class="lang-btn" title="Switch to English">
-                                🇺🇸 EN
-                            </a>
-                        @else
-                            <a href="{{ route('lang.switch', 'fr') }}" class="lang-btn" title="Passer en Français">
-                                🇫🇷 FR
-                            </a>
-                        @endif
+                        <x-language-switcher />
                     </li>
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>
 
-            <a class="btn-getstarted" href="{{ route('login') }}">
-                <i class="bi bi-box-arrow-in-right me-1"></i>
-                {{ app()->getLocale() === 'fr' ? 'Espace Connexion' : 'Login' }}
-            </a>
+            {{-- User Menu or Login Button --}}
+            @if(auth()->check())
+                {{-- Authenticated User Menu --}}
+                <div class="dropdown d-flex align-items-center" style="margin-left: 1rem;">
+                    <button class="user-menu-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        @if(auth()->user()?->profile_photo)
+                            <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" 
+                                class="rounded-circle" style="width: 36px; height: 36px; object-fit: cover; border: 2px solid #0d9488;">
+                        @else
+                            <div class="user-avatar-placeholder">
+                                {{ auth()->user()?->initials ?? 'U' }}
+                            </div>
+                        @endif
+                        <span class="user-name">{{ auth()->user()?->name }}</span>
+                    </button>
+                    
+                    <ul class="dropdown-menu dropdown-menu-end user-dropdown" style="min-width: 280px;">
+                        <li class="dropdown-header">
+                            <div class="user-header-info">
+                                @if(auth()->user()?->profile_photo)
+                                    <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="rounded-circle" style="width: 42px; height: 42px; object-fit: cover;">
+                                @else
+                                    <div class="user-avatar-placeholder" style="width: 42px; height: 42px;">
+                                        {{ auth()->user()?->initials ?? 'U' }}
+                                    </div>
+                                @endif
+                                <div>
+                                    <div class="user-header-name">{{ auth()->user()?->name }}</div>
+                                    <div class="user-header-role">{{ auth()->user()?->role_label ?? auth()->user()?->role }}</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li><hr class="dropdown-divider" style="margin: 8px 0;"></li>
+                        <li>
+                            <a class="dropdown-item dashboard-link" href="{{ auth()->user()->getDashboardRoute() }}">
+                                <i class="bi bi-speedometer2"></i>
+                                <span>{{ app()->getLocale() === 'fr' ? 'Mon Tableau de Bord' : 'My Dashboard' }}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('profile.show') }}">
+                                <i class="bi bi-person-circle"></i>
+                                <span>{{ app()->getLocale() === 'fr' ? 'Mon Profil' : 'My Profile' }}</span>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider" style="margin: 8px 0;"></li>
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}" style="display: block;">
+                                @csrf
+                                <button type="submit" class="dropdown-item logout-btn" style="width: 100%; text-align: left;">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span>{{ app()->getLocale() === 'fr' ? 'Déconnexion' : 'Logout' }}</span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            @else
+                {{-- Login Button for Guests --}}
+                <a class="btn-getstarted" href="{{ route('login') }}">
+                    <i class="bi bi-box-arrow-in-right me-1"></i>
+                    {{ app()->getLocale() === 'fr' ? 'Espace Connexion' : 'Login' }}
+                </a>
+            @endif
 
         </div>
     </header>
@@ -169,6 +221,13 @@
 
     <!-- Landing JS -->
     <script src="{{ asset('js/landing.js') }}"></script>
+
+    <!-- Real-time Settings Updater (Phase 10) -->
+    @if(app()->environment('production') || request()->getHost() === 'localhost:8000')
+    {{-- Inclure Laravel Echo pour les broadcasts --}}
+    <script src="{{ mix('js/app.js') }}" defer></script>
+    <script src="{{ asset('js/realtime-settings-updater.js') }}"></script>
+    @endif
 
     @stack('scripts')
 </body>

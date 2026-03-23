@@ -108,17 +108,6 @@ class AuditService
      * @param \App\Models\ReportCard $bulletin
      * @return ActivityLog
      */
-    public function logBulletinLock($bulletin): ActivityLog
-    {
-        return $this->log(
-            action: 'BULLETIN_LOCKED',
-            model: 'ReportCard',
-            modelId: $bulletin->id,
-            changes: ['is_locked' => true],
-            notes: "Student: {$bulletin->student->user->name}, Sequence: {$bulletin->sequence}"
-        );
-    }
-
     /**
      * Log security event (failed login, unauthorized access, etc.)
      * 

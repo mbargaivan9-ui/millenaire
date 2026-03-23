@@ -84,9 +84,9 @@
                                     $cst = $assignments->firstWhere('id', $stat['cst_id']);
                                     @endphp
                                     @if($cst)
-                                    <a href="{{ route('teacher.bulletin.grid', ['classSubjectTeacher' => $stat['cst_id'], 'term' => $term, 'sequence' => 1]) }}"
+                                    <a href="{{ route('teacher.grades.entry.index', $stat['cst_id']) }}"
                                        class="btn btn-xs btn-outline-primary" title="Grille Séq.1">S1</a>
-                                    <a href="{{ route('teacher.bulletin.grid', ['classSubjectTeacher' => $stat['cst_id'], 'term' => $term, 'sequence' => 2]) }}"
+                                    <a href="{{ route('teacher.grades.entry.index', $stat['cst_id']) }}"
                                        class="btn btn-xs btn-outline-primary" title="Grille Séq.2">S2</a>
                                     <button class="btn btn-xs btn-outline-secondary"
                                             onclick="loadStats({{ $stat['cst_id'] }})" title="Statistiques">

@@ -76,8 +76,8 @@
         <div class="card mb-4">
             <div class="card-header"><h6 class="card-title mb-0"><i data-lucide="lock" style="width:16px" class="me-2"></i>{{ $isFr ? 'Changer le mot de passe' : 'Change password' }}</h6></div>
             <div class="card-body">
-                <form method="POST" action="{{ route('profile.password') }}">
-                    @csrf @method('PUT')
+                <form method="POST" action="{{ route('profile.change-password') }}">
+                    @csrf
                     <div class="row gy-3">
                         <div class="col-12">
                             <label class="form-label">{{ $isFr ? 'Mot de passe actuel' : 'Current password' }}</label>

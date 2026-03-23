@@ -23,95 +23,122 @@
   </div>
 </div>
 
-{{-- Daily Briefing --}}
-<div class="briefing-card mb-20">
-  <div class="briefing-header">
-    <span class="briefing-label">RÉSUMÉ DU JOUR</span>
-    <span class="briefing-badge">
-      <i data-lucide="trending-up" style="width:13px;height:13px"></i>
-      8.2% vs hier
-    </span>
-  </div>
-  <h2 class="briefing-title">{{ $briefing['title'] ?? 'Système performant' }}</h2>
-  <p class="briefing-text">{{ $briefing['text'] ?? 'État du système optimal avec une activité normale' }}</p>
+{{-- Daily Briefing - Modern Card --}}
+<div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; overflow: hidden; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
+  <div class="card-body p-4">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div>
+        <h5 class="mb-0" style="font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #667eea;">RÉSUMÉ DU JOUR</h5>
+      </div>
+      <span class="badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 12px; padding: 8px 12px; border-radius: 8px;">
+        <i data-lucide="trending-up" style="width:13px;height:13px; vertical-align: middle; margin-right: 4px;"></i>
+        8.2% vs hier
+      </span>
+    </div>
 
-  <div class="briefing-stats">
-    <div class="briefing-stat">
-      <div class="briefing-stat-label">Utilisateurs Total</div>
-      <div class="briefing-stat-value">{{ $totalUsers ?? 0 }}</div>
-      <div class="briefing-stat-change text-success">+12.5%</div>
-    </div>
-    <div class="briefing-stat">
-      <div class="briefing-stat-label">Élèves Actifs</div>
-      <div class="briefing-stat-value">{{ $activeStudents ?? 0 }}</div>
-      <div class="briefing-stat-change text-success">+8.3%</div>
-    </div>
-    <div class="briefing-stat">
-      <div class="briefing-stat-label">Enseignants</div>
-      <div class="briefing-stat-value">{{ $totalTeachers ?? 0 }}</div>
-      <div class="briefing-stat-change text-success">+2.1%</div>
-    </div>
-    <div class="briefing-stat">
-      <div class="briefing-stat-label">Activité</div>
-      <div class="briefing-stat-value">98.2%</div>
-      <div class="briefing-stat-change text-success">+1.2%</div>
-    </div>
-  </div>
+    <h2 class="h4 mb-2" style="color: #111827; font-weight: 700;">{{ $briefing['title'] ?? 'Système performant' }}</h2>
+    <p class="text-muted mb-4">{{ $briefing['text'] ?? 'État du système optimal avec une activité normale' }}</p>
 
-  <div class="briefing-tags">
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <span class="briefing-tag">
-        <i data-lucide="zap" style="width:12px;height:12px;color:var(--warning)"></i>
+    <div class="row g-3">
+      <div class="col-6 col-md-3">
+        <div style="padding: 16px; background: white; border-radius: 12px; border: 1px solid #e5e7eb;">
+          <div style="font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">Utilisateurs Total</div>
+          <div style="font-size: 24px; font-weight: 700; color: #111827;">{{ $totalUsers ?? 0 }}</div>
+          <div style="font-size: 12px; color: #10b981; margin-top: 4px;"><i data-lucide="trending-up" style="width:12px;height:12px;"></i> +12.5%</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="padding: 16px; background: white; border-radius: 12px; border: 1px solid #e5e7eb;">
+          <div style="font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">Élèves Actifs</div>
+          <div style="font-size: 24px; font-weight: 700; color: #111827;">{{ $activeStudents ?? 0 }}</div>
+          <div style="font-size: 12px; color: #10b981; margin-top: 4px;"><i data-lucide="trending-up" style="width:12px;height:12px;"></i> +8.3%</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="padding: 16px; background: white; border-radius: 12px; border: 1px solid #e5e7eb;">
+          <div style="font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">Enseignants</div>
+          <div style="font-size: 24px; font-weight: 700; color: #111827;">{{ $totalTeachers ?? 0 }}</div>
+          <div style="font-size: 12px; color: #10b981; margin-top: 4px;"><i data-lucide="trending-up" style="width:12px;height:12px;"></i> +2.1%</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="padding: 16px; background: white; border-radius: 12px; border: 1px solid #e5e7eb;">
+          <div style="font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">Activité</div>
+          <div style="font-size: 24px; font-weight: 700; color: #111827;">98.2%</div>
+          <div style="font-size: 12px; color: #10b981; margin-top: 4px;"><i data-lucide="trending-up" style="width:12px;height:12px;"></i> +1.2%</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px;">
+      <span style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; background: white; border-radius: 8px; font-size: 12px; border: 1px solid #e5e7eb;">
+        <i data-lucide="zap" style="width:12px;height:12px;color:#f59e0b"></i>
         Système stable
       </span>
-      <span class="briefing-tag">
-        <i data-lucide="shield-check" style="width:12px;height:12px;color:var(--success)"></i>
+      <span style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; background: white; border-radius: 8px; font-size: 12px; border: 1px solid #e5e7eb;">
+        <i data-lucide="shield-check" style="width:12px;height:12px;color:#10b981"></i>
         SLA 99.1%
       </span>
-      <span class="briefing-tag">
-        <i data-lucide="trending-up" style="width:12px;height:12px;color:var(--primary)"></i>
+      <span style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; background: white; border-radius: 8px; font-size: 12px; border: 1px solid #e5e7eb;">
+        <i data-lucide="trending-up" style="width:12px;height:12px;color:#2563eb"></i>
         Croissance positive
       </span>
     </div>
-    <a class="briefing-link" href="">
-      Voir analytics
-      <i data-lucide="arrow-right" style="width:13px;height:13px"></i>
-    </a>
   </div>
 </div>
 
-{{-- KPI Row --}}
-<div class="kpi-grid mb-20">
-  <div class="kpi-card">
-    <div class="kpi-label">Total Utilisateurs</div>
-    <div class="kpi-value">{{ $totalUsers ?? 0 }}</div>
-    <div class="kpi-change up">
-      <i data-lucide="trending-up" style="width:12px;height:12px"></i>
-      12.5%
+{{-- KPI Row - Modern Gradient Cards --}}
+<div class="row mb-4 g-4">
+  {{-- Total Users Card --}}
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="metric-card-modern gradient-blue">
+      <div class="card-content">
+        <div class="metric-label-modern">Total Utilisateurs</div>
+        <div class="metric-value-modern">{{ $totalUsers ?? 0 }}</div>
+        <div class="metric-footer-modern">
+          <i data-lucide="trending-up" style="width:12px;height:12px"></i>
+          <span>+12.5%</span>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="kpi-card">
-    <div class="kpi-label">Total Étudiants</div>
-    <div class="kpi-value">{{ $totalStudents ?? 0 }}</div>
-    <div class="kpi-change up">
-      <i data-lucide="trending-up" style="width:12px;height:12px"></i>
-      8.3%
+
+  {{-- Total Students Card --}}
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="metric-card-modern gradient-cyan">
+      <div class="card-content">
+        <div class="metric-label-modern">Total Étudiants</div>
+        <div class="metric-value-modern">{{ $totalStudents ?? 0 }}</div>
+        <div class="metric-footer-modern">
+          <i data-lucide="trending-up" style="width:12px;height:12px"></i>
+          <span>+8.3%</span>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="kpi-card">
-    <div class="kpi-label">Revenus Encaissés</div>
-    <div class="kpi-value">{{ number_format($totalRevenue ?? 0, 0, ',', ' ') }}</div>
-    <div class="kpi-change up">
-      <i data-lucide="trending-up" style="width:12px;height:12px"></i>
-      5.1%
+
+  {{-- Revenue Card --}}
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="metric-card-modern gradient-green">
+      <div class="card-content">
+        <div class="metric-label-modern">Revenus Encaissés</div>
+        <div class="metric-value-modern">{{ number_format($totalRevenue ?? 0, 0, ',', ' ') }}</div>
+        <div class="metric-footer-modern">
+          <i data-lucide="trending-up" style="width:12px;height:12px"></i>
+          <span>+5.1%</span>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="kpi-card">
-    <div class="kpi-label">Paiements En Attente</div>
-    <div class="kpi-value">{{ $pendingPayments ?? 0 }}</div>
-    <div class="kpi-change" style="color:var(--warning)">
-      <i data-lucide="alert-circle" style="width:12px;height:12px"></i>
-      {{ number_format($unpaidAmount ?? 0, 0) }}
+
+  {{-- Pending Payments Card --}}
+  <div class="col-12 col-sm-6 col-lg-3">
+    <div class="metric-card-modern gradient-orange">
+      <div class="card-content">
+        <div class="metric-label-modern">Paiements En Attente</div>
+        <div class="metric-value-modern">{{ $pendingPayments ?? 0 }}</div>
+        <div class="metric-subtitle-modern">{{ number_format($unpaidAmount ?? 0, 0) }} FCFA</div>
+      </div>
     </div>
   </div>
 </div>

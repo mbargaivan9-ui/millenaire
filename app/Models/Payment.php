@@ -44,4 +44,56 @@ class Payment extends Model
     {
         return $query->where('status', self::STATUS_SUCCESS);
     }
+
+    /**
+     * Get human-readable status label
+     */
+    public function getStatusLabel(): string
+    {
+        $labels = [
+            'pending' => 'Pending',
+            'success' => 'Completed',
+            'completed' => 'Completed',
+            'failed' => 'Failed',
+            'expired' => 'Expired',
+            'cancelled' => 'Cancelled',
+            'processing' => 'Processing',
+        ];
+
+        return $labels[$this->status] ?? ucfirst($this->status);
+    }
+
+    /**
+     * Get status color for UI
+     */
+    public function getStatusColor(): string
+    {
+        $colors = [
+            'pending' => 'yellow',
+            'success' => 'green',
+            'completed' => 'green',
+            'failed' => 'red',
+            'expired' => 'red',
+            'cancelled' => 'gray',
+            'processing' => 'blue',
+        ];
+
+        return $colors[$this->status] ?? 'gray';
+    }
+
+    /**
+     * Check if payment is successful
+     */
+    public function isSuccessful(): bool
+    {
+        return in_array($this->status, ['success', 'completed']);
+    }
+
+    /**
+     * Check if payment is pending
+     */
+    public function isPending(): bool
+    {
+        return $this->status === 'pending' || $this->status === 'processing';
+    }
 }

@@ -24,6 +24,7 @@ return [
     'my_classes' => 'Mes Classes',
     'enter_marks' => 'Saisir Notes',
     'report_cards' => 'Bulletins Classe',
+    'bulletins' => 'Gestion Bulletins',
     'template_grid' => 'Grille Template',
     'list' => 'Liste',
     'templates' => 'Modèles',
@@ -50,4 +51,23 @@ return [
     'kpi' => 'KPI',
     'reports' => 'Rapports',
     'roles' => 'Rôles',
+    
+    // Communication Section
+    'communication' => 'Communication',
+    'chat' => 'Discussions',
+    'messages' => 'Messages',
+    'notifications' => 'Notifications',
+    
+    // Additional Navigation Items
+    'ocr_wizard' => 'Digitaliseur OCR',
+    'bulletin_ocr' => 'Structures OCR',
+    'children' => 'Enfants',
+    'monitoring' => 'Suivi Académique',
+    'report_cards' => 'Bulletins',
+    'payment' => 'Paiement',
+    'appointments' => 'Rendez-vous',
+    'my_marks' => 'Notes',
+    'progress' => 'Progression',
+    'learning' => 'Apprentissage',
+    'student' => 'Étudiant',
 ];

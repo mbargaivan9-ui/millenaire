@@ -16,9 +16,9 @@
     </div>
 
     <!-- Statistics Cards -->
-    <div class="row mb-4">
+    <div class="row mb-4 g-3">
         <div class="col-md-2">
-            <div class="card text-center border-left-primary">
+            <div class="card kpi-card shadow-sm h-100 text-center border-0">
                 <div class="card-body">
                     <div class="h4 mb-0">{{ $statistics['total_roles'] }}</div>
                     <small class="text-muted">Total Roles</small>
@@ -26,7 +26,7 @@
             </div>
         </div>
         <div class="col-md-2">
-            <div class="card text-center border-left-info">
+            <div class="card kpi-card shadow-sm h-100 text-center border-0">
                 <div class="card-body">
                     <div class="h4 mb-0">{{ $statistics['total_admins'] }}</div>
                     <small class="text-muted">Admins</small>
@@ -34,7 +34,7 @@
             </div>
         </div>
         <div class="col-md-2">
-            <div class="card text-center border-left-success">
+            <div class="card kpi-card shadow-sm h-100 text-center border-0">
                 <div class="card-body">
                     <div class="h4 mb-0">{{ $statistics['censeur_count'] }}</div>
                     <small class="text-muted">Censeurs</small>
@@ -42,7 +42,7 @@
             </div>
         </div>
         <div class="col-md-2">
-            <div class="card text-center border-left-warning">
+            <div class="card kpi-card shadow-sm h-100 text-center border-0">
                 <div class="card-body">
                     <div class="h4 mb-0">{{ $statistics['intendant_count'] }}</div>
                     <small class="text-muted">Intendants</small>
@@ -50,7 +50,7 @@
             </div>
         </div>
         <div class="col-md-2">
-            <div class="card text-center border-left-secondary">
+            <div class="card kpi-card shadow-sm h-100 text-center border-0">
                 <div class="card-body">
                     <div class="h4 mb-0">{{ $statistics['secretaire_count'] }}</div>
                     <small class="text-muted">Secrétaires</small>
@@ -58,7 +58,7 @@
             </div>
         </div>
         <div class="col-md-2">
-            <div class="card text-center border-left-dark">
+            <div class="card kpi-card shadow-sm h-100 text-center border-0">
                 <div class="card-body">
                     <div class="h4 mb-0">{{ $statistics['surveillant_count'] }}</div>
                     <small class="text-muted">Surveillants</small>
@@ -68,7 +68,7 @@
     </div>
 
     <!-- Roles Table -->
-    <div class="card">
+    <div class="card kpi-card shadow-sm h-100 border-0">
         <div class="card-header">
             <h5 class="mb-0">Administrative Roles</h5>
         </div>

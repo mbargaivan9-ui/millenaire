@@ -13,7 +13,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
-use App\Models\Bulletin;
 use App\Models\Mark;
 use App\Models\Payment;
 use App\Models\Student;
@@ -98,18 +97,6 @@ class DashboardController extends Controller
     private function buildAlerts(): array
     {
         $alerts = [];
-
-        // Bulletins non validés
-        $pendingBulletins = Bulletin::where('status', 'submitted')->count();
-        if ($pendingBulletins > 0) {
-            $alerts[] = [
-                'type'       => 'warning',
-                'icon'       => 'file-text',
-                'title'      => "$pendingBulletins bulletins en attente de validation",
-                'desc'       => 'Des enseignants ont soumis des bulletins à valider.',
-                'action_url' => route('admin.bulletins.index'),
-            ];
-        }
 
         // Paiements en retard
         $overduePayments = Payment::where('status', 'pending')

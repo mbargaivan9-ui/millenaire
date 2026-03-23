@@ -27,36 +27,10 @@ class HomeController extends Controller
     /**
      * Affiche la page d'accueil publique.
      * Charge les annonces publiées, les enseignants actifs et les statistiques globales.
-     * Redirige les utilisateurs authentifiés vers leur dashboard selon leur rôle.
+     * Les utilisateurs authentifiés peuvent accéder à cette page sans être redirigés.
      */
     public function index()
     {
-        // ✅ Rediriger les utilisateurs authentifiés vers leur dashboard approprié
-        if (Auth::check()) {
-            $user = Auth::user();
-            $role = $user->role ?? 'student';
-            
-            // Mappage des rôles aux routes de dashboard
-            $roleRoutes = [
-                'admin' => 'admin.dashboard',
-                'censeur' => 'admin.dashboard',
-                'intendant' => 'admin.dashboard',
-                'secretaire' => 'admin.dashboard',
-                'surveillant' => 'admin.dashboard',
-                'professeur' => 'teacher.dashboard',
-                'prof_principal' => 'teacher.dashboard',
-                'parent' => 'parent.dashboard',
-                'student' => 'student.dashboard',
-            ];
-            
-            $route = $roleRoutes[$role] ?? 'home';
-            
-            // Ne pas créer une boucle infinie si la route est 'home'
-            if ($route !== 'home') {
-                return redirect()->route($route);
-            }
-        }
-    
         try {
             $settings = EstablishmentSetting::getInstance();
         } catch (\Exception $e) {
@@ -67,8 +41,8 @@ class HomeController extends Controller
         $announcements = collect();
         try {
             $announcements = Announcement::query()
-                ->select('id', 'title', 'content', 'slug', 'published_at')
-                ->where('status', 'active')
+                ->select('id', 'title', 'content', 'slug', 'published_at', 'cover_image', 'attached_file', 'category')
+                ->where('is_published', true)
                 ->where(function ($q) {
                     $q->whereNull('published_at')
                       ->orWhere('published_at', '<=', now());
@@ -170,6 +144,12 @@ class HomeController extends Controller
      */
     public function instructors(): \Illuminate\View\View
     {
+        try {
+            $settings = EstablishmentSetting::getInstance();
+        } catch (\Exception $e) {
+            $settings = null;
+        }
+
         $teachers = collect();
         try {
             $teachers = Teacher::select('id', 'user_id', 'qualification', 'is_prof_principal', 'is_active')
@@ -180,7 +160,7 @@ class HomeController extends Controller
             // Silently fail
         }
 
-        return view('public.instructors', compact('teachers'));
+        return view('public.instructors', compact('teachers', 'settings'));
     }
 
     /**
@@ -188,6 +168,12 @@ class HomeController extends Controller
      */
     public function staff(): \Illuminate\View\View
     {
+        try {
+            $settings = EstablishmentSetting::getInstance();
+        } catch (\Exception $e) {
+            $settings = null;
+        }
+
         $adminRoles = collect();
         try {
             $adminRoles = AdminRole::select('id', 'user_id', 'role_name', 'responsibilities')
@@ -197,7 +183,7 @@ class HomeController extends Controller
             // Silently fail
         }
 
-        return view('public.staff', compact('adminRoles'));
+        return view('public.staff', compact('adminRoles', 'settings'));
     }
 
     /**
@@ -206,11 +192,17 @@ class HomeController extends Controller
     public function teacherProfile(int $id): \Illuminate\View\View
     {
         try {
+            $settings = EstablishmentSetting::getInstance();
+        } catch (\Exception $e) {
+            $settings = null;
+        }
+
+        try {
             $teacher = Teacher::select('id', 'user_id', 'qualification', 'is_prof_principal', 'is_active')
                 ->where('is_active', true)
                 ->findOrFail($id);
 
-            return view('public.teacher-profile', compact('teacher'));
+            return view('public.teacher-profile', compact('teacher', 'settings'));
         } catch (\Exception $e) {
             abort(404, 'Teacher not found');
         }

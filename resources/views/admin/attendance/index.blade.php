@@ -28,25 +28,25 @@
 
 {{-- Stats KPI Grid --}}
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px">
-  <div class="card">
+  <div class="card kpi-card shadow-sm h-100">
     <div class="card-body">
       <div style="color:var(--text-muted);font-size:12px;margin-bottom:8px">Total d'enregistrements</div>
       <div style="font-size:24px;font-weight:700">{{ $stats['total_records'] ?? 0 }}</div>
     </div>
   </div>
-  <div class="card">
+  <div class="card kpi-card shadow-sm h-100">
     <div class="card-body">
       <div style="color:var(--text-muted);font-size:12px;margin-bottom:8px">Absences</div>
       <div style="font-size:24px;font-weight:700;color:var(--danger)">{{ $stats['absences'] ?? 0 }}</div>
     </div>
   </div>
-  <div class="card">
+  <div class="card kpi-card shadow-sm h-100">
     <div class="card-body">
       <div style="color:var(--text-muted);font-size:12px;margin-bottom:8px">Justifiées</div>
       <div style="font-size:24px;font-weight:700;color:var(--success)">{{ $stats['justified'] ?? 0 }}</div>
     </div>
   </div>
-  <div class="card">
+  <div class="card kpi-card shadow-sm h-100">
     <div class="card-body">
       <div style="color:var(--text-muted);font-size:12px;margin-bottom:8px">En attente d'approbation</div>
       <div style="font-size:24px;font-weight:700;color:var(--info)">{{ $stats['pending'] ?? 0 }}</div>

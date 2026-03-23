@@ -190,7 +190,7 @@ class ProfileController extends Controller
             $teacher = $user->teacher;
             $stats = [
                 ['label' => 'Classes', 'value' => $teacher?->classSubjectTeachers()->distinct('class_id')->count() ?? 0, 'icon' => 'users'],
-                ['label' => 'Notes saisies', 'value' => $teacher ? \App\Models\BulletinEntry::whereHas('classSubjectTeacher', fn($q) => $q->where('teacher_id', $teacher->id))->count() : 0, 'icon' => 'check-square'],
+                ['label' => 'Notes saisies', 'value' => $teacher ? \App\Models\Mark::whereHas('classSubjectTeacher', fn($q) => $q->where('teacher_id', $teacher->id))->count() : 0, 'icon' => 'check-square'],
                 ['label' => 'Années exp.', 'value' => $teacher ? (int)$teacher->years_experience : 0, 'icon' => 'award'],
                 ['label' => 'Matières', 'value' => $teacher?->classSubjectTeachers()->distinct('subject_id')->count() ?? 0, 'icon' => 'book-open'],
             ];

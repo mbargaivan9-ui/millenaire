@@ -10,16 +10,35 @@ class EstablishmentSetting extends Model
     protected $table = 'establishment_settings';
     
     protected $fillable = [
-        'logo_path',
-        'about_title',
-        'about_description',
-        'proviseur_name',
-        'proviseur_bio',
-        'proviseur_photo',
-        'carousel_images',
-        'phone',
-        'email',
-        'address',
+        // Platform Identity
+        'platform_name', 'slogan', 'logo_path', 'favicon_path',
+        'school_name_fr', 'school_name_en',
+        
+        // Hero Section
+        'hero_title', 'hero_subtitle', 'hero_cta_text', 'hero_image',
+        
+        // Principal / Director
+        'proviseur_name', 'proviseur_title', 'proviseur_bio', 'proviseur_photo',
+        
+        // About Section
+        'about_title', 'about_description', 'about_image',
+        
+        // Contact & Social
+        'address', 'phone', 'email',
+        'social_facebook', 'social_twitter', 'google_maps_url',
+        
+        // Branding
+        'primary_color', 'secondary_color', 'years_existence',
+        'carousel_images', 'signature_image',
+        
+        // Academic Settings
+        'anglophone_grading', 'sequences_per_term',
+        'current_academic_year', 'current_term', 'current_sequence',
+        'grading_system', 'pass_mark',
+        
+        // Notification Settings
+        'notify_absence_parent', 'notify_new_bulletin', 
+        'notify_payment_success', 'email_notifications',
     ];
 
     protected $casts = [

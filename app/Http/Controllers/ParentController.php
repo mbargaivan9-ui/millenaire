@@ -62,7 +62,7 @@ class ParentController extends Controller
             });
         })->sortByDesc('created_at');
         
-        return view('parent.payments.index', [
+        return view('payment.index', [
             'payments' => $allPayments,
             'summary' => [
                 'total' => $allPayments->sum('amount'),

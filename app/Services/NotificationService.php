@@ -13,12 +13,10 @@
 
 namespace App\Services;
 
-use App\Models\Bulletin;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\EstablishmentSetting;
 use App\Notifications\AbsenceRecordedNotification;
-use App\Notifications\BulletinPublishedNotification;
 use App\Notifications\PaymentConfirmedNotification;
 use Illuminate\Support\Facades\Notification;
 
@@ -60,44 +58,6 @@ class NotificationService
         }
     }
 
-    /**
-     * Notifier parents et élève qu'un bulletin a été publié.
-     */
-    public function sendBulletinNotification(Bulletin $bulletin): void
-    {
-        $settings = EstablishmentSetting::getInstance();
-
-        if (!($settings->notify_new_bulletin ?? true)) {
-            return;
-        }
-
-        $student   = $bulletin->student;
-        $guardians = $student->guardians ?? collect();
-
-        // Notifier l'élève
-        $student->user?->notify(new BulletinPublishedNotification($bulletin));
-
-        // Notifier les parents/tuteurs
-        foreach ($guardians as $guardian) {
-            $user = $guardian->user ?? null;
-            if (!$user) continue;
-
-            try {
-                $user->notify(new BulletinPublishedNotification($bulletin));
-
-                broadcast(new \App\Events\BulletinPublished([
-                    'bulletin_id'  => $bulletin->id,
-                    'student_name' => $student->user?->name,
-                    'term'         => $bulletin->term,
-                    'sequence'     => $bulletin->sequence,
-                    'moyenne'      => $bulletin->moyenne,
-                ]))->toPrivate("guardian.{$user->id}");
-
-            } catch (\Throwable $e) {
-                \Log::error("[NotificationService] Bulletin notification failed: " . $e->getMessage());
-            }
-        }
-    }
 
     /**
      * Notifier la confirmation d'un paiement Mobile Money.

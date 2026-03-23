@@ -7,9 +7,7 @@ use App\Models\Classe;
 use App\Models\Mark;
 use App\Models\Schedule;
 use App\Models\CourseMaterial;
-use App\Models\ReportCard;
 use App\Services\GradeCalculationService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 
 /**
@@ -63,14 +61,7 @@ class DashboardController extends Controller
             $pendingGrades = max(0, $totalStudents2 - $filledGrades);
         }
 
-        // Bulletins non soumis
-        $pendingBulletins = 0;
-        if ($teacher?->head_class_id) {
-            $pendingBulletins = \App\Models\Bulletin::where('class_id', $teacher->head_class_id)
-                ->where('status', 'draft')
-                ->count();
-        }
-
+       
         // Emploi du temps du jour
         $todayDow       = strtolower(Carbon::now()->format('l')); // 'monday', 'tuesday', etc.
         $todaySchedule  = Schedule::where('teacher_id', $teacher?->id)
@@ -87,6 +78,10 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
+        // Bulletins intelligents en attente de publication (pour prof principal)
+        // Note: Table report_cards not active yet - use count of 0
+        $pendingBulletins = 0;
+        
         return view('teacher.dashboard', compact(
             'teacher', 'classes', 'totalStudents',
             'attendanceToday', 'pendingGrades', 'pendingBulletins',
@@ -163,140 +158,54 @@ class DashboardController extends Controller
     }
 
     /**
-     * Display report cards for professor principal.
+     * Bulletin/Grades Dashboard for a specific class.
      * 
-     * @route GET /teacher/report-cards (accessible only to prof_principal)
+     * @route GET /teacher/bulletin/{class}
+     * @param \App\Models\Classe $class
      */
-    public function reportCards()
+    public function bulletinDashboard(Classe $class)
     {
-        $user = auth()->user();
+        $user    = auth()->user();
         $teacher = $user->teacher;
         
-        // Ensure teacher record exists and is prof principal
+        // Ensure teacher record exists
         abort_unless($teacher, 403, 'Accès non autorisé. Aucun enregistrement enseignant trouvé.');
-        abort_unless($teacher->is_prof_principal, 403, 'Accès non autorisé. Seuls les professeurs principaux peuvent accéder à cette page.');
 
-        // Get head class (the class this professor is responsible for)
-        $headClass = $teacher->head_class_id ? Classe::find($teacher->head_class_id) : null;
-
-        if (!$headClass) {
-            return view('teacher.report-cards.index', [
-                'reportCards' => collect(),
-                'headClass' => null,
-                'message' => 'Vous n\'êtes pas assigné à une classe principale.'
-            ]);
-        }
-
-        // Get all report cards for students in the head class
-        $reportCards = ReportCard::where('class_id', $headClass->id)
-            ->with(['student.user', 'student.classe'])
-            ->orderByDesc('term')
-            ->orderByDesc('sequence')
-            ->paginate(15);
-
-        return view('teacher.report-cards.index', compact('reportCards', 'headClass'));
-    }
-
-    /**
-     * Show a specific report card.
-     * 
-     * @route GET /teacher/report-cards/{reportCard}
-     */
-    public function showReportCard(ReportCard $reportCard)
-    {
-        $user = auth()->user();
-        $teacher = $user->teacher;
+        // Check if teacher has access to this class
+        $hasAccess = $teacher->classSubjectTeachers()
+            ->where('class_id', $class->id)
+            ->exists() || $teacher->head_class_id === $class->id;
         
-        // Verify authorization
-        abort_unless($teacher, 403, 'Accès non autorisé.');
-        abort_unless(
-            $teacher->is_prof_principal && $teacher->head_class_id === $reportCard->class_id,
-            403,
-            'Accès non autorisé à ce bulletin.'
-        );
+        abort_unless($hasAccess, 403, 'Accès refusé à cette classe.');
 
-        $reportCard->load('student.user', 'student.classe');
-
-        return view('teacher.report-cards.show', compact('reportCard'));
-    }
-
-    /**
-     * Edit report card form.
-     * 
-     * @route GET /teacher/report-cards/{reportCard}/edit
-     */
-    public function editReportCard(ReportCard $reportCard)
-    {
-        $user = auth()->user();
-        $teacher = $user->teacher;
+        // Get class details with students and subjects
+        $classDetails = $class->load(['students' => fn($q) => $q->where('is_active', true)]);
         
-        // Verify authorization
-        abort_unless($teacher, 403, 'Accès non autorisé.');
-        abort_unless(
-            $teacher->is_prof_principal && $teacher->head_class_id === $reportCard->class_id,
-            403,
-            'Accès non autorisé à ce bulletin.'
-        );
+        // Get settings for current term/sequence
+        $settings = \App\Models\EstablishmentSetting::getInstance();
+        $term = $settings->current_term ?? 1;
+        $sequence = $settings->current_sequence ?? 1;
 
-        $reportCard->load('student.user', 'student.classe');
+        // Get marks for this class in current term/sequence
+        $marks = Mark::where([
+            'class_id' => $class->id,
+            'term' => $term,
+            'sequence' => $sequence,
+        ])->with('student', 'subject', 'teacher')->get();
 
-        return view('teacher.report-cards.edit', compact('reportCard'));
+        // Get subjects for this class
+        $subjects = $class->subjects()->get();
+
+        // Get assignments for this class (class-subject-teacher)
+        $assignments = $class->classSubjectTeachers()
+            ->with('subject', 'teacher')
+            ->get();
+
+        return view('teacher.bulletin-dashboard', compact(
+            'class', 'classDetails', 'marks', 'subjects', 'assignments', 
+            'term', 'sequence', 'teacher'
+        ));
     }
 
-    /**
-     * Update report card.
-     * 
-     * @route PUT /teacher/report-cards/{reportCard}
-     */
-    public function updateReportCard(\Illuminate\Http\Request $request, ReportCard $reportCard)
-    {
-        $user = auth()->user();
-        $teacher = $user->teacher;
-        
-        // Verify authorization
-        abort_unless($teacher, 403, 'Accès non autorisé.');
-        abort_unless(
-            $teacher->is_prof_principal && $teacher->head_class_id === $reportCard->class_id,
-            403,
-            'Accès non autorisé à ce bulletin.'
-        );
-
-        // Validate input
-        $validated = $request->validate([
-            'appreciation' => 'nullable|string|max:500',
-            'behavior_comment' => 'nullable|string|max:500',
-        ]);
-
-        // Update report card
-        $reportCard->update($validated);
-
-        return redirect()->route('teacher.report-cards.show', $reportCard)
-            ->with('success', 'Bulletin mis à jour avec succès.');
-    }
-
-    /**
-     * Download report card as PDF.
-     * 
-     * @route GET /teacher/report-cards/{reportCard}/pdf
-     */
-    public function downloadPDF(ReportCard $reportCard)
-    {
-        $user = auth()->user();
-        $teacher = $user->teacher;
-        
-        // Verify authorization
-        abort_unless($teacher, 403, 'Accès non autorisé.');
-        abort_unless(
-            $teacher->is_prof_principal && $teacher->head_class_id === $reportCard->class_id,
-            403,
-            'Accès non autorisé à ce bulletin.'
-        );
-
-        $reportCard->load('student.user', 'student.classe');
-
-        // Generate PDF using DomPDF
-        $pdf = Pdf::loadView('teacher.report-cards.pdf', compact('reportCard'));
-
-        return $pdf->download("bulletin-{$reportCard->student->user->last_name}-{$reportCard->term}-{$reportCard->sequence}.pdf");
-    }
+    // Report Cards functionality removed
 }

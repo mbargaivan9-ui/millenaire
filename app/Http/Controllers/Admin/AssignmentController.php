@@ -18,6 +18,7 @@ use App\Models\Teacher;
 use App\Models\TeacherAssignmentHistory;
 use App\Models\ClassSubjectTeacher;
 use App\Models\Subject;
+use App\Events\ProfPrincipalAssigned;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -58,13 +59,18 @@ class AssignmentController extends Controller
         ]);
 
         try {
-            DB::transaction(function () use ($request) {
+            $oldTeacher = null;
+            $newTeacher = null;
+            $class = null;
+
+            DB::transaction(function () use ($request, &$oldTeacher, &$newTeacher, &$class) {
                 $class     = Classe::findOrFail($request->class_id);
-                $newTeacher = Teacher::findOrFail($request->teacher_id);
+                $newTeacher = Teacher::with('user')->findOrFail($request->teacher_id);
 
                 // ─── Sauvegarder l'ancienne affectation dans l'historique ─────
                 $oldTeacher = Teacher::where('is_prof_principal', true)
                     ->where('head_class_id', $request->class_id)
+                    ->with('user')
                     ->first();
 
                 TeacherAssignmentHistory::create([
@@ -93,6 +99,13 @@ class AssignmentController extends Controller
                 // ─── Mettre à jour la classe ───────────────────────────────────
                 $class->update(['head_teacher_id' => $request->teacher_id]);
             });
+
+            // ─── Dispatcher l'événement pour invalider le cache session ───────
+            event(new ProfPrincipalAssigned(
+                $newTeacher->user,
+                $class->id,
+                $oldTeacher?->user
+            ));
 
             // ─── Log activité ────────────────────────────────────────────────
             activity()

@@ -28,6 +28,11 @@
         
         {{-- Menu utilisateur --}}
         <div class="d-flex align-items-center gap-3 ms-auto">
+            {{-- Language Switcher --}}
+            <div style="display: flex; align-items: center;">
+                <x-language-switcher />
+            </div>
+
             {{-- Notifications --}}
             <div class="dropdown">
                 <button class="btn btn-link text-dark position-relative p-0" data-bs-toggle="dropdown">

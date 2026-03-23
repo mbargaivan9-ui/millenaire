@@ -68,20 +68,22 @@ Route::prefix('api/v1')->name('api.v1.')->group(function () {
                 // Attendance
                 Route::apiResource('attendance', 'App\Http\Controllers\Api\V1\Teacher\AttendanceController');
 
-                // 🔥 Template Digitizer (OCR) - Prof Principal only
+                // � Smart Bulletin Templates API (replaces old OCR system)
+                // NOTE: To be implemented in API controller
+                /*
                 Route::middleware('role:prof_principal')
-                    ->prefix('bulletin-templates')
-                    ->name('templates.')
+                    ->prefix('smart-bulletin-templates')
+                    ->name('smart-templates.')
                     ->group(function () {
-                        Route::get('/', 'App\Http\Controllers\Api\V1\Teacher\BulletinTemplateController@index')->name('index');
-                        Route::post('/', 'App\Http\Controllers\Api\V1\Teacher\BulletinTemplateController@store')->name('store');
-                        Route::get('{id}', 'App\Http\Controllers\Api\V1\Teacher\BulletinTemplateController@show')->name('show');
-                        Route::put('{id}', 'App\Http\Controllers\Api\V1\Teacher\BulletinTemplateController@update')->name('update');
-                        Route::post('{id}/upload', 'App\Http\Controllers\Api\V1\Teacher\BulletinTemplateController@upload')->name('upload');
-                        Route::post('{id}/process-ocr', 'App\Http\Controllers\Api\V1\Teacher\BulletinTemplateController@processOCR')->name('process-ocr');
+                        Route::get('/', 'App\Http\Controllers\Api\V1\Teacher\SmartBulletinController@indexTemplates')->name('index');
+                        Route::post('/', 'App\Http\Controllers\Api\V1\Teacher\SmartBulletinController@storeTemplate')->name('store');
+                        Route::get('{id}', 'App\Http\Controllers\Api\V1\Teacher\SmartBulletinController@showTemplate')->name('show');
                     });
+                */
 
                 // Bulletins (Report Cards) - Prof Principal only
+                // NOTE: To be implemented in SmartBulletinController API endpoint
+                /*
                 Route::middleware('role:prof_principal')
                     ->prefix('bulletins')
                     ->name('bulletins.')
@@ -91,8 +93,10 @@ Route::prefix('api/v1')->name('api.v1.')->group(function () {
                         Route::post('lock-sequence', 'App\Http\Controllers\Api\V1\Teacher\BulletinController@lockSequence')->name('lock-sequence');
                         Route::post('export-pdf', 'App\Http\Controllers\Api\V1\Teacher\BulletinController@exportPDF')->name('export-pdf');
                     });
+                */
 
-                // 🔥 OCR Zone Detection System
+                // 🔥 OCR Zone Detection System (Disabled - BulletinOCRAPIController not found)
+                /*
                 Route::middleware('role:prof_principal')
                     ->prefix('bulletin/ocr')
                     ->name('bulletin.ocr.')
@@ -101,6 +105,7 @@ Route::prefix('api/v1')->name('api.v1.')->group(function () {
                         Route::get('{id}/ocr-zones', 'App\Http\Controllers\Teacher\BulletinOCRAPIController@getZones')->name('zones');
                         Route::post('{id}/ocr-zones', 'App\Http\Controllers\Teacher\BulletinOCRAPIController@saveZones')->name('save-zones');
                     });
+                */
             });
 
         /**
@@ -164,7 +169,7 @@ Route::prefix('api/v1')->name('api.v1.')->group(function () {
                 Route::apiResource('classes', 'App\Http\Controllers\Api\V1\Admin\ClasseController');
 
                 // Subjects
-                Route::apiResource('subjects', 'App\Http\Controllers\Api\V1\Admin\SubjectController');
+                // Route::apiResource('subjects', 'App\Http\Controllers\Api\V1\Admin\SubjectController');
 
                 // 🔥 Teacher Assignments (Drag & Drop)
                 Route::prefix('assignments')->name('assignments.')->group(function () {

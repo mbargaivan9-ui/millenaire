@@ -1,0 +1,411 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MODERN DASHBOARD STYLES - Millénaire Connect
+   Professional high-end design with gradients, animations, and premium styling
+   ═════════════════════════════════════════════════════════════════════════════════*/
+
+:root {
+  --primary: #2563eb;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #06b6d4;
+  --purple: #8b5cf6;
+  --pink: #ec4899;
+  --indigo: #6366f1;
+  --cyan: #06b6d4;
+  --amber: #f59e0b;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════════
+   METRIC & KPI CARDS - Premium Design
+   ═════════════════════════════════════════════════════════════════════════════════*/
+
+.metric-card-modern {
+  position: relative;
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+}
+
+.metric-card-modern:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+}
+
+.metric-card-modern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.metric-card-modern.gradient-blue {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.metric-card-modern.gradient-pink {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.metric-card-modern.gradient-green {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.metric-card-modern.gradient-cyan {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.metric-card-modern.gradient-orange {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.metric-card-modern.gradient-purple {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+.metric-card-modern .card-content {
+  position: relative;
+  z-index: 2;
+  color: white;
+  padding: 24px;
+}
+
+.metric-label-modern {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  opacity: 0.9;
+  margin-bottom: 12px;
+}
+
+.metric-value-modern {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.metric-subtitle-modern {
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.metric-footer-modern {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  opacity: 0.85;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════════
+   STAT CARDS - Compact Design
+   ═════════════════════════════════════════════════════════════════════════════════*/
+
+.stat-card-modern {
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-card-modern:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card-modern .card-body {
+  color: white;
+  text-align: center;
+  padding: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.stat-card-modern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+  z-index: 1;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════════
+   DATA TABLES - Premium Styling
+   ═════════════════════════════════════════════════════════════════════════════════*/
+
+.data-table-modern {
+  background: white;
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.data-table-modern .table {
+  margin-bottom: 0;
+}
+
+.data-table-modern thead {
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.data-table-modern thead th {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: #374151;
+  border: none;
+  padding: 16px;
+}
+
+.data-table-modern tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.data-table-modern tbody tr:hover {
+  background: #f9fafb;
+}
+
+.data-table-modern tbody td {
+  padding: 16px;
+  color: #374151;
+  border: none;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════════
+   BADGE & STATUS - Professional Styling
+   ═════════════════════════════════════════════════════════════════════════════════*/
+
+.badge-success-modern {
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 6px 12px;
+  display: inline-block;
+}
+
+.badge-warning-modern {
+  background: #fef08a;
+  color: #854d0e;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 6px 12px;
+  display: inline-block;
+}
+
+.badge-danger-modern {
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 6px 12px;
+  display: inline-block;
+}
+
+.badge-info-modern {
+  background: #dbeafe;
+  color: #1e40af;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 6px 12px;
+  display: inline-block;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════════
+   PROGRESS BARS - Modern Style
+   ═════════════════════════════════════════════════════════════════════════════════*/
+
+.progress-modern {
+  background: #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 24px;
+}
+
+.progress-modern .progress-bar {
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.progress-modern .progress-bar.success {
+  background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.progress-modern .progress-bar.primary {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.progress-modern .progress-bar.warning {
+  background: linear-gradient(90deg, #f5a623 0%, #ffb366 100%);
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════════
+   BUTTONS - Professional Design
+   ═════════════════════════════════════════════════════════════════════════════════*/
+
+.btn-modern {
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  padding: 10px 16px;
+  transition: all 0.3s ease;
+  font-size: 13px;
+}
+
+.btn-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-modern-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-modern-primary:hover {
+  background: #1d4ed8;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════════
+   FORM ELEMENTS - Modern Styling
+   ═════════════════════════════════════════════════════════════════════════════════*/
+
+.form-control-modern,
+.form-select-modern {
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  padding: 10px 12px;
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.form-control-modern:focus,
+.form-select-modern:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════════
+   HEADER SECTIONS - Gradient Backgrounds
+   ═════════════════════════════════════════════════════════════════════════════════*/
+
+.section-header-modern {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
+  color: white;
+  padding: 40px 0;
+  margin: -20px -15px 0;
+  border-radius: 0 0 20px 20px;
+}
+
+.section-header-modern h1 {
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.section-header-modern p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 15px;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═════════════════════════════════════════════════════════════════════════════════*/
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-in {
+  animation: slideInUp 0.4s ease-out;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ═════════════════════════════════════════════════════════════════════════════════*/
+
+@media (max-width: 768px) {
+  .metric-value-modern {
+    font-size: 1.8rem;
+  }
+
+  .stat-card-modern .card-body {
+    padding: 16px;
+  }
+
+  .section-header-modern h1 {
+    font-size: 1.5rem;
+  }
+
+  .metric-card-modern .card-content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .metric-value-modern {
+    font-size: 1.5rem;
+  }
+
+  .data-table-modern thead th {
+    padding: 12px 8px;
+    font-size: 10px;
+  }
+
+  .data-table-modern tbody td {
+    padding: 12px 8px;
+    font-size: 12px;
+  }
+}

@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.chat.permission' => \App\Http\Middleware\CheckChatPermission::class,
             'block.inappropriate'   => \App\Http\Middleware\BlockInappropriateContent::class,
             'ensure.teacher.record' => \App\Http\Middleware\EnsureTeacherRecordExists::class,
+            'check.must.change.password' => \App\Http\Middleware\CheckMustChangePassword::class,
         ]);
 
         // Global locale middleware for web

@@ -31,7 +31,8 @@ class SettingsController extends Controller
         $settings     = EstablishmentSetting::getInstance();
         $testimonials = Testimonial::orderBy('created_at', 'desc')->get();
 
-        return view('admin.settings.edit', compact('settings', 'testimonials'));
+        // Retourner la nouvelle vue sans Livewire
+        return view('admin.settings.tabs', compact('settings', 'testimonials'));
     }
 
     /**
@@ -51,21 +52,26 @@ class SettingsController extends Controller
         $request->validate([
             'platform_name'     => 'nullable|string|max:100',
             'slogan'            => 'nullable|string|max:200',
-            'logo'              => 'nullable|image|mimes:jpeg,png,gif,webp,svg|max:2048',
+            'logo'              => 'nullable|image|mimes:jpeg,png,gif,webp,svg,bmp,tiff,ico,heic,heif|max:2048',
             'favicon'           => 'nullable|image|mimes:ico,png|max:512',
             'hero_title'        => 'nullable|string|max:200',
             'hero_subtitle'     => 'nullable|string|max:500',
             'hero_cta_text'     => 'nullable|string|max:80',
-            'hero_image'        => 'nullable|image|mimes:jpeg,png,webp|max:5120',
-            'carousel_images.*' => 'nullable|image|mimes:jpeg,png,webp|max:5120',
+            'hero_image'        => 'nullable|image|mimes:jpeg,png,webp,gif,bmp,tiff,svg|max:5120',
+            // Old carousel format support
+            'carousel_images.*' => 'nullable|image|mimes:jpeg,png,gif,webp,svg,bmp,tiff,ico,heic,heif|max:5120',
+            // New carousel format - individual slides
+            'carousel_replace.0' => 'nullable|image|mimes:jpeg,png,gif,webp,svg,bmp,tiff,ico,heic,heif|max:5120',
+            'carousel_replace.1' => 'nullable|image|mimes:jpeg,png,gif,webp,svg,bmp,tiff,ico,heic,heif|max:5120',
+            'carousel_replace.2' => 'nullable|image|mimes:jpeg,png,gif,webp,svg,bmp,tiff,ico,heic,heif|max:5120',
             'proviseur_name'    => 'nullable|string|max:150',
             'proviseur_title'   => 'nullable|string|max:150',
-            'proviseur_photo'   => 'nullable|image|mimes:jpeg,png,webp|max:2048',
+            'proviseur_photo'   => 'nullable|image|mimes:jpeg,png,webp,gif,bmp,tiff|max:2048',
             'proviseur_bio'     => 'nullable|string|max:2000',
-            'signature_image'   => 'nullable|image|mimes:jpeg,png,webp|max:2048',
+            'signature_image'   => 'nullable|image|mimes:jpeg,png,webp,gif,bmp,tiff|max:2048',
             'about_title'       => 'nullable|string|max:200',
             'about_description' => 'nullable|string|max:3000',
-            'about_image'       => 'nullable|image|mimes:jpeg,png,webp|max:5120',
+            'about_image'       => 'nullable|image|mimes:jpeg,png,gif,webp,svg,bmp,tiff,heic,heif|max:5120',
             'primary_color'     => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'secondary_color'   => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'years_existence'   => 'nullable|integer|min:1|max:200',
@@ -75,6 +81,12 @@ class SettingsController extends Controller
             'social_facebook'   => 'nullable|url|max:300',
             'social_twitter'    => 'nullable|url|max:300',
             'google_maps_url'   => 'nullable|url|max:1000',
+            'anglophone_grading' => 'nullable|in:letter,percentage',
+            'sequences_per_term' => 'nullable|integer|in:2,3',
+            'notify_absence_parent' => 'nullable|boolean',
+            'notify_new_bulletin' => 'nullable|boolean',
+            'notify_payment_success' => 'nullable|boolean',
+            'email_notifications' => 'nullable|boolean',
         ]);
 
         $settings = EstablishmentSetting::getInstance();
@@ -104,52 +116,97 @@ class SettingsController extends Controller
 
         // ─── Upload Logo ─────────────────────────────────────────────────────
         if ($request->hasFile('logo')) {
-            if ($settings->logo_path && Storage::disk('public')->exists($settings->logo_path)) {
-                Storage::disk('public')->delete($settings->logo_path);
+            if ($settings->logo_path && Storage::disk('public')->exists(str_replace('storage/', '', $settings->logo_path))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $settings->logo_path));
             }
-            $data['logo_path'] = $request->file('logo')->store('settings', 'public');
+            $path = $request->file('logo')->store('settings', 'public');
+            $data['logo_path'] = 'storage/' . $path;
         }
 
         // ─── Upload Favicon ──────────────────────────────────────────────────
         if ($request->hasFile('favicon')) {
-            $data['favicon_path'] = $request->file('favicon')->store('settings', 'public');
+            if ($settings->favicon_path && Storage::disk('public')->exists(str_replace('storage/', '', $settings->favicon_path))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $settings->favicon_path));
+            }
+            $path = $request->file('favicon')->store('settings', 'public');
+            $data['favicon_path'] = 'storage/' . $path;
         }
 
         // ─── Upload Hero Image ───────────────────────────────────────────────
         if ($request->hasFile('hero_image')) {
-            if ($settings->hero_image && Storage::disk('public')->exists($settings->hero_image)) {
-                Storage::disk('public')->delete($settings->hero_image);
+            if ($settings->hero_image && Storage::disk('public')->exists(str_replace('storage/', '', $settings->hero_image))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $settings->hero_image));
             }
-            $data['hero_image'] = $request->file('hero_image')->store('settings', 'public');
+            $path = $request->file('hero_image')->store('settings', 'public');
+            $data['hero_image'] = 'storage/' . $path;
         }
 
         // ─── Upload Proviseur Photo ──────────────────────────────────────────
         if ($request->hasFile('proviseur_photo')) {
-            if ($settings->proviseur_photo && Storage::disk('public')->exists($settings->proviseur_photo)) {
-                Storage::disk('public')->delete($settings->proviseur_photo);
+            if ($settings->proviseur_photo && Storage::disk('public')->exists(str_replace('storage/', '', $settings->proviseur_photo))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $settings->proviseur_photo));
             }
-            $data['proviseur_photo'] = $request->file('proviseur_photo')->store('settings/proviseur', 'public');
+            $path = $request->file('proviseur_photo')->store('settings/proviseur', 'public');
+            $data['proviseur_photo'] = 'storage/' . $path;
         }
 
         // ─── Upload Signature ────────────────────────────────────────────────
         if ($request->hasFile('signature_image')) {
-            $data['signature_image'] = $request->file('signature_image')->store('settings', 'public');
+            if ($settings->signature_image && Storage::disk('public')->exists(str_replace('storage/', '', $settings->signature_image))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $settings->signature_image));
+            }
+            $path = $request->file('signature_image')->store('settings', 'public');
+            $data['signature_image'] = 'storage/' . $path;
         }
 
         // ─── Upload About Image ──────────────────────────────────────────────
         if ($request->hasFile('about_image')) {
-            $data['about_image'] = $request->file('about_image')->store('settings', 'public');
+            if ($settings->about_image && Storage::disk('public')->exists(str_replace('storage/', '', $settings->about_image))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $settings->about_image));
+            }
+            $path = $request->file('about_image')->store('settings', 'public');
+            $data['about_image'] = 'storage/' . $path;
         }
 
         // ─── Carousel Images ─────────────────────────────────────────────────
-        $carouselImages = $request->input('carousel_keep', []);
-        if ($request->hasFile('carousel_images')) {
-            foreach ($request->file('carousel_images') as $img) {
-                $carouselImages[] = $img->store('settings/carousel', 'public');
+        // Gestion des slides individuels (carousel_replace[0], [1], [2])
+        $carouselImages = [];
+        
+        // Récupérer les images existantes conservées
+        $keepImages = $request->input('carousel_keep', []);
+        
+        // Traiter les 3 slides du carousel
+        for ($i = 0; $i < 3; $i++) {
+            $fieldName = "carousel_replace.{$i}";
+            
+            if ($request->hasFile($fieldName)) {
+                // Nouvelle image uploadée pour ce slide
+                // Supprimer l'ancienne si elle existe
+                if (isset($keepImages[$i]) && Storage::disk('public')->exists(str_replace('storage/', '', $keepImages[$i]))) {
+                    Storage::disk('public')->delete(str_replace('storage/', '', $keepImages[$i]));
+                }
+                // Stocker la nouvelle
+                $path = $request->file($fieldName)->store('settings/carousel', 'public');
+                $carouselImages[$i] = 'storage/' . $path;
+            } elseif (isset($keepImages[$i])) {
+                // Conserver l'image existante
+                $carouselImages[$i] = $keepImages[$i];
             }
         }
+        
+        // Ajouter les nouvelles images supplémentaires si présentes
+        if ($request->hasFile('carousel_images')) {
+            foreach ($request->file('carousel_images') as $img) {
+                $path = $img->store('settings/carousel', 'public');
+                $carouselImages[] = 'storage/' . $path;
+            }
+        }
+        
+        // Sauvegarder seulement les images non-vides
+        $carouselImages = array_filter($carouselImages, fn($img) => !empty($img));
+        
         if (!empty($carouselImages)) {
-            $data['carousel_images'] = $carouselImages;
+            $data['carousel_images'] = array_values($carouselImages); // Réindexer pour éviter les gaps
         }
 
         // ─── Barème appréciations ────────────────────────────────────────────
@@ -167,6 +224,7 @@ class SettingsController extends Controller
         Cache::forget('public.teachers');
         Cache::forget('public.testimonials');
         Cache::forget('public.stats');
+        Cache::forget('establishment.settings');  // 👈 Invalider le cache des paramètres!
 
         // ─── Broadcaster l'événement Reverb ──────────────────────────────────
         if (class_exists(\App\Events\SettingsUpdated::class)) {
@@ -179,7 +237,7 @@ class SettingsController extends Controller
             ->withProperties(['updated_fields' => array_keys($data)])
             ->log('Paramètres de la plateforme mis à jour');
 
-        return redirect()->route('admin.settings.index')
+        return redirect()->route('admin.settings.edit')
             ->with('success', app()->getLocale() === 'fr'
                 ? 'Paramètres enregistrés avec succès !'
                 : 'Settings saved successfully!');

@@ -56,14 +56,25 @@
     </div>
 
     <!-- Payment Actions -->
-    <div class="mb-8">
+    <div class="mb-8 flex flex-col sm:flex-row gap-4">
         <button onclick="showPaymentModal({{ $student->id }})" 
-                class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition shadow-lg">
+                class="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition shadow-lg">
             <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
             {{ __('Make Payment') }}
         </button>
+        
+        <!-- PHASE 10: Orange Money & MTN MoMo Payment Button -->
+        @if($balance > 0)
+        <a href="{{ route('mobile-money.show', $student) }}" 
+           class="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg font-semibold hover:shadow-lg transition shadow-lg text-center">
+            <svg class="w-5 h-5 inline-block mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-13c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z"/>
+            </svg>
+            {{ __('Pay with Mobile Money') }}
+        </a>
+        @endif
     </div>
 
     <!-- Payment History Table -->

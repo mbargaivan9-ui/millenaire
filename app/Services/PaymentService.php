@@ -293,14 +293,7 @@ class PaymentService
         // Marquer la facture comme payée
         // Envoyer la notification au parent
         $student = $payment->student?->load('guardian.user');
-        if ($student?->guardian?->user) {
-            $student->guardian->user->notify(
-                new \App\Notifications\BulletinPublishedNotification(
-                    "Votre paiement de XAF " . number_format($payment->amount) . " a été confirmé. Réf: " . $payment->transaction_ref
-                )
-            );
-        }
-
+        
         activity()
             ->performedOn($payment)
             ->withProperties(['amount' => $payment->amount, 'operator' => $payment->operator])

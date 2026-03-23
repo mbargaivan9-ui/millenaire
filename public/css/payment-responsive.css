@@ -1,0 +1,311 @@
+/* ═════════════════════════════════════════════════════════════════
+   PAYMENT RESPONSIVE STYLING - Mobile-First Optimization
+   ═════════════════════════════════════════════════════════════════ */
+
+/* Mobile Payment Views - Compact on Small Screens */
+@media (max-width: 640px) {
+    /* Payment Header Optimization */
+    .payment-header {
+        padding: 1rem 1rem;
+    }
+
+    .payment-header h1 {
+        font-size: 1.5rem;
+        line-height: 1.2;
+    }
+
+    /* Payment Step Indicators - Compact */
+    .step-indicator {
+        flex-shrink: 0;
+        min-width: auto;
+    }
+
+    .step-indicator span {
+        display: none;
+    }
+
+    .step-indicator > div:first-child {
+        position: relative;
+        margin-bottom: 0;
+    }
+
+    /* Payment Cards Grid */
+    .payment-card {
+        padding: 1rem;
+    }
+
+    .payment-card .amount {
+        font-size: 1.5rem;
+    }
+
+    /* Payment Buttons - Full Width */
+    .payment-btn {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .payment-button-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .payment-button-group button {
+        flex: 1;
+    }
+
+    /* Operator Selection Cards */
+    .operator-card {
+        padding: 1.5rem;
+    }
+
+    .operator-card h3 {
+        font-size: 1.25rem;
+    }
+
+    /* Statistics Cards */
+    .stat-card {
+        padding: 1.5rem;
+    }
+
+    .stat-card .stat-value {
+        font-size: 1.75rem;
+    }
+
+    .stat-card .stat-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    /* Summary Stats Grid */
+    .summary-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .summary-stats .stat-item {
+        padding: 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .summary-stats .stat-item .amount {
+        font-size: 1rem;
+    }
+
+    /* Content Area Padding */
+    .payment-content {
+        padding: 1rem;
+    }
+
+    /* Student Info Card on Mobile */
+    .student-info-avatar {
+        width: 3rem;
+        height: 3rem;
+        font-size: 1.25rem;
+    }
+
+    /* Responsive Text Sizes */
+    .payment-text-xl {
+        font-size: 1rem;
+    }
+
+    .payment-text-2xl {
+        font-size: 1.25rem;
+    }
+
+    .payment-text-3xl {
+        font-size: 1.5rem;
+    }
+
+    /* Progress Section */
+    .progress-section {
+        padding: 1rem;
+    }
+
+    /* Animation Sizes on Mobile */
+    .payment-animation-lg {
+        width: 5rem;
+        height: 5rem;
+    }
+
+    .payment-animation-lg svg {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .payment-animation-xl {
+        width: 6rem;
+        height: 6rem;
+    }
+
+    .payment-animation-xl svg {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    /* Phone Input Styling */
+    .phone-input {
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+    }
+
+    /* Confirmation Summary */
+    .confirmation-summary {
+        font-size: 0.875rem;
+        padding: 1rem;
+    }
+
+    .confirmation-summary .amount {
+        font-size: 1.5rem;
+    }
+
+    /* Status Messages */
+    .status-message {
+        font-size: 1rem;
+    }
+
+    .status-detail {
+        font-size: 0.75rem;
+    }
+
+    /* Warning Boxes */
+    .payment-warning {
+        padding: 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    /* Footer Text */
+    .payment-footer {
+        font-size: 0.75rem;
+        padding: 0.5rem;
+    }
+}
+
+/* Medium Screens Optimization (640px - 1024px) */
+@media (min-width: 641px) and (max-width: 1024px) {
+    .payment-header h1 {
+        font-size: 2.25rem;
+    }
+
+    .stat-card .stat-value {
+        font-size: 2rem;
+    }
+
+    .payment-animation-lg {
+        width: 6rem;
+        height: 6rem;
+    }
+
+    .payment-content {
+        padding: 1.5rem;
+    }
+}
+
+/* Large Screens (1024px+) */
+@media (min-width: 1025px) {
+    .payment-header h1 {
+        font-size: 3rem;
+    }
+
+    .stat-card .stat-value {
+        font-size: 2.25rem;
+    }
+
+    .payment-animation-lg {
+        width: 7rem;
+        height: 7rem;
+    }
+}
+
+/* Prevent Overflow */
+.payment-wrapper {
+    overflow-x: hidden;
+    word-wrap: break-word;
+}
+
+/* Responsive Padding Utility */
+.responsive-p {
+    padding: 1rem;
+}
+
+@media (min-width: 640px) {
+    .responsive-p {
+        padding: 1.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .responsive-p {
+        padding: 2rem;
+    }
+}
+
+/* Responsive Gap Utility */
+.responsive-gap {
+    gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+    .responsive-gap {
+        gap: 1rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .responsive-gap {
+        gap: 1.5rem;
+    }
+}
+
+/* Touch-friendly Button Sizing */
+@media (hover: none) and (pointer: coarse) {
+    .payment-btn {
+        min-height: 3rem;
+        padding: 0.75rem;
+    }
+
+    .payment-interactive {
+        min-width: 2.5rem;
+        min-height: 2.5rem;
+    }
+}
+
+/* Landscape Mode Mobile */
+@media (max-height: 500px) {
+    .payment-header {
+        margin-bottom: 0.5rem;
+    }
+
+    .progress-section {
+        padding: 0.5rem;
+    }
+
+    .payment-content {
+        min-height: auto;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-card .stat-value {
+        font-size: 1.5rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .payment-btn,
+    .payment-interactive,
+    .step-indicator {
+        display: none;
+    }
+
+    .payment-content {
+        background: white;
+        color: black;
+    }
+}

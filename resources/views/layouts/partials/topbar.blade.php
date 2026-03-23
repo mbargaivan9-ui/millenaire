@@ -19,57 +19,29 @@
     <span class="topbar-kbd">/</span>
   </div>
 
+  {{-- Home Link --}}
+  <a href="{{ route('home') }}" class="topbar-btn" title="{{ __('app.back_to_home') }}" style="gap: 6px;">
+    <i data-lucide="home"></i>
+    <span style="font-size: 12px; font-weight: 600; display: none; margin-right: 4px;">{{ __('app.home') }}</span>
+  </a>
+
   {{-- Actions --}}
   <div class="topbar-actions">
 
-    {{-- Language Switcher --}}
-    <div class="dropdown">
-      <div class="topbar-lang" data-dropdown="lang-menu">
-        @if(app()->getLocale() === 'fr')
-          <span>🇫🇷</span><span><i data-lucide="french-flag"></i>FR</span>
-        @else
-          <span>🇺🇸</span><span><i data-lucide="usa-flag"></i>EN</span>
-        @endif
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="6 9 12 15 18 9"/>
-        </svg>
-      </div>
-      <div class="dropdown-menu" id="lang-menu" style="min-width:160px">
-        <div class="dropdown-item" data-lang="fr" style="gap:10px">
-          <span>🇫🇷</span>
-          <span style="font-size:13px;font-weight:500">Français</span>
-          @if(app()->getLocale() === 'fr')
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-              fill="none" stroke="var(--primary)" stroke-width="2.5" style="margin-left:auto">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-          @endif
-        </div>
-        <div class="dropdown-item" data-lang="en" style="gap:10px">
-          <span>🇺🇸</span>
-          <span style="font-size:13px;font-weight:500">English</span>
-          @if(app()->getLocale() === 'en')
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-              fill="none" stroke="var(--primary)" stroke-width="2.5" style="margin-left:auto">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-          @endif
-        </div>
-      </div>
-    </div>
+    {{-- Language Switcher - Premium Component --}}
+    <x-language-switcher />
 
     <div class="topbar-divider"></div>
 
     {{-- Theme Toggle --}}
-    <button class="topbar-btn" data-theme-toggle title="{{ __('toggle theme') ?? 'Toggle theme' }}">
+    <button class="topbar-btn" data-theme-toggle title="{{ __('app.toggle_theme') }}">
       <i data-lucide="sun" id="theme-icon-light"></i>
       <i data-lucide="moon" id="theme-icon-dark" style="display:none"></i>
     </button>
 
     {{-- Notifications --}}
     <div class="dropdown">
-      <button class="topbar-btn" data-dropdown="notif-menu" title="{{ __('notifications') ?? 'Notifications' }}">
+      <button class="topbar-btn" data-dropdown="notif-menu" title="{{ __('app.notifications') }}">
         <i data-lucide="bell"></i>
         @php $unreadNotif = auth()->user()?->unread_notifications_count ?? 0; @endphp
         @if($unreadNotif > 0)
@@ -78,7 +50,7 @@
       </button>
       <div class="dropdown-menu" id="notif-menu" style="min-width:340px;right:0">
         <div class="dropdown-header">
-          <span class="dropdown-title">{{ __('notifications') ?? 'Notifications' }}</span>
+          <span class="dropdown-title">{{ __('app.notifications') }}</span>
         </div>
         @forelse(auth()->user()?->notifications?->take(5) ?? [] as $notif)
         <div class="dropdown-item">
@@ -98,14 +70,14 @@
         </div>
         @endforelse
         <div class="dropdown-footer">
-          <a href="{{ route('notifications.index') }}">{{ __('view all notifications') ?? 'View all' }}</a>
+          <a href="{{ route('notifications.index') }}">{{ __('app.view_all_notifications') }}</a>
         </div>
       </div>
     </div>
 
     {{-- Messages --}}
     <div class="dropdown">
-      <button class="topbar-btn" data-dropdown="msg-menu" title="{{ __('messages') ?? 'Messages' }}">
+      <button class="topbar-btn" data-dropdown="msg-menu" title="{{ __('app.messages') }}">
         <i data-lucide="mail"></i>
         @php $unreadMsg = auth()->user()?->unread_messages_count ?? 0; @endphp
         @if($unreadMsg > 0)
@@ -114,14 +86,14 @@
       </button>
       <div class="dropdown-menu" id="msg-menu" style="min-width:300px">
         <div class="dropdown-header">
-          <span class="dropdown-title">{{ __('messages') ?? 'Messages' }}</span>
-          <a class="dropdown-link" href="{{ route('messages.index') }}">{{ __('view all') ?? 'View all' }}</a>
+          <span class="dropdown-title">{{ __('app.messages') }}</span>
+          <a class="dropdown-link" href="{{ route('messages.index') }}">{{ __('app.view_all') }}</a>
         </div>
         <div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px">
-          {{ __('No messages') ?? 'No new messages' }}
+          {{ __('app.no_messages') }}
         </div>
         <div class="dropdown-footer">
-          <a href="{{ route('messages.index') }}">{{ __('open inbox') ?? 'Open Inbox' }}</a>
+          <a href="{{ route('messages.index') }}">{{ __('app.open_inbox') }}</a>
         </div>
       </div>
     </div>
@@ -144,26 +116,38 @@
         <div class="dropdown-header">
           <span class="dropdown-title">{{ auth()->user()?->name ?? 'User' }}</span>
         </div>
-        @if(Route::has('profile'))
+        {{-- Profile Link --}}
+        @if(Route::has('account.profile'))
         <a href="{{ route('account.profile') }}" class="dropdown-item">
           <div class="dropdown-item-icon" style="background:var(--primary-bg)">
             <i data-lucide="user" style="width:16px;height:16px;color:var(--primary)"></i>
           </div>
           <div>
-            <div class="dropdown-item-title">{{ __('profile') ?? 'Profile' }}</div>
-            <div class="dropdown-item-desc">{{ __('view profile') ?? 'View your profile' }}</div>
+            <div class="dropdown-item-title">{{ __('app.profile') }}</div>
+            <div class="dropdown-item-desc">{{ __('app.profile_settings') }}</div>
+          </div>
+        </a>
+        @elseif(Route::has('profile.show'))
+        <a href="{{ route('profile.show') }}" class="dropdown-item">
+          <div class="dropdown-item-icon" style="background:var(--primary-bg)">
+            <i data-lucide="user" style="width:16px;height:16px;color:var(--primary)"></i>
+          </div>
+          <div>
+            <div class="dropdown-item-title">{{ __('app.profile') }}</div>
+            <div class="dropdown-item-desc">{{ __('app.profile_settings') }}</div>
           </div>
         </a>
         @endif
 
+        {{-- Security Link --}}
         @if(Route::has('profile.security'))
         <a href="{{ route('profile.security') }}" class="dropdown-item">
           <div class="dropdown-item-icon" style="background:var(--warning-bg)">
             <i data-lucide="shield" style="width:16px;height:16px;color:var(--warning)"></i>
           </div>
           <div>
-            <div class="dropdown-item-title">{{ __('security') ?? 'Security' }}</div>
-            <div class="dropdown-item-desc">{{ __('change_password') ?? 'Change password' }}</div>
+            <div class="dropdown-item-title">{{ __('app.security') }}</div>
+            <div class="dropdown-item-desc">{{ __('app.change_password') ?? 'Change Password' }}</div>
           </div>
         </a>
         @endif
@@ -174,8 +158,8 @@
             <i data-lucide="settings" style="width:16px;height:16px;color:var(--info)"></i>
           </div>
           <div>
-            <div class="dropdown-item-title">{{ __('settings') ?? 'Settings' }}</div>
-            <div class="dropdown-item-desc">{{ __('manage settings') ?? 'Manage settings' }}</div>
+            <div class="dropdown-item-title">{{ __('app.settings') ?? 'Settings' }}</div>
+            <div class="dropdown-item-desc">{{ __('app.manage_settings') ?? 'Manage Settings' }}</div>
           </div>
         </a>
         @endif
@@ -184,7 +168,7 @@
           <form method="POST" action="{{ route('logout') }}" style="display:inline">
             @csrf
             <button type="submit" class="dropdown-link" style="color:var(--danger);font-size:13px">
-              {{ __('logout') ?? 'Logout' }}
+              {{ __('app.sign_out') }}
             </button>
           </form>
         </div>

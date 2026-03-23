@@ -157,6 +157,53 @@ return [
         'anglophone'  => 'Anglophone',
     ],
 
+    // Langue & Localisation
+    'select_language'   => 'Sélectionner la Langue',
+    'french'            => 'Français',
+    'english'           => 'English',
+    'france'            => 'France',
+    'united_states'     => 'États-Unis',
+    'language'          => 'Langue',
+    'change_language'   => 'Changer de Langue',
+
+    // Messages Système
+    'toggle_theme'      => 'Changer le Thème',
+    'notifications'     => 'Notifications',
+    'messages'          => 'Messages',
+    'no_notifications'  => 'Aucune notification',
+    'view_all_notifications' => 'Voir Toutes les Notifications',
+    'view_all'          => 'Voir Tout',
+    'open_inbox'        => 'Ouvrir la Boîte de Réception',
+    'no_messages'       => 'Aucun nouveau message',
+    'back_to_home'      => 'Retourner à l\'Accueil',
+    'home'              => 'Accueil',
+    'please_wait'       => 'Veuillez patienter...',
+    'loading'           => 'Chargement...',
+
+    // Navigation & Interface
+    'menu'              => 'Menu',
+    'account'           => 'Compte',
+    'profile'           => 'Profil',
+    'my_account'        => 'Mon Compte',
+    'profile_settings'  => 'Paramètres du Profil',
+    'security'          => 'Sécurité',
+    'privacy'           => 'Confidentialité',
+    'help'              => 'Aide & Support',
+    'logout_confirm'    => 'Êtes-vous sûr de vouloir vous déconnecter ?',
+    'sign_out'          => 'Se déconnecter',
+    'language_changed'  => 'Langue modifiée avec succès',
+
+    // Expressions Courantes
+    'select_all'  => 'Tout Sélectionner',
+    'deselect_all'=> 'Tout Désélectionner',
+    'show_more'   => 'Afficher Plus',
+    'show_less'   => 'Afficher Moins',
+    'copy_to_clipboard' => 'Copier dans le Presse-papiers',
+    'copied'      => 'Copié !',
+    'not_available' => 'Non Disponible',
+    'coming_soon' => 'À Venir Bientôt',
+    'maintenance_mode' => 'Sous Maintenance',
+
     // Validation messages
     'validation' => [
         'required'  => 'Le champ :attribute est obligatoire.',

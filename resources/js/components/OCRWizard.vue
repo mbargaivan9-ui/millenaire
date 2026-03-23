@@ -62,13 +62,8 @@
 
       <!-- Étape 2: Validation OCR -->
       <div v-if="currentStep === 'validation' && ocrResult" class="wizard-step">
-        <OCRBulletinViewer 
-          :previewImage="ocrResult.preview_url"
-          :ocrZones="ocrResult.ocr_zones"
-          :rawText="ocrResult.raw_text"
-          @zone-updated="handleZoneUpdate"
-          @export-data="handleExportData"
-        />
+        <!-- OCRBulletinViewer component temporarily disabled -->
+        <p class="text-muted">{{ ocrResult.raw_text }}</p>
       </div>
 
       <!-- Étape 3: Résumé -->
@@ -115,12 +110,9 @@
 </template>
 
 <script>
-import OCRBulletinViewer from './OCRBulletinViewer.vue';
-
 export default {
   name: 'OCRWizard',
   components: {
-    OCRBulletinViewer,
   },
   data() {
     return {

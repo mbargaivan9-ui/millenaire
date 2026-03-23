@@ -188,11 +188,12 @@
     {{-- ─── Step Progress ───────────────────────────────────────────────────── --}}
     <div class="step-progress mb-4">
         @foreach([
-            ['icon' => '1', 'label_fr' => 'Opérateur',     'label_en' => 'Operator'],
-            ['icon' => '2', 'label_fr' => 'Numéro',         'label_en' => 'Number'],
-            ['icon' => '3', 'label_fr' => 'Confirmation',   'label_en' => 'Confirm'],
-            ['icon' => '4', 'label_fr' => 'Traitement',     'label_en' => 'Processing'],
-            ['icon' => '5', 'label_fr' => 'Reçu',           'label_en' => 'Receipt'],
+            ['icon' => '1', 'label_fr' => 'Montant',         'label_en' => 'Amount'],
+            ['icon' => '2', 'label_fr' => 'Opérateur',       'label_en' => 'Operator'],
+            ['icon' => '3', 'label_fr' => 'Numéro',          'label_en' => 'Number'],
+            ['icon' => '4', 'label_fr' => 'Confirmation',    'label_en' => 'Confirm'],
+            ['icon' => '5', 'label_fr' => 'Traitement',      'label_en' => 'Processing'],
+            ['icon' => '6', 'label_fr' => 'Reçu',            'label_en' => 'Receipt'],
         ] as $i => $step)
         <div class="step-item" id="step-item-{{ $i + 1 }}">
             <div class="step-circle {{ $i === 0 ? 'active' : '' }}" id="step-circle-{{ $i + 1 }}">
@@ -206,8 +207,61 @@
     <div class="card">
         <div class="card-body p-4">
 
-            {{-- ══════════ ÉTAPE 1: Sélection Opérateur ══════════ --}}
+            {{-- ══════════ ÉTAPE 1: Saisie Montant ══════════ --}}
             <div class="step-panel active" id="panel-1">
+                <h5 class="fw-bold mb-1">{{ $isFr ? 'Montant à payer' : 'Amount to pay' }}</h5>
+                <p class="text-muted mb-3" style="font-size:.85rem">
+                    {{ $isFr ? 'Saisissez le montant que vous souhaitez payer pour la scolarité.' : 'Enter the amount you wish to pay for school fees.' }}
+                </p>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold mb-2">{{ $isFr ? 'Montant (XAF)' : 'Amount (XAF)' }}</label>
+                    <div style="display:flex;gap:.5rem;align-items:center">
+                        <span style="font-weight:700;font-size:1.2rem">XAF</span>
+                        <input type="number" id="amount-input" class="form-control" 
+                               placeholder="0" 
+                               min="1000" max="{{ $amount }}"
+                               value="{{ $amount }}"
+                               oninput="validateAmount(this)">
+                    </div>
+                    <small class="text-muted d-block mt-2">
+                        {{ $isFr ? 'Maximum disponible: ' : 'Maximum available: ' }}
+                        <strong>XAF {{ number_format($amount, 0, ',', ' ') }}</strong>
+                    </small>
+                    <div id="amount-error" class="text-danger mt-2" style="font-size:.8rem;display:none">
+                        {{ $isFr ? 'Le montant doit être entre 1000 et ' : 'Amount must be between 1000 and ' }}
+                        {{ number_format($amount, 0, ',', ' ') }} XAF
+                    </div>
+                </div>
+
+                {{-- Amount Summary --}}
+                <div class="confirm-summary">
+                    <div class="confirm-row">
+                        <span class="confirm-label">{{ $isFr ? 'Montant à payer' : 'Amount to pay' }}</span>
+                        <span class="confirm-value" id="summary-amount-display" style="color:var(--primary)">
+                            XAF {{ number_format($amount, 0, ',', ' ') }}
+                        </span>
+                    </div>
+                    <div class="confirm-row">
+                        <span class="confirm-label">{{ $isFr ? 'Type' : 'Type' }}</span>
+                        <span class="confirm-value">{{ $feeType }}</span>
+                    </div>
+                    <div class="confirm-row">
+                        <span class="confirm-label">{{ $isFr ? 'Étudiant' : 'Student' }}</span>
+                        <span class="confirm-value">{{ $student?->user?->name }}</span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <button class="btn btn-primary px-4" id="btn-step1" disabled onclick="goToStep(2)">
+                        {{ $isFr ? 'Continuer' : 'Continue' }}
+                        <i data-lucide="arrow-right" style="width:16px" class="ms-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            {{-- ══════════ ÉTAPE 2: Sélection Opérateur ══════════ --}}
+            <div class="step-panel" id="panel-2">
                 <h5 class="fw-bold mb-1">{{ $isFr ? 'Choisir votre opérateur' : 'Choose your operator' }}</h5>
                 <p class="text-muted mb-3" style="font-size:.85rem">
                     {{ $isFr ? 'Sélectionnez le réseau avec lequel vous souhaitez payer.' : 'Select the network you want to pay with.' }}
@@ -218,7 +272,7 @@
                     <div class="amount-label">{{ $isFr ? 'Montant à payer' : 'Amount to pay' }}</div>
                     <div class="amount-value">
                         <span class="amount-currency">XAF</span>
-                        {{ number_format($amount, 0, ',', ' ') }}
+                        <span id="display-amount">{{ number_format($amount, 0, ',', ' ') }}</span>
                     </div>
                     <div style="opacity:.75;font-size:.83rem;margin-top:.5rem">{{ $feeType }}</div>
                 </div>
@@ -245,16 +299,20 @@
                     {{ $isFr ? 'Transaction sécurisée SSL/TLS — Vos données sont protégées' : 'Secure SSL/TLS transaction — Your data is protected' }}
                 </div>
 
-                <div class="d-flex justify-content-end mt-4">
-                    <button class="btn btn-primary px-4" id="btn-step1" disabled onclick="goToStep(2)">
+                <div class="d-flex justify-content-between mt-4">
+                    <button class="btn btn-light" onclick="goToStep(1)">
+                        <i data-lucide="arrow-left" style="width:16px" class="me-1"></i>
+                        {{ $isFr ? 'Retour' : 'Back' }}
+                    </button>
+                    <button class="btn btn-primary px-4" id="btn-step2" disabled onclick="goToStep(3)">
                         {{ $isFr ? 'Continuer' : 'Continue' }}
                         <i data-lucide="arrow-right" style="width:16px" class="ms-2"></i>
                     </button>
                 </div>
             </div>
 
-            {{-- ══════════ ÉTAPE 2: Saisie Numéro ══════════ --}}
-            <div class="step-panel" id="panel-2">
+            {{-- ══════════ ÉTAPE 3: Saisie Numéro ══════════ --}}
+            <div class="step-panel" id="panel-3">
                 <h5 class="fw-bold mb-1">{{ $isFr ? 'Votre numéro de téléphone' : 'Your phone number' }}</h5>
                 <p class="text-muted mb-3" style="font-size:.85rem">
                     {{ $isFr ? 'Saisissez le numéro associé à votre compte Mobile Money.' : 'Enter the phone number linked to your Mobile Money account.' }}
@@ -279,29 +337,29 @@
 
                 <div class="confirm-summary">
                     <div class="confirm-row">
-                        <span class="confirm-label">{{ $isFr ? 'Opérateur' : 'Operator' }}</span>
-                        <span class="confirm-value" id="summary-operator">—</span>
+                        <span class="confirm-label">{{ $isFr ? 'Montant' : 'Amount' }}</span>
+                        <span class="confirm-value" style="color:var(--primary)">XAF <span id="confirm-amount">{{ number_format($amount, 0, ',', ' ') }}</span></span>
                     </div>
                     <div class="confirm-row">
-                        <span class="confirm-label">{{ $isFr ? 'Montant' : 'Amount' }}</span>
-                        <span class="confirm-value" style="color:var(--primary)">XAF {{ number_format($amount, 0, ',', ' ') }}</span>
+                        <span class="confirm-label">{{ $isFr ? 'Opérateur' : 'Operator' }}</span>
+                        <span class="confirm-value" id="summary-operator">—</span>
                     </div>
                 </div>
 
                 <div class="d-flex justify-content-between mt-4">
-                    <button class="btn btn-light" onclick="goToStep(1)">
+                    <button class="btn btn-light" onclick="goToStep(2)">
                         <i data-lucide="arrow-left" style="width:16px" class="me-1"></i>
                         {{ $isFr ? 'Retour' : 'Back' }}
                     </button>
-                    <button class="btn btn-primary px-4" id="btn-step2" disabled onclick="goToStep(3)">
+                    <button class="btn btn-primary px-4" id="btn-step3" disabled onclick="goToStep(4)">
                         {{ $isFr ? 'Continuer' : 'Continue' }}
                         <i data-lucide="arrow-right" style="width:16px" class="ms-2"></i>
                     </button>
                 </div>
             </div>
 
-            {{-- ══════════ ÉTAPE 3: Confirmation ══════════ --}}
-            <div class="step-panel" id="panel-3">
+            {{-- ══════════ ÉTAPE 4: Confirmation ══════════ --}}
+            <div class="step-panel" id="panel-4">
                 <h5 class="fw-bold mb-1">{{ $isFr ? 'Confirmer votre paiement' : 'Confirm your payment' }}</h5>
                 <p class="text-muted mb-3" style="font-size:.85rem">
                     {{ $isFr ? 'Vérifiez les informations avant de lancer le paiement.' : 'Check the details before initiating payment.' }}
@@ -317,18 +375,16 @@
                         <span class="confirm-value">{{ $feeType }}</span>
                     </div>
                     <div class="confirm-row">
+                        <span class="confirm-label">{{ $isFr ? 'Montant' : 'Amount' }}</span>
+                        <span class="confirm-value" style="color:var(--primary)">XAF <span id="confirm-final-amount">{{ number_format($amount, 0, ',', ' ') }}</span></span>
+                    </div>
+                    <div class="confirm-row">
                         <span class="confirm-label">{{ $isFr ? 'Opérateur' : 'Operator' }}</span>
                         <span class="confirm-value" id="confirm-op">—</span>
                     </div>
                     <div class="confirm-row">
                         <span class="confirm-label">{{ $isFr ? 'Numéro' : 'Phone' }}</span>
                         <span class="confirm-value" id="confirm-phone">—</span>
-                    </div>
-                    <div class="confirm-row">
-                        <span class="confirm-label" style="font-size:1rem;font-weight:700">{{ $isFr ? 'Total à payer' : 'Total amount' }}</span>
-                        <span class="confirm-value" style="font-size:1.3rem;color:var(--primary)">
-                            XAF {{ number_format($amount, 0, ',', ' ') }}
-                        </span>
                     </div>
                 </div>
 
@@ -340,7 +396,7 @@
                 </div>
 
                 <div class="d-flex justify-content-between mt-4">
-                    <button class="btn btn-light" onclick="goToStep(2)">
+                    <button class="btn btn-light" onclick="goToStep(3)">
                         <i data-lucide="arrow-left" style="width:16px" class="me-1"></i>
                         {{ $isFr ? 'Retour' : 'Back' }}
                     </button>
@@ -351,8 +407,8 @@
                 </div>
             </div>
 
-            {{-- ══════════ ÉTAPE 4: Traitement ══════════ --}}
-            <div class="step-panel" id="panel-4">
+            {{-- ══════════ ÉTAPE 5: Traitement ══════════ --}}
+            <div class="step-panel" id="panel-5">
                 <div class="processing-container">
                     <div class="processing-ring"></div>
                     <h5 class="fw-bold mb-1">{{ $isFr ? 'Traitement en cours...' : 'Processing...' }}</h5>
@@ -384,8 +440,8 @@
                 </div>
             </div>
 
-            {{-- ══════════ ÉTAPE 5: Reçu / Résultat ══════════ --}}
-            <div class="step-panel" id="panel-5">
+            {{-- ══════════ ÉTAPE 6: Reçu / Résultat ══════════ --}}
+            <div class="step-panel" id="panel-6">
                 {{-- Success --}}
                 <div id="result-success" style="display:none">
                     <div class="result-screen">
@@ -403,7 +459,7 @@
                             </div>
                             <div class="confirm-row">
                                 <span class="confirm-label">{{ $isFr ? 'Montant payé' : 'Amount paid' }}</span>
-                                <span class="confirm-value" style="color:#10b981">XAF {{ number_format($amount, 0, ',', ' ') }}</span>
+                                <span class="confirm-value" style="color:#10b981">XAF <span id="receipt-amount">{{ number_format($amount, 0, ',', ' ') }}</span></span>
                             </div>
                             <div class="confirm-row">
                                 <span class="confirm-label">{{ $isFr ? 'Date & Heure' : 'Date & Time' }}</span>
@@ -486,12 +542,51 @@ window.goToStep = function (step) {
     });
 };
 
+// ─── Validate amount ──────────────────────────────────────────────────────────
+window.validateAmount = function (inp) {
+    // Safety check for AMOUNT
+    const maxAmount = typeof AMOUNT !== 'undefined' && AMOUNT > 0 ? AMOUNT : parseInt(inp.max) || 100000;
+    const minAmount = 1000;
+    
+    let val = inp.value ? parseInt(inp.value) : maxAmount;  // Use maxAmount if empty
+    
+    // If value is not a valid number, treat as maxAmount
+    if (isNaN(val)) val = maxAmount;
+    
+    const isValid = val >= minAmount && val <= maxAmount;
+    const errEl = document.getElementById('amount-error');
+    const btnStep1 = document.getElementById('btn-step1');
+    
+    // Show/hide error
+    if (val > 0 && !isValid && inp.value) {
+        errEl.style.display = '';
+    } else {
+        errEl.style.display = 'none';
+    }
+    
+    // Enable/disable continue button
+    if (btnStep1) {
+        btnStep1.disabled = !isValid;
+    }
+    
+    // Update all amount displays (only if they exist)
+    const displayValue = val || maxAmount;
+    const formattedAmount = new Intl.NumberFormat('fr-FR').format(displayValue);
+    document.getElementById('summary-amount-display')?.textContent = 'XAF ' + formattedAmount;
+    document.getElementById('display-amount')?.textContent = formattedAmount;
+    document.getElementById('confirm-amount')?.textContent = formattedAmount;
+    document.getElementById('confirm-final-amount')?.textContent = formattedAmount;
+    
+    // Store the amount for later use
+    window.selectedAmount = displayValue;
+};
+
 // ─── Select operator ──────────────────────────────────────────────────────────
 window.selectOperator = function (op) {
     selectedOperator = op;
     document.querySelectorAll('.operator-card').forEach(c => c.classList.remove('selected'));
     document.getElementById(`op-${op}`)?.classList.add('selected');
-    document.getElementById('btn-step1').disabled = false;
+    document.getElementById('btn-step2').disabled = false;
     document.getElementById('summary-operator').textContent = op === 'orange' ? 'Orange Money' : 'MTN MoMo';
     document.getElementById('op-flag').textContent = op === 'orange' ? '🟠' : '🟡';
 };
@@ -507,32 +602,42 @@ window.validatePhone = function (inp) {
     const errEl   = document.getElementById('phone-error');
 
     errEl.style.display = (!isValid && val.length > 0) ? '' : 'none';
-    document.getElementById('btn-step2').disabled = !isValid;
-    if (isValid) phoneNumber = val;
+    document.getElementById('btn-step3').disabled = !isValid;
+    
+    if (isValid) {
+        phoneNumber = val;
+        // Update summary operator if exists (Step 3)
+        document.getElementById('summary-operator')?.textContent = selectedOperator === 'orange' ? 'Orange Money' : 'MTN MoMo';
+        // Update confirmation details if elements exist (Step 4)
+        document.getElementById('confirm-phone')?.textContent = '+237 ' + val;
+        document.getElementById('confirm-op')?.textContent = selectedOperator === 'orange' ? 'Orange Money' : 'MTN MoMo';
+    }
 };
 
 // ─── Initiate payment ─────────────────────────────────────────────────────────
 window.initiatePayment = async function () {
     // Update confirm panel values
+    const finalAmount = window.selectedAmount || AMOUNT;
     document.getElementById('confirm-op').textContent    = selectedOperator === 'orange' ? 'Orange Money' : 'MTN MoMo';
     document.getElementById('confirm-phone').textContent = `+237 ${phoneNumber}`;
+    document.getElementById('confirm-final-amount').textContent = finalAmount.toLocaleString('fr-FR');
 
-    goToStep(4);
+    goToStep(5);
 
     // Step 1: Sending
     await sleep(1500);
     setProcStep(1, 'done'); setProcStep(2, 'active');
 
     try {
-        const res = await fetch('{{ route('payment.initiate') }}', {
+        const res = await fetch('{{ route('parent.payments.initiate') }}', {
             method: 'POST',
             headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept':'application/json' },
             body: JSON.stringify({
                 operator:   selectedOperator,
-                phone:      phoneNumber,
-                amount:     AMOUNT,
+                phone_number: '+237' + phoneNumber,
+                amount:     window.selectedAmount || AMOUNT,
                 student_id: STUDENT_ID,
-                invoice_id: INVOICE_ID,
+                purpose:    'tuition_fees',
             }),
         });
         const data = await res.json();
@@ -567,10 +672,8 @@ function startPolling(ref) {
             const data = await res.json();
             if (data.status === 'success') {
                 clearInterval(pollInterval);
-                setProcStep(3, 'done'); setProcStep(4, 'active');
+                setProcStep(3, 'done'); setProcStep(4, 'done');
                 await sleep(1000);
-                setProcStep(4, 'done');
-                await sleep(500);
                 showSuccess(data);
             } else if (data.status === 'failed') {
                 clearInterval(pollInterval);
@@ -591,21 +694,24 @@ function setProcStep(n, state) {
 }
 
 function showSuccess(data) {
+    // Update receipt details with actual values
     document.getElementById('receipt-txn').textContent  = data.transaction_ref ?? '—';
     document.getElementById('receipt-date').textContent = new Date().toLocaleString();
+    document.getElementById('receipt-amount').textContent = (window.selectedAmount || AMOUNT).toLocaleString('fr-FR');
+    
     if (data.receipt_url) {
         document.getElementById('download-receipt').href = data.receipt_url;
     }
     document.getElementById('result-success').style.display = '';
     document.getElementById('result-error').style.display   = 'none';
-    goToStep(5);
+    goToStep(6);
 }
 
 function showError(msg) {
     document.getElementById('error-message').textContent = msg;
     document.getElementById('result-success').style.display = 'none';
     document.getElementById('result-error').style.display   = '';
-    goToStep(5);
+    goToStep(6);
 }
 
 window.resetPayment = function () { goToStep(1); };
@@ -614,7 +720,14 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize lucide icons
     if (typeof lucide !== 'undefined') lucide.createIcons();
+    
+    // Initialize amount validation on page load
+    const amountInput = document.getElementById('amount-input');
+    if (amountInput) {
+        validateAmount(amountInput);
+    }
 });
 
 })();

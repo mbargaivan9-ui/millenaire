@@ -5,7 +5,6 @@
 
 import { createApp } from 'vue';
 import OCRWizard from './components/OCRWizard.vue';
-import OCRBulletinViewer from './components/OCRBulletinViewer.vue';
 
 // ─── Theme Manager ──────────────────────────────────────────
 const ThemeManager = {
@@ -416,7 +415,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Register OCR Components
     app.component('OCRWizard', OCRWizard);
-    app.component('OCRBulletinViewer', OCRBulletinViewer);
     
     app.mount(appElement);
     console.log('[Vue] Application initialized with OCR components');

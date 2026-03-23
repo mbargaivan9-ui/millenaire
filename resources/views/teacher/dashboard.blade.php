@@ -52,34 +52,69 @@
     </div>
 </div>
 
-{{-- ─── KPIs ─────────────────────────────────────────────────────────────────── --}}
-<div class="row gy-3 mb-4">
-    <div class="col-md-3 col-6">
-        <div class="stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#0d9488,#14b8a6)"><i data-lucide="users"></i></div>
-            <div class="stat-value">{{ $totalStudents ?? 0 }}</div>
-            <div class="stat-label">{{ $isFr ? 'Élèves au total' : 'Total students' }}</div>
+{{-- ─── KPIs ──────────────────────────────────────────────────────────────────── --}}
+<div class="row g-3 mb-4">
+    {{-- Total Students --}}
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1">{{ $isFr ? 'Élèves au total' : 'Total students' }}</p>
+                        <h2 class="fw-bold mb-0">{{ $totalStudents ?? 0 }}</h2>
+                    </div>
+                    <div class="kpi-icon bg-primary bg-opacity-10 text-primary">👥</div>
+                </div>
+                <div class="mt-2 small text-muted">{{ $classes->count() }} {{ $isFr ? 'classe(s)' : 'class(es)' }}</div>
+            </div>
         </div>
     </div>
-    <div class="col-md-3 col-6">
-        <div class="stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#3b82f6,#2563eb)"><i data-lucide="book-open"></i></div>
-            <div class="stat-value">{{ $classes->count() }}</div>
-            <div class="stat-label">{{ $isFr ? 'Classes' : 'Classes' }}</div>
+
+    {{-- Classes --}}
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1">{{ $isFr ? 'Classes' : 'Classes' }}</p>
+                        <h2 class="fw-bold mb-0">{{ $classes->count() }}</h2>
+                    </div>
+                    <div class="kpi-icon bg-info bg-opacity-10 text-info">📚</div>
+                </div>
+                <div class="mt-2 small text-muted">{{ $isFr ? 'Gérées' : 'Managed' }}</div>
+            </div>
         </div>
     </div>
-    <div class="col-md-3 col-6">
-        <div class="stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#10b981,#059669)"><i data-lucide="check-square"></i></div>
-            <div class="stat-value">{{ $attendanceToday ?? 0 }}%</div>
-            <div class="stat-label">{{ $isFr ? "Présence aujourd'hui" : "Today's attendance" }}</div>
+
+    {{-- Attendance Today --}}
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1">{{ $isFr ? "Présence aujourd'hui" : "Today's attendance" }}</p>
+                        <h2 class="fw-bold mb-0">{{ $attendanceToday ?? 0 }}<small style="font-size:0.6em">%</small></h2>
+                    </div>
+                    <div class="kpi-icon bg-success bg-opacity-10 text-success">✓</div>
+                </div>
+                <div class="mt-2 small text-muted">{{ $isFr ? 'Présents' : 'Present' }}</div>
+            </div>
         </div>
     </div>
-    <div class="col-md-3 col-6">
-        <div class="stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706)"><i data-lucide="pen-tool"></i></div>
-            <div class="stat-value">{{ $pendingGrades ?? 0 }}</div>
-            <div class="stat-label">{{ $isFr ? 'Notes à saisir' : 'Grades to enter' }}</div>
+
+    {{-- Pending Grades --}}
+    <div class="col-6 col-lg-3">
+        <div class="card kpi-card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-muted small mb-1">{{ $isFr ? 'Notes à saisir' : 'Grades to enter' }}</p>
+                        <h2 class="fw-bold mb-0">{{ $pendingGrades ?? 0 }}</h2>
+                    </div>
+                    <div class="kpi-icon bg-warning bg-opacity-10 text-warning">📝</div>
+                </div>
+                <div class="mt-2 small text-muted">{{ $isFr ? 'En attente' : 'Pending' }}</div>
+            </div>
         </div>
     </div>
 </div>
@@ -112,7 +147,7 @@
                                 <a href="{{ route('teacher.attendance.index', ['class_id' => $class->id]) }}" class="btn btn-sm btn-light" style="flex:1;justify-content:center">
                                     <i data-lucide="calendar" style="width:12px" class="me-1"></i>{{ $isFr ? 'Appel' : 'Roll call' }}
                                 </a>
-                                <a href="{{ route('teacher.bulletin.grid', $class->id) }}" class="btn btn-sm btn-primary" style="flex:1;justify-content:center">
+                                <a href="{{ route('teacher.bulletin.dashboard', $class->id) }}" class="btn btn-sm btn-primary" style="flex:1;justify-content:center">
                                     <i data-lucide="table-2" style="width:12px" class="me-1"></i>{{ $isFr ? 'Notes' : 'Grades' }}
                                 </a>
                             </div>
@@ -196,7 +231,7 @@
                 <p style="font-size:.82rem;color:#92400e;margin-bottom:.75rem">
                     {{ $pendingBulletins }} {{ $isFr ? 'bulletins non soumis pour validation.' : 'bulletins pending submission.' }}
                 </p>
-                <a href="{{ route('teacher.bulletin.grid', $teacher->head_class_id) }}" class="btn btn-warning btn-sm">
+                <a href="{{ route('teacher.bulletin.dashboard', $teacher->head_class_id) }}" class="btn btn-warning btn-sm">
                     {{ $isFr ? 'Saisir les notes' : 'Enter grades' }} →
                 </a>
             </div>
@@ -210,7 +245,7 @@
                 <i data-lucide="scan" style="width:32px;color:var(--primary);display:block;margin:0 auto .75rem"></i>
                 <div class="fw-bold mb-1">{{ $isFr ? 'Digitaliseur de Bulletin' : 'Bulletin Digitizer' }}</div>
                 <p class="text-muted mb-3" style="font-size:.8rem">{{ $isFr ? 'Numérisez un bulletin papier en quelques clics.' : 'Digitize a paper bulletin in a few clicks.' }}</p>
-                <a href="{{ route('teacher.bulletin-structure-ocr.create', $teacher->head_class_id) }}" class="btn btn-primary btn-sm">
+                
                     <i data-lucide="scan" style="width:13px" class="me-1"></i>{{ $isFr ? 'Ouvrir le digitaliseur' : 'Open digitizer' }}
                 </a>
             </div>

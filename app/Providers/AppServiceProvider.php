@@ -17,8 +17,12 @@ use Illuminate\Support\Facades\Blade;
 use App\Models\EstablishmentSetting;
 use App\Contracts\RedirectServiceInterface;
 use App\Contracts\AuthenticationServiceInterface;
+use App\Contracts\AnnouncementServiceInterface;
+use App\Contracts\PaymentInterface;
 use App\Services\RedirectService;
 use App\Services\AuthenticationService;
+use App\Services\AnnouncementService;
+use App\Providers\CampayPaymentProvider;
 use App\Repositories\Interfaces\PaymentRepositoryInterface;
 use App\Repositories\Eloquent\EloquentPaymentRepository;
 
@@ -26,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        
         // Singleton for establishment settings
         $this->app->singleton(EstablishmentSetting::class, function () {
             return EstablishmentSetting::getInstance();
@@ -34,11 +39,15 @@ class AppServiceProvider extends ServiceProvider
         // Bind service interfaces to their implementations
         $this->app->bind(RedirectServiceInterface::class, RedirectService::class);
         $this->app->bind(AuthenticationServiceInterface::class, AuthenticationService::class);
+        $this->app->bind(AnnouncementServiceInterface::class, AnnouncementService::class);
+        
+        // Bind payment interface to Campay provider
+        $this->app->bind(PaymentInterface::class, CampayPaymentProvider::class);
         
         // Bind repository interfaces to their implementations
         $this->app->bind(PaymentRepositoryInterface::class, EloquentPaymentRepository::class);
     }
-
+    
     public function boot(): void
     {
         // Bootstrap 5 pagination
@@ -57,6 +66,20 @@ class AppServiceProvider extends ServiceProvider
 
             Blade::directive('gradeColor', function ($expression) {
                 return "<?php echo $expression < 10 ? '#ef4444' : ($expression < 13 ? '#f59e0b' : ($expression < 16 ? '#3b82f6' : '#10b981')); ?>";
+            });
+
+            // Logo directives
+            Blade::directive('logoUrl', function () {
+                return "<?php echo \App\Helpers\SettingsHelper::logoUrl(); ?>";
+            });
+
+            Blade::directive('logoImg', function ($expression) {
+                return "<?php echo '<img src=\"' . \App\Helpers\SettingsHelper::logoUrl() . '\" ' . $expression . ' >'; ?>";
+            });
+
+            // Settings helper
+            Blade::directive('setting', function ($expression) {
+                return "<?php echo \App\Helpers\SettingsHelper::get($expression); ?>";
             });
         } catch (\Exception $e) {
             // Silently fail if Blade directives fail
@@ -80,4 +103,5 @@ class AppServiceProvider extends ServiceProvider
             }
         });
     }
+    
 }

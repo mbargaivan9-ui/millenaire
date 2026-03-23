@@ -8,7 +8,7 @@
 @extends('layouts.public')
 
 @php
-  $pageTitle = $pageTitle ?? (app()->getLocale() === 'fr' ? 'Corps Administratif' : 'Administrative Staff');
+  $pageTitle = $pageTitle ?? __('public.staff_title_detailed');
 @endphp
 
 @section('title', $pageTitle)
@@ -16,14 +16,14 @@
 
 @section('content')
 
-@php $isFr = app()->getLocale() === 'fr'; @endphp
+@endphp
 
 <div class="page-title" style="background:linear-gradient(135deg,#0d9488,#0f766e);padding:3rem 0;text-align:center;color:#fff;">
     <div class="container">
         <h1 style="font-family:'Raleway',sans-serif;font-weight:800;font-size:2.2rem;margin-bottom:.5rem">
-            {{ $isFr ? 'Corps Administratif' : 'Administrative Staff' }}
+            {{ __('public.staff_title_detailed') }}
         </h1>
-        <p style="opacity:.85">{{ $isFr ? "L'équipe de direction et d'administration de l'établissement" : 'The school management and administrative team' }}</p>
+        <p style="opacity:.85">{{ __('public.staff_subtitle_detailed') }}</p>
     </div>
 </div>
 
@@ -58,7 +58,7 @@
                     </div>
                     <div class="instructor-info">
                         <h5>{{ $role->user->display_name ?? $role->user->name }}</h5>
-                        <p class="specialty">{{ $role->role_name ?? ($isFr ? 'Administration' : 'Administration') }}</p>
+                        <p class="specialty">{{ $role->role_name ?? __('public.staff_role_admin') }}</p>
                         @if($role->user->email && ($role->show_email ?? false))
                         <p style="font-size:.8rem;color:#64748b;word-break:break-all">
                             <i class="bi bi-envelope me-1" style="color:#0d9488"></i>
@@ -86,7 +86,7 @@
             @empty
             <div class="col-12 text-center py-5">
                 <i class="bi bi-person-badge" style="font-size:4rem;color:#0d9488;opacity:.3"></i>
-                <p class="mt-3 text-muted">{{ $isFr ? 'Informations non disponibles pour le moment.' : 'Information not available at the moment.' }}</p>
+                <p class="mt-3 text-muted">{{ __('public.staff_info_unavailable') }}</p>
             </div>
             @endforelse
         </div>

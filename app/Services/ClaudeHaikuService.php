@@ -127,32 +127,6 @@ class ClaudeHaikuService
     /**
      * Generate individual student bulletin HTML
      *
-     * @param array $templateStructure Base template
-     * @param array $studentData Student information
-     * @param array $grades Student grades
-     * @return string HTML bulletin
-     */
-    public function generateStudentBulletin(array $templateStructure, array $studentData, array $grades): string
-    {
-        try {
-            $systemPrompt = $this->getStudentBulletinSystemPrompt();
-            $userPrompt = $this->getUserPromptForStudentBulletin($templateStructure, $studentData, $grades);
-            
-            $response = $this->callClaudeWithRetry($systemPrompt, $userPrompt);
-            
-            return $response;
-            
-        } catch (Exception $e) {
-            Log::error('Student bulletin generation failed', [
-                'error' => $e->getMessage(),
-                'student_id' => $studentData['id'] ?? 'unknown',
-            ]);
-            
-            throw $e;
-        }
-    }
-
-    /**
      * System prompt for template structure analysis
      */
     private function getSystemPrompt(): string
@@ -279,54 +253,6 @@ Le composant doit :
 - Permettre toutes les modifications listées dans les instructions système
 
 Génère le code Blade/HTML complet, prêt à intégrer dans une vue Laravel.
-PROMPT;
-    }
-
-    /**
-     * System prompt for student bulletin
-     */
-    private function getStudentBulletinSystemPrompt(): string
-    {
-        return <<<'PROMPT'
-Tu es un expert en génération de bulletins scolaires HTML.
-
-À partir :
-1. D'une structure template validée (JSON)
-2. Des données personnelles de l'élève
-3. De ses notes par matière
-
-Génère le HTML complet du bulletin individuel avec :
-- Injection des données de l'élève
-- Calcul et affichage des moyennes
-- Affichage des rangs et appréciations
-- Layout identique au template validé
-- CSS intégré pour impression PDF
-
-Le HTML doit être autonome et printable (media print optimisé).
-PROMPT;
-    }
-
-    /**
-     * User prompt for student bulletin
-     */
-    private function getUserPromptForStudentBulletin(array $template, array $student, array $grades): string
-    {
-        $studentJson = json_encode($student, JSON_PRETTY_PRINT);
-        $gradesJson = json_encode($grades, JSON_PRETTY_PRINT);
-        
-        return <<<PROMPT
-Génère le bulletin HTML complet pour cet élève :
-
-TEMPLATE STRUCTURE :
-{$template['header']['school_name']} - {$template['header']['academic_year']} - Trimestre {$template['header']['trimester']}
-
-DONNÉES ÉLÈVE :
-{$studentJson}
-
-NOTES ET CALCULS :
-{$gradesJson}
-
-Génère le HTML complet du bulletin, prêt à être converti en PDF.
 PROMPT;
     }
 

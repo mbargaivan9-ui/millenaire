@@ -88,4 +88,19 @@ class DashboardController extends Controller
             'classStats'
         ));
     }
+
+    /**
+     * Display quiz results for the student
+     */
+    public function quizResults()
+    {
+        $student = auth()->user()->student;
+        
+        $quizSubmissions = \App\Models\QuizSubmission::where('student_id', $student->id)
+            ->with('quiz.subject')
+            ->orderByDesc('completed_at')
+            ->paginate(20);
+
+        return view('student.quiz-results', compact('quizSubmissions'));
+    }
 }
