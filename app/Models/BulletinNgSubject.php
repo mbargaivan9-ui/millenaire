@@ -12,12 +12,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class BulletinNgSubject extends Model
 {
     protected $table    = 'bulletin_ng_subjects';
-    protected $fillable = ['config_id', 'nom', 'coefficient', 'nom_prof', 'ordre'];
+    protected $fillable = ['config_id', 'user_id', 'nom', 'coefficient', 'nom_prof', 'ordre'];
     protected $casts    = ['coefficient' => 'float', 'ordre' => 'integer'];
 
     public function config(): BelongsTo
     {
         return $this->belongsTo(BulletinNgConfig::class, 'config_id');
+    }
+
+    public function teacher(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function notes(): HasMany

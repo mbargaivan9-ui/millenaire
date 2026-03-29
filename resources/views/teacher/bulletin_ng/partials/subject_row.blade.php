@@ -16,6 +16,9 @@
                value="{{ $sub->nom_prof ?? '' }}"
                placeholder="{{ $isEN ? 'Teacher name...' : 'Nom du professeur...' }}">
     </td>
+    @if($sub && isset($sub->id))
+        <input type="hidden" name="subjects[{{ $i }}][id]" value="{{ $sub->id }}">
+    @endif
     <td>
         <button type="button" class="bng-btn-icon bng-btn-icon-danger remove-row-btn" title="Supprimer">✕</button>
     </td>

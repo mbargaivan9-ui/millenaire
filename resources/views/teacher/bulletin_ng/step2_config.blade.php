@@ -68,9 +68,6 @@
                 <input type="hidden" name="langue" value="{{ $langue }}">
                 @if(isset($config) && $config)
                     <input type="hidden" name="config_id" value="{{ $config->id }}">
-                @else
-                    {{-- Generate a temporary config_id if none exists --}}
-                    <input type="hidden" name="config_id" value="{{ 'session_' . time() . '_' . random_int(1000, 9999) }}">
                 @endif
 
                 <div class="bng-form-grid">
@@ -234,7 +231,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const zone    = document.getElementById('logoUploadZone');
     const preview = document.getElementById('logoPreview');
     const holder  = document.getElementById('logoPlaceholder');
+    const form    = document.getElementById('configForm');
 
+    // Logo upload preview
     zone.addEventListener('click', () => input.click());
 
     input.addEventListener('change', function () {
@@ -255,6 +254,34 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         };
         reader.readAsDataURL(file);
+    });
+
+    // Form submission via AJAX
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Redirect to step3 with the config_id
+                window.location.href = `/teacher/bulletin-ng/${data.config_id}/step3`;
+            } else {
+                alert('Erreur: ' + (data.message || 'Une erreur est survenue'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Erreur lors de l\'enregistrement: ' + error);
+        }
     });
 });
 </script>

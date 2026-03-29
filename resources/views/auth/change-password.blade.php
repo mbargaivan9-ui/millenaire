@@ -118,9 +118,12 @@
 
 <div class="auth-left">
     <div class="auth-logo">
-        @php $settings = \App\Models\EstablishmentSetting::getInstance(); @endphp
-        @if($settings->logo_path)
-            <img src="{{ asset($settings->logo_path) }}" style="width:50px;height:50px;object-fit:contain" alt="Logo">
+        @php 
+            $settings = \App\Models\EstablishmentSetting::getInstance();
+            $logoUrl = \App\Helpers\SettingsHelper::logoUrl();
+        @endphp
+        @if($logoUrl)
+            <img src="{{ $logoUrl }}" style="width:50px;height:50px;object-fit:contain" alt="Logo">
         @else
             <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                 <path d="M12 1l9 5v6c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V6l9-5z"/><path d="M10 17l4-4 4 4M10 13l4 4 4-4"/>

@@ -17,7 +17,6 @@ return new class extends Migration {
                 $table->json('properties')->nullable();
                 $table->uuid('batch_uuid')->nullable()->index();
                 $table->timestamps();
-                $table->index('log_name');
             });
         }
     }

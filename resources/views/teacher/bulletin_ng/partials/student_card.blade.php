@@ -15,7 +15,7 @@
                 data-id="{{ $student->id }}" title="Supprimer">🗑</button>
     </div>
     <div class="bng-student-details">
-        <span>{{ $isEN ? 'DOB' : 'Naissance' }}: {{ $student->date_naissance ? $student->date_naissance->format('d/m/Y') : '—' }}</span>
+        <span>{{ $isEN ? 'DOB' : 'Naissance' }}: {{ $student->date_naissance ? (\Carbon\Carbon::parse($student->date_naissance)->format('d/m/Y')) : '—' }}</span>
         <span>{{ $isEN ? 'Place' : 'Lieu' }}: {{ $student->lieu_naissance ?: '—' }}</span>
     </div>
 </div>

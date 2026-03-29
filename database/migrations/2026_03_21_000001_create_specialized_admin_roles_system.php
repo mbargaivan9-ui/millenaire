@@ -70,7 +70,7 @@ return new class extends Migration
                 $table->timestamps();
 
                 // Unique constraint
-                $table->unique(['admin_specialized_role_id', 'admin_role_section_id']);
+                $table->unique(['admin_specialized_role_id', 'admin_role_section_id'], 'arsa_role_section_unique');
             });
         }
 
@@ -83,7 +83,7 @@ return new class extends Migration
                 $table->id();
                 $table->foreignId('user_id')->constrained()->cascadeOnDelete();
                 $table->foreignId('admin_specialized_role_id')
-                    ->constrained('admin_specialized_roles')
+                    ->references('id')->on('admin_specialized_roles')
                     ->cascadeOnDelete();
                 $table->json('assigned_sections')->nullable(); // JSON array of assigned section IDs
                 $table->text('notes')->nullable(); // Notes about assignment
@@ -107,7 +107,7 @@ return new class extends Migration
                 $table->id();
                 $table->foreignId('user_id')->constrained()->cascadeOnDelete();
                 $table->foreignId('admin_role_section_id')
-                    ->constrained('admin_role_sections')
+                    ->references('id')->on('admin_role_sections')
                     ->cascadeOnDelete();
                 $table->string('action'); // create, read, update, delete, export
                 $table->string('entity_type')->nullable(); // student, teacher, class, etc

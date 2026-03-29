@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Direct de l'AJAX Step 5</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .box { border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 5px; }
+        input { padding: 8px; margin: 5px 0; width: 300px; }
+        button { background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #45a049; }
+        .output { background: #f0f0f0; padding: 10px; margin: 10px 0; border-left: 4px solid #4CAF50; max-height: 300px; overflow-y: auto; white-space: pre-wrap; font-family: monospace; font-size: 12px; }
+        .error { border-left-color: #f44336; background: #ffebee; }
+        .success { border-left-color: #4CAF50; background: #e8f5e9; }
+        .info { border-left-color: #2196F3; background: #e3f2fd; }
+        h1 { color: #333; }
+        h2 { color: #666; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Direct AJAX Step 5</h1>
+        <p>Ce test va directement tester si l'endpoint `/save-note` fonctionne correctement.</p>
+
+        <div class="box">
+            <h2>1. Configuration</h2>
+            <label for="baseUrl">URL de base du serveur:</label>
+            <input type="text" id="baseUrl" value="http://localhost:8000" placeholder="http://localhost:8000">
+            
+            <label for="configId">ID de Config (trouvé dans l'URL de Step 5):</label>
+            <input type="text" id="configId" placeholder="ex: session_123_456 ou 1">
+            
+            <label for="csrf">Token CSRF (depuis meta tag ou console):</label>
+            <input type="text" id="csrf" placeholder="Token CSRF">
+            
+            <label for="studentId">ID d'un élève (depuis les inputs data-student):</label>
+            <input type="text" id="studentId" placeholder="student_xxxx">
+            
+            <label for="subjectId">ID d'une matière (depuis les inputs data-subject):</label>
+            <input type="text" id="subjectId" placeholder="subject_xxxx">
+            
+            <label for="note">Note à tester:</label>
+            <input type="number" id="note" value="15" min="0" max="20" step="0.25">
+            
+            <button onclick="testAjax()">🚀 Tester l'AJAX</button>
+        </div>
+
+        <div class="box">
+            <h2>2. Résultats</h2>
+            <button onclick="clearOutput()">Effacer</button>
+            <div id="output" class="output info">En attente de test...</div>
+        </div>
+
+        <div class="box">
+            <h2>3. Guide pour remplir les champs</h2>
+            <p><strong>ConfigId:</strong></p>
+            <ol>
+                <li>Ouvre Step 5 dans le navigateur</li>
+                <li>Regarde l'URL: <code>http://localhost:8000/...bullet-ng/<strong>ICI</strong>/step5</code></li>
+                <li>Copie la valeur entre `/bulletin-ng/` et `/step5`</li>
+            </ol>
+            
+            <p><strong>CSRF:</strong></p>
+            <ol>
+                <li>Ouvre F12 (Console)</li>
+                <li>Tape: <code>document.querySelector('meta[name=csrf-token]').content</code></li>
+                <li>Copie le résultat</li>
+            </ol>
+            
+            <p><strong>StudentId et SubjectId:</strong></p>
+            <ol>
+                <li>Dans la page Step 5, clique droit sur un input de note</li>
+                <li>"Inspecter l'élément"</li>
+                <li>Regarde l'attribut <code>data-student</code> et <code>data-subject</code></li>
+                <li>Copie les valeurs</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const line = document.createElement('div');
+            
+            let prefix = '';
+            if (message.includes('ERROR') || message.includes('❌')) {
+                prefix = '❌ ';
+                output.className = 'output error';
+            } else if (message.includes('SUCCESS') || message.includes('✅')) {
+                prefix = '✅ ';
+                output.className = 'output success';
+            } else {
+                prefix = 'ℹ️ ';
+                output.className = 'output info';
+            }
+            
+            line.textContent = prefix + message;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+            log('Output cleared');
+        }
+
+        async function testAjax() {
+            const baseUrl = document.getElementById('baseUrl').value.trim();
+            const configId = document.getElementById('configId').value.trim();
+            const csrf = document.getElementById('csrf').value.trim();
+            const studentId = document.getElementById('studentId').value.trim();
+            const subjectId = document.getElementById('subjectId').value.trim();
+            const note = parseFloat(document.getElementById('note').value);
+
+            // Validation
+            if (!baseUrl || !configId || !csrf || !studentId || !subjectId || isNaN(note)) {
+                log('ERROR: Remplissez tous les champs!');
+                return;
+            }
+
+            clearOutput();
+            log('Starting AJAX test...');
+            log(`Base URL: ${baseUrl}`);
+            log(`Config ID: ${configId}`);
+            log(`Student ID: ${studentId}`);
+            log(`Subject ID: ${subjectId}`);
+            log(`Note: ${note}`);
+            log('');
+
+            const url = `${baseUrl}/teacher/bulletin-ng/${configId}/save-note`;
+            log(`Endpoint URL: ${url}`);
+            log('');
+
+            const requestBody = {
+                ng_student_id: studentId,
+                ng_subject_id: subjectId,
+                note: note
+            };
+
+            log('Request Body:');
+            log(JSON.stringify(requestBody, null, 2));
+            log('');
+
+            log('Sending request...');
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrf,
+                    },
+                    body: JSON.stringify(requestBody),
+                });
+
+                log(`✅ HTTP Response Status: ${response.status}`);
+
+                if (!response.ok) {
+                    log(`ERROR: HTTP ${response.status} - ${response.statusText}`);
+                    const text = await response.text();
+                    log(`Response Body: ${text.substring(0, 200)}`);
+                    return;
+                }
+
+                const data = await response.json();
+
+                log('✅ SUCCESS: Response received');
+                log('');
+                log('Response JSON:');
+                log(JSON.stringify(data, null, 2));
+                log('');
+
+                // Vérifications
+                if (data.success) {
+                    log('✅ data.success = true');
+                } else {
+                    log('ERROR: data.success = false');
+                }
+
+                if (data.stats) {
+                    log('✅ data.stats exists');
+                    log(`   - avg: ${data.stats.avg}`);
+                    log(`   - pct: ${data.stats.pct}%`);
+                    log(`   - max: ${data.stats.max}`);
+                    log(`   - min: ${data.stats.min}`);
+                    log(`   - passing: ${data.stats.passing}`);
+                } else {
+                    log('ERROR: data.stats NOT FOUND');
+                }
+
+                if (data.stats && data.stats.avgs) {
+                    const studentAvg = data.stats.avgs[studentId];
+                    if (studentAvg !== undefined) {
+                        log(`✅ Student average found: ${studentAvg}`);
+                    } else {
+                        log(`ERROR: Student ID "${studentId}" NOT in stats.avgs`);
+                        log(`Available student IDs: ${Object.keys(data.stats.avgs).join(', ')}`);
+                    }
+                } else {
+                    log('ERROR: data.stats.avgs NOT FOUND');
+                }
+
+                if (data.stats && data.stats.ranks) {
+                    const studentRank = data.stats.ranks[studentId];
+                    if (studentRank !== undefined) {
+                        log(`✅ Student rank found: ${studentRank}`);
+                    } else {
+                        log(`ERROR: Student ID "${studentId}" NOT in stats.ranks`);
+                        log(`Available student IDs: ${Object.keys(data.stats.ranks).join(', ')}`);
+                    }
+                }
+
+                log('');
+                log('✅ TEST COMPLETED SUCCESSFULLY');
+                log('If you see all ✅ marks, the AJAX is working!');
+                log('Then the problem is in the JavaScript on Step 5 page.');
+
+            } catch (error) {
+                log(`ERROR: ${error.message}`);
+                console.error(error);
+            }
+        }
+
+        // Auto-fill from URL params
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('configId')) document.getElementById('configId').value = params.get('configId');
+        if (params.has('baseUrl')) document.getElementById('baseUrl').value = params.get('baseUrl');
+    </script>
+</body>
+</html>

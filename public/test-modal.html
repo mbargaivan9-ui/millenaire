@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 4 Modal Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .test-section { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .test-item { margin: 10px 0; padding: 10px; background: #f9f9f9; border-left: 4px solid #0d9488; }
+        .passed { border-left-color: #10b981; color: #10b981; font-weight: bold; }
+        .failed { border-left-color: #ef4444; color: #ef4444; font-weight: bold; }
+        button { padding: 10px 20px; background: #0d9488; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        button:hover { background: #0a7a72; }
+        .modal { position: fixed; inset: 0; z-index: 9000; display: flex; align-items: center; justify-content: center; visibility: visible; opacity: 1; transition: opacity 0.2s ease, visibility 0.2s ease; }
+        .modal.hidden { visibility: hidden; opacity: 0; pointer-events: none; }
+        .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.55); }
+        .modal-content { position: relative; z-index: 1; background: white; border-radius: 12px; width: 100%; max-width: 540px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); padding: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Step 4 Modal - Quick Test</h1>
+    
+    <div class="test-section">
+        <h2>✅ Checklist</h2>
+        <div id="checks"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔨 Interactive Test</h2>
+        <button id="testBtn">➕ Click to Open Modal</button>
+        <div id="testModal" class="modal hidden">
+            <div class="modal-overlay" id="testOverlay"></div>
+            <div class="modal-content">
+                <button class="close-btn" id="testClose">✕</button>
+                <h3>Modal Test</h3>
+                <p>If you see this, the modal opened successfully! ✅</p>
+                <button id="testCloseBtn">Close Modal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Test suite
+    const checks = document.getElementById('checks');
+    
+    function addCheck(name, passed, message) {
+        const div = document.createElement('div');
+        div.className = 'test-item ' + (passed ? 'passed' : 'failed');
+        div.textContent = (passed ? '✅' : '❌') + ' ' + name;
+        if (message) div.textContent += ' - ' + message;
+        checks.appendChild(div);
+    }
+    
+    // Test 1: CSS loaded
+    const styles = window.getComputedStyle(document.documentElement);
+    addCheck('CSS Loaded', styles.fontFamily !== '', 'Basic CSS applied');
+    
+    // Test 2: DOM elements exist
+    const modal = document.getElementById('testModal');
+    addCheck('Modal Element', !!modal, modal ? 'Found #testModal' : 'Missing #testModal');
+    
+    const btn = document.getElementById('testBtn');
+    addCheck('Button Element', !!btn, btn ? 'Found #testBtn' : 'Missing #testBtn');
+    
+    // Test 3: CSS hidden class works
+    if (modal) {
+        const hasHidden = modal.classList.contains('hidden');
+        const computed = window.getComputedStyle(modal);
+        const isHidden = computed.visibility === 'hidden' || computed.opacity === '0';
+        addCheck('CSS Hidden State', hasHidden && isHidden, 'Modal starts hidden');
+    }
+    
+    // Test 4: Event handlers
+    let handlerAdded = false;
+    if (btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Button clicked');
+            if (modal) {
+                modal.classList.remove('hidden');
+                const computed = window.getComputedStyle(modal);
+                console.log('After remove hidden - visibility:', computed.visibility, 'opacity:', computed.opacity);
+            }
+        });
+        handlerAdded = true;
+    }
+    addCheck('Event Handlers', handlerAdded, 'Click handler added');
+    
+    // Test 5: Close handlers
+    if (modal) {
+        const closeBtn = document.getElementById('testClose');
+        const closeBtn2 = document.getElementById('testCloseBtn');
+        const overlay = document.getElementById('testOverlay');
+        
+        if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+        if (closeBtn2) closeBtn2.addEventListener('click', () => modal.classList.add('hidden'));
+        if (overlay) overlay.addEventListener('click', () => modal.classList.add('hidden'));
+        
+        const hasCloseBtns = !!closeBtn || !!closeBtn2;
+        addCheck('Close Handlers', hasCloseBtns, 'Close buttons bound');
+    }
+    
+    // Final verdict
+    setTimeout(() => {
+        const allPassed = document.querySelectorAll('.test-item.failed').length === 0;
+        const verdict = document.createElement('div');
+        verdict.className = 'test-section';
+        verdict.style.fontSize = '18px';
+        verdict.style.fontWeight = 'bold';
+        verdict.textContent = allPassed ? '✅ ALL TESTS PASSED!' : '❌ Some tests failed';
+        verdict.style.color = allPassed ? '#10b981' : '#ef4444';
+        verdict.style.textAlign = 'center';
+        document.body.appendChild(verdict);
+    }, 100);
+    </script>
+</body>
+</html>

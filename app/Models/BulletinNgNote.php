@@ -12,13 +12,23 @@ class BulletinNgNote extends Model
 {
     protected $table    = 'bulletin_ng_notes';
     protected $fillable = [
-        'config_id', 'ng_student_id', 'ng_subject_id',
-        'note', 'saisie_par', 'saisie_at',
+        'config_id', 'session_id', 'ng_student_id', 'ng_subject_id',
+        'sequence_number', 'note', 'saisie_par', 'saisie_at',
     ];
     protected $casts = [
         'note'      => 'float',
         'saisie_at' => 'datetime',
     ];
+
+    public function config(): BelongsTo
+    {
+        return $this->belongsTo(BulletinNgConfig::class, 'config_id');
+    }
+
+    public function session(): BelongsTo
+    {
+        return $this->belongsTo(BulletinNgSession::class, 'session_id');
+    }
 
     public function student(): BelongsTo
     {

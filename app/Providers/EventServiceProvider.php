@@ -14,6 +14,8 @@ use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Events\ProfPrincipalAssigned;
 use App\Listeners\InvalidateProfPrincipalSessionCache;
+use App\Events\BulletinNoteWasSaved;
+use App\Listeners\RecalculateBulletinStats;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -28,6 +30,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         ProfPrincipalAssigned::class => [
             InvalidateProfPrincipalSessionCache::class,
+        ],
+        BulletinNoteWasSaved::class => [
+            RecalculateBulletinStats::class,
         ],
     ];
 

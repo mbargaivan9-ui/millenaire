@@ -13,10 +13,13 @@ class BulletinNgStudent extends Model
 {
     protected $table    = 'bulletin_ng_students';
     protected $fillable = [
-        'config_id', 'student_id', 'matricule', 'nom',
-        'date_naissance', 'lieu_naissance', 'sexe', 'ordre',
+        'config_id', 'student_id', 'matricule', 'matricule_original', 'nom',
+        'date_naissance', 'lieu_naissance', 'sexe', 'is_active', 'ordre',
     ];
-    protected $casts = ['date_naissance' => 'date'];
+    protected $casts = [
+        'date_naissance' => 'date',
+        'is_active'      => 'boolean',
+    ];
 
     public function config(): BelongsTo
     {
@@ -36,6 +39,11 @@ class BulletinNgStudent extends Model
     public function conduite(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(BulletinNgConduite::class, 'ng_student_id');
+    }
+
+    public function trimestres(): HasMany
+    {
+        return $this->hasMany(BulletinNgTrimestre::class, 'ng_student_id');
     }
 
     /** Moyenne pondérée de l'élève */

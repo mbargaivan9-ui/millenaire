@@ -94,7 +94,7 @@ td{padding:3pt 5pt;border:0.5pt solid #d1fae5;vertical-align:middle}
   <div class="info-grid">
     <div><strong>{{ $config->langue==='EN'?'Name':'Nom et Prénom' }}:</strong> {{ $student->nom }}</div>
     <div><strong>{{ $config->langue==='EN'?'ID':'Matricule' }}:</strong> {{ $student->matricule }}</div>
-    <div><strong>{{ $config->langue==='EN'?'Date of Birth':'Né(e) le' }}:</strong> {{ $student->date_naissance ? $student->date_naissance->format('d/m/Y') : '—' }}</div>
+    <div><strong>{{ $config->langue==='EN'?'Date of Birth':'Né(e) le' }}:</strong> {{ $student->date_naissance ? (\Carbon\Carbon::parse($student->date_naissance)->format('d/m/Y')) : '—' }}</div>
     <div><strong>{{ $config->langue==='EN'?'Class':'Classe' }}:</strong> {{ $config->nom_classe }}</div>
     <div><strong>{{ $config->langue==='EN'?'Place of Birth':'Lieu de naissance' }}:</strong> {{ $student->lieu_naissance ?: '—' }}</div>
     <div><strong>{{ $config->langue==='EN'?'Class Size':'Effectif' }}:</strong> {{ $config->effectif }}</div>

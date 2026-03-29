@@ -78,6 +78,21 @@ class BulletinNgConfig extends Model
         return $this->hasMany(BulletinNgNote::class, 'config_id');
     }
 
+    public function sessions(): HasMany
+    {
+        return $this->hasMany(BulletinNgSession::class, 'config_id')->orderBy('trimestre_number')->orderBy('sequence_number');
+    }
+
+    public function trimestres(): HasMany
+    {
+        return $this->hasMany(BulletinNgTrimestre::class, 'config_id');
+    }
+
+    public function conduites(): HasMany
+    {
+        return $this->hasMany(BulletinNgConduite::class, 'config_id');
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────
 
     public function isEN(): bool

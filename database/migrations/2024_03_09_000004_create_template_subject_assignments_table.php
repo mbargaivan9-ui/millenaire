@@ -14,7 +14,11 @@ return new class extends Migration {
     public function up(): void
     {
         // Check if table already exists to avoid conflicts
-        if (!Schema::hasTable('template_subject_assignments')) {
+        // Also check if referenced tables exist
+        if (!Schema::hasTable('template_subject_assignments') && 
+            Schema::hasTable('bulletin_templates') && 
+            Schema::hasTable('subjects')) {
+            
             Schema::create('template_subject_assignments', function (Blueprint $table) {
                 $table->id();
                 

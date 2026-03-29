@@ -15,7 +15,7 @@ return new class extends Migration
             Schema::create('schedules', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('class_id')->constrained('classes')->onDelete('cascade');
-                $table->foreignId('class_subject_teacher_id')->constrained('class_subject_teacher')->onDelete('cascade');
+                $table->foreignId('class_subject_teacher_id')->constrained('class_subject_teachers')->onDelete('cascade');
                 $table->enum('day_of_week', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
                 $table->time('start_time');
                 $table->time('end_time');

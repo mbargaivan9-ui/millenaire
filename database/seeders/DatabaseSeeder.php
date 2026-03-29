@@ -45,6 +45,7 @@ class EstablishmentSeeder extends Seeder
                 'email'                => 'info@millenaire.cm',
                 'primary_color'        => '#0d9488',
                 'secondary_color'      => '#0f766e',
+                'logo_path'            => 'icons/icon-512.png',
                 'current_academic_year'=> '2025/2026',
                 'current_term'         => 2,
                 'current_sequence'     => 4,
@@ -66,21 +67,21 @@ class ClasseSeeder extends Seeder
     {
         $classes = [
             // Francophone
-            ['name' => '6ème A', 'section' => 'francophone', 'capacity' => 45],
-            ['name' => '5ème A', 'section' => 'francophone', 'capacity' => 45],
-            ['name' => '4ème A', 'section' => 'francophone', 'capacity' => 45],
-            ['name' => '3ème A', 'section' => 'francophone', 'capacity' => 45],
-            ['name' => '2nde A', 'section' => 'francophone', 'capacity' => 40],
-            ['name' => '1ère A', 'section' => 'francophone', 'capacity' => 40],
-            ['name' => 'Tle A',  'section' => 'francophone', 'capacity' => 40],
+            ['name' => '6ème A', 'level' => '6ème', 'section' => 'francophone', 'capacity' => 45],
+            ['name' => '5ème A', 'level' => '5ème', 'section' => 'francophone', 'capacity' => 45],
+            ['name' => '4ème A', 'level' => '4ème', 'section' => 'francophone', 'capacity' => 45],
+            ['name' => '3ème A', 'level' => '3ème', 'section' => 'francophone', 'capacity' => 45],
+            ['name' => '2nde A', 'level' => '2nde', 'section' => 'francophone', 'capacity' => 40],
+            ['name' => '1ère A', 'level' => '1ère', 'section' => 'francophone', 'capacity' => 40],
+            ['name' => 'Tle A',  'level' => 'Terminale', 'section' => 'francophone', 'capacity' => 40],
             // Anglophone
-            ['name' => 'Form 1', 'section' => 'anglophone', 'capacity' => 40],
-            ['name' => 'Form 2', 'section' => 'anglophone', 'capacity' => 40],
-            ['name' => 'Form 3', 'section' => 'anglophone', 'capacity' => 40],
-            ['name' => 'Form 4', 'section' => 'anglophone', 'capacity' => 40],
-            ['name' => 'Form 5', 'section' => 'anglophone', 'capacity' => 35],
-            ['name' => 'L.6th',  'section' => 'anglophone', 'capacity' => 35],
-            ['name' => 'U.6th',  'section' => 'anglophone', 'capacity' => 35],
+            ['name' => 'Form 1', 'level' => 'Form 1', 'section' => 'anglophone', 'capacity' => 40],
+            ['name' => 'Form 2', 'level' => 'Form 2', 'section' => 'anglophone', 'capacity' => 40],
+            ['name' => 'Form 3', 'level' => 'Form 3', 'section' => 'anglophone', 'capacity' => 40],
+            ['name' => 'Form 4', 'level' => 'Form 4', 'section' => 'anglophone', 'capacity' => 40],
+            ['name' => 'Form 5', 'level' => 'Form 5', 'section' => 'anglophone', 'capacity' => 35],
+            ['name' => 'L.6th',  'level' => 'L.6th', 'section' => 'anglophone', 'capacity' => 35],
+            ['name' => 'U.6th',  'level' => 'U.6th', 'section' => 'anglophone', 'capacity' => 35],
         ];
 
         foreach ($classes as $data) {
@@ -97,18 +98,18 @@ class SubjectSeeder extends Seeder
     public function run(): void
     {
         $subjects = [
-            ['name' => 'Mathématiques', 'name_en' => 'Mathematics', 'coefficient' => 4],
-            ['name' => 'Physique-Chimie', 'name_en' => 'Physics & Chemistry', 'coefficient' => 3],
-            ['name' => 'Sciences de la Vie et de la Terre', 'name_en' => 'Life & Earth Sciences', 'coefficient' => 2],
-            ['name' => 'Français', 'name_en' => 'French', 'coefficient' => 4],
-            ['name' => 'Anglais', 'name_en' => 'English', 'coefficient' => 3],
-            ['name' => 'Histoire-Géographie', 'name_en' => 'History & Geography', 'coefficient' => 3],
-            ['name' => 'Éducation Civique', 'name_en' => 'Civic Education', 'coefficient' => 1],
-            ['name' => 'Informatique', 'name_en' => 'Computer Science', 'coefficient' => 2],
-            ['name' => 'Éducation Physique', 'name_en' => 'Physical Education', 'coefficient' => 1],
-            ['name' => 'Arts Plastiques', 'name_en' => 'Art', 'coefficient' => 1],
-            ['name' => 'Économie', 'name_en' => 'Economics', 'coefficient' => 2],
-            ['name' => 'Philosophie', 'name_en' => 'Philosophy', 'coefficient' => 3],
+            ['name' => 'Mathématiques', 'code' => 'MATH', 'coefficient' => 4],
+            ['name' => 'Physique-Chimie', 'code' => 'PHYS', 'coefficient' => 3],
+            ['name' => 'Sciences de la Vie et de la Terre', 'code' => 'SVT', 'coefficient' => 2],
+            ['name' => 'Français', 'code' => 'FR', 'coefficient' => 4],
+            ['name' => 'Anglais', 'code' => 'ENG', 'coefficient' => 3],
+            ['name' => 'Histoire-Géographie', 'code' => 'HG', 'coefficient' => 3],
+            ['name' => 'Éducation Civique', 'code' => 'EC', 'coefficient' => 1],
+            ['name' => 'Informatique', 'code' => 'INFO', 'coefficient' => 2],
+            ['name' => 'Éducation Physique', 'code' => 'EP', 'coefficient' => 1],
+            ['name' => 'Arts Plastiques', 'code' => 'ART', 'coefficient' => 1],
+            ['name' => 'Économie', 'code' => 'ECON', 'coefficient' => 2],
+            ['name' => 'Philosophie', 'code' => 'PHIL', 'coefficient' => 3],
         ];
 
         foreach ($subjects as $data) {

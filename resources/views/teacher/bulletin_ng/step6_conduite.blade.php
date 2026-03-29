@@ -31,7 +31,8 @@
                 @php
                     $cond = $conduites->get($student->id);
                     $avg  = $stats['avgs'][$student->id] ?? 0;
-                    $rank = $stats['ranks'][$student->id] ?? '-';
+                    $rank = $stats['ranks'][$student->id] ?? null;
+                    $rankDisplay = $rank ? "{$rank}/{$students->count()}" : '—';
                 @endphp
                 <div class="bng-card bng-conduite-card" data-student-id="{{ $student->id }}">
                     {{-- En-tête élève --}}
@@ -43,10 +44,10 @@
                         </div>
                         <div class="bng-conduite-scores">
                             <span class="bng-badge {{ $avg >= 10 ? 'bng-badge-success' : 'bng-badge-danger' }}">
-                                {{ $isEN ? 'Avg' : 'Moy' }}: {{ number_format($avg, 2) }}
+                                {{ $isEN ? 'Avg' : 'Moy' }}: {{ $avg > 0 ? number_format($avg, 2) : '—' }}
                             </span>
                             <span class="bng-badge bng-badge-primary">
-                                {{ $isEN ? 'Rank' : 'Rang' }}: {{ $rank }}/{{ $students->count() }}
+                                {{ $isEN ? 'Rank' : 'Rang' }}: {{ $rankDisplay }}
                             </span>
                         </div>
                     </div>

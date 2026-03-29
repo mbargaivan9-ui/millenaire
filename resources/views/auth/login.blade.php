@@ -1,5 +1,5 @@
 @extends('layouts.auth')
-@section('title', __('auth.login'))
+@section('title', 'Connexion')
 
 @section('content')
 <div class="auth-wrapper">
@@ -8,40 +8,43 @@
   <div class="auth-panel">
     <div class="auth-brand">
       <div class="auth-brand-logo">
-        @php $settings = \App\Models\EstablishmentSetting::getInstance(); @endphp
-        @if($settings->logo_path)
-          <img src="{{ asset($settings->logo_path) }}" alt="Logo" style="width: 48px; height: 48px; object-fit: contain; filter: brightness(0) invert(1);">
+        @php 
+          $logoUrl = \App\Helpers\SettingsHelper::logoUrl();
+          $settings = \App\Models\EstablishmentSetting::getInstance();
+        @endphp
+        @if($logoUrl)
+          <img src="{{ $logoUrl }}" alt="Logo de l'établissement" style="width: 48px; height: 48px; object-fit: contain; max-width: 100%;" loading="lazy">
         @else
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 48px; height: 48px;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 48px; height: 48px; color: #0d9488;">
             <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
           </svg>
         @endif
       </div>
       <div>
         <span class="auth-brand-name">{{ $settings->platform_name ?? 'Millénaire Connect' }}</span>
-        <span class="auth-brand-tag">{{ __('public.welcome_subtitle') }}</span>
+        <span class="auth-brand-tag">{{ $settings->platform_tagline ?? 'La plateforme de gestion scolaire complète pour l\'éducation moderne' }}</span>
       </div>
     </div>
 
-    <h1 class="auth-panel-title">{{ __('auth.welcome_title') }}</h1>
-    <p class="auth-panel-desc">{{ __('auth.welcome_message') }}</p>
+    <h1 class="auth-panel-title">Bienvenue sur Millénaire Connect</h1>
+    <p class="auth-panel-desc">Bienvenue ! Connectez-vous pour accéder à votre espace.</p>
 
     <ul class="auth-panel-features">
-      <li><i data-lucide="bar-chart-3"></i><span>{{ __('common.report_cards') }}</span></li>
-      <li><i data-lucide="calendar"></i><span>{{ __('common.schedule') }}</span></li>
-      <li><i data-lucide="message-circle"></i><span>{{ __('common.messaging') }}</span></li>
-      <li><i data-lucide="credit-card"></i><span>{{ __('common.mobile_payments') }}</span></li>
+      <li><i data-lucide="bar-chart-3"></i><span>Bulletins Scolaires</span></li>
+      <li><i data-lucide="calendar"></i><span>Emploi du Temps</span></li>
+      <li><i data-lucide="message-circle"></i><span>Messagerie Sécurisée</span></li>
+      <li><i data-lucide="credit-card"></i><span>Paiements Mobile Money</span></li>
     </ul>
 
-    <div class="auth-meta">© {{ date('Y') }} {{ config('app.name') }}. {{ __('auth.rights_reserved') }}</div>
+    <div class="auth-meta">© {{ date('Y') }} {{ config('app.name') }}. Tous droits réservés.</div>
   </div>
 
   {{-- Form --}}
   <div class="auth-form-area">
     <div class="auth-card">
       <div style="margin-bottom: 32px;">
-        <h2 class="auth-title" style="font-size: 28px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">{{ __('auth.login') }}</h2>
-        <p class="auth-subtitle" style="font-size: 14px; color: #64748b; margin: 0;">{{ __('auth.login_subtitle') }}</p>
+        <h2 class="auth-title" style="font-size: 28px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Connexion</h2>
+        <p class="auth-subtitle" style="font-size: 14px; color: #64748b; margin: 0;">Connectez-vous à votre compte Millénaire</p>
       </div>
 
       @if($errors->any())
@@ -50,7 +53,7 @@
           <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
         </svg>
         <div>
-          <strong>{{ __('common.error') }}:</strong> {{ $errors->first() }}
+          <strong>Erreur :</strong> {{ $errors->first() }}
         </div>
       </div>
       @endif
@@ -59,7 +62,7 @@
         @csrf
 
         <div class="form-group" style="margin-bottom: 18px;">
-          <label class="form-label" for="email" style="display: block; font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">{{ __('common.email') }}</label>
+          <label class="form-label" for="email" style="display: block; font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">Adresse e-mail</label>
           <div style="position: relative;">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" 
                  stroke="currentColor" stroke-width="2" style="position: absolute; left: 14px; top: 50%; 
@@ -79,9 +82,9 @@
 
         <div class="form-group" style="margin-bottom: 24px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px;">
-            <label class="form-label" for="password" style="font-size: 14px; font-weight: 600; color: #1e293b; margin: 0;">{{ __('common.password') }}</label>
+            <label class="form-label" for="password" style="font-size: 14px; font-weight: 600; color: #1e293b; margin: 0;\" >Mot de passe</label>
             <a href="{{ route('password.request') }}" style="font-size: 13px; color: #0d9488; text-decoration: none; font-weight: 600; hover: text-decoration: underline;">
-              {{ __('auth.forgot_password') }}
+              Mot de passe oublié ?
             </a>
           </div>
           <div style="position: relative;">
@@ -93,7 +96,7 @@
             <input type="password" id="password" name="password" class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
                    style="padding-left: 44px; padding-right: 44px; height: 44px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: all 0.3s ease;"
                    placeholder="••••••••" required autocomplete="current-password">
-            <button type="button" class="input-group-icon" data-toggle-password="password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; padding: 4px; cursor: pointer; color: #64748b; display: flex; align-items: center; justify-content: center;" title="{{ __('auth.toggle_password') }}">
+            <button type="button" class="input-group-icon" data-toggle-password="password" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; padding: 4px; cursor: pointer; color: #64748b; display: flex; align-items: center; justify-content: center;" title="Afficher/masquer le mot de passe">
               <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
               </svg>
@@ -112,12 +115,12 @@
           <input type="checkbox" id="remember" name="remember" value="1" @if(old('remember')) checked @endif 
                  style="width: 18px; height: 18px; accent-color: #0d9488; border-radius: 4px; cursor: pointer; border: 1.5px solid #cbd5e1;">
           <label for="remember" style="font-size: 13px; color: #475569; cursor: pointer; margin: 0; user-select: none; font-weight: 500;">
-            {{ __('auth.remember_me') }}
+            Se souvenir de moi
           </label>
         </div>
 
         <button type="submit" style="width: 100%; height: 44px; background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3); hover: box-shadow: 0 6px 16px rgba(13, 148, 136, 0.4);">
-          {{ __('auth.sign_in') }}
+          Se connecter
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M5 12h14M12 5l7 7-7 7"/>
           </svg>
@@ -126,9 +129,9 @@
 
       <div style="text-align: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
         <p style="font-size: 13px; color: #64748b; margin: 0;">
-          {{ __('auth.no_account') }}
+          Vous n'avez pas de compte ?
           <a href="{{ route('register') }}" style="color: #0d9488; font-weight: 600; text-decoration: none;">
-            {{ __('auth.create_one') }}
+            En créer un
           </a>
         </p>
       </div>
@@ -138,7 +141,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
-          {{ __('auth.back_to_website') }}
+          Retour au site
         </a>
       </div>
     </div>

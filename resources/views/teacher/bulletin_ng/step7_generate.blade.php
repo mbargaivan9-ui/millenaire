@@ -52,15 +52,19 @@
         @foreach($students as $student)
         @php
             $avg  = $stats['avgs'][$student->id] ?? 0;
-            $rank = $stats['ranks'][$student->id] ?? '-';
-            $app  = match(true) {
+            // ✅ FIX: Only show rank if data is available (avg > 0)
+            $rank = ($avg > 0) ? ($stats['ranks'][$student->id] ?? '-') : '—';
+            
+            // ✅ FIX: Appreciation only if data complete
+            $app  = ($avg > 0) ? match(true) {
                 $avg < 10  => $isEN ? 'Fail'        : 'Échec',
                 $avg < 12  => $isEN ? 'Pass'        : 'Passable',
                 $avg < 15  => $isEN ? 'Fairly Good' : 'Assez Bien',
                 $avg < 17  => $isEN ? 'Good'        : 'Bien',
                 default    => 'Excellent',
-            };
-            $appClass = $avg >= 15 ? 'app-good' : ($avg >= 10 ? 'app-ok' : 'app-bad');
+            } : ($isEN ? 'Pending Data' : 'En attente');
+            
+            $appClass = $avg >= 15 ? 'app-good' : ($avg >= 10 ? 'app-ok' : ($avg > 0 ? 'app-bad' : 'app-pending'));
         @endphp
         <div class="bng-bulletin-card">
             <div class="bng-bulletin-card-header">
@@ -69,20 +73,20 @@
                     <div class="bng-bulletin-mat">{{ $student->matricule }}</div>
                 </div>
                 <div class="bng-bulletin-avg">
-                    <div class="bng-bulletin-avg-val">{{ number_format($avg,2) }}</div>
-                    <div class="bng-bulletin-avg-lbl">/20</div>
+                    <div class="bng-bulletin-avg-val">{{ $avg > 0 ? number_format($avg, 2) : '—' }}</div>
+                    <div class="bng-bulletin-avg-lbl">{{ $avg > 0 ? '/20' : '' }}</div>
                 </div>
             </div>
             <div class="bng-bulletin-card-body">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                     <span style="font-size:12px;color:var(--bng-text-sec);">{{ $isEN ? 'Rank' : 'Rang' }}</span>
-                    <span style="font-weight:700;font-size:12px;">{{ $rank }}/{{ $students->count() }}</span>
+                    <span style="font-weight:700;font-size:12px;">{{ ($avg > 0) ? "$rank/{$students->count()}" : '—' }}</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
                     <span style="font-size:12px;color:var(--bng-text-sec);">{{ $isEN ? 'Appreciation' : 'Appréciation' }}</span>
                     <span class="bng-app-badge {{ $appClass }}">{{ $app }}</span>
                 </div>
-                @if($student->conduite && $student->conduite->tableau_honneur)
+                @if($student->conduite?->tableau_honneur)
                     <div style="background:#fef9c3;border-radius:8px;padding:4px 10px;font-size:11px;color:#a16207;font-weight:600;margin-top:8px;">
                         🏅 {{ $isEN ? 'Honor Roll' : "Tableau d'Honneur" }}
                     </div>

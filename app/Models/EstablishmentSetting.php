@@ -54,13 +54,13 @@ class EstablishmentSetting extends Model
             return self::firstOrCreate(
                 ['id' => 1],
                 [
-                    'logo_path' => 'img/logo-Millénaire connect.png',
+                    'logo_path' => 'icons/icon-512.png',
                     'about_title' => 'É€ Propos de Millénaire connect',
                     'proviseur_name' => 'Monsieur Jean Dupont',
                     'carousel_images' => [
-                        'img/carousel-1.svg',
-                        'img/carousel-2.svg',
-                        'img/carousel-3.svg',
+                        'images/carousel-1.svg',
+                        'images/carousel-2.svg',
+                        'images/carousel-3.svg',
                     ],
                 ]
             );
@@ -68,15 +68,15 @@ class EstablishmentSetting extends Model
             // Return a default instance when database is unavailable
             return new self([
                 'id' => 1,
-                'logo_path' => 'img/logo-Millénaire connect.png',
-                'about_title' => 'Bienvenue É  Millénaire Connect',
+                'logo_path' => 'icons/icon-512.png',
+                'about_title' => 'Bienvenue É  Millénaire Connect',
                 'about_description' => 'Excellence académique pour un avenir brillant.',
                 'proviseur_name' => 'Monsieur Jean Dupont',
                 'proviseur_bio' => 'Directeur de l\'établissement',
                 'carousel_images' => [
-                    'img/carousel-1.svg',
-                    'img/carousel-2.svg',
-                    'img/carousel-3.svg',
+                    'images/carousel-1.svg',
+                    'images/carousel-2.svg',
+                    'images/carousel-3.svg',
                 ],
                 'phone' => '+33 1 23 45 67 89',
                 'email' => 'contact@millenaire.edu',

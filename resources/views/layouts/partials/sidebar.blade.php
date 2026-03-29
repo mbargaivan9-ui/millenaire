@@ -3,9 +3,12 @@
   {{-- Brand --}}
   <div class="sidebar-brand">
     <div class="brand-logo">
-      @php $settings = $globalSettings ?? App\Models\EstablishmentSetting::getInstance(); @endphp
-      @if($settings->logo_path)
-        <img src="{{ asset($settings->logo_path) }}" alt="{{ $settings->platform_name }}" style="width:40px;height:40px;object-fit:contain;">
+      @php 
+        $settings = $globalSettings ?? App\Models\EstablishmentSetting::getInstance();
+        $logoUrl = \App\Helpers\SettingsHelper::logoUrl();
+      @endphp
+      @if($logoUrl)
+        <img src="{{ $logoUrl }}" alt="{{ $settings->platform_name }}" style="width:40px;height:40px;object-fit:contain;">
       @else
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -116,7 +119,12 @@
           <span class="sidebar-icon"><i data-lucide="dollar-sign"></i></span>
           <span class="sidebar-label">{{ __('Frais') }}</span>
         </a>
-        
+
+        {{-- Payment Module (Mobile Money) --}}
+        <a href="{{ route('schoolpay.admin.dashboard') }}" class="sidebar-item {{ request()->routeIs('schoolpay.admin.*') ? 'active' : '' }}">
+          <span class="sidebar-icon"><i data-lucide="credit-card"></i></span>
+          <span class="sidebar-label">{{ __('Paiements Mobile Money') }}</span>
+        </a>
 
        
 
@@ -261,7 +269,7 @@
         
 
         {{-- Payments Menu (All Payment Views) --}}
-        <div class="sidebar-item {{ request()->routeIs('parent.payments.*', 'parent.mobile-money.*') ? 'active open' : '' }}" data-toggle="sub-payment">
+        <div class="sidebar-item {{ request()->routeIs('parent.payments.*', 'parent.mobile-money.*', 'schoolpay.parent.*') ? 'active open' : '' }}" data-toggle="sub-payment">
           <span class="sidebar-icon"><i data-lucide="credit-card"></i></span>
           <span class="sidebar-label">{{ __('Paiement') }}</span>
           <svg class="sidebar-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -269,7 +277,14 @@
             <polyline points="9 18 15 12 9 6"/>
           </svg>
         </div>
-        <div class="sidebar-submenu {{ request()->routeIs('parent.payments.*', 'parent.mobile-money.*') ? 'open' : '' }}" id="sub-payment">
+        <div class="sidebar-submenu {{ request()->routeIs('parent.payments.*', 'parent.mobile-money.*', 'schoolpay.parent.*') ? 'open' : '' }}" id="sub-payment">
+          {{-- SchoolPay Interface --}}
+          <a href="{{ route('schoolpay.parent.index') }}" class="sidebar-subitem {{ request()->routeIs('schoolpay.parent.*') ? 'active' : '' }}">
+            <span class="text-xs"><i class="fas fa-credit-card me-1"></i>{{ __('Paiement SchoolPay') }}</span>
+          </a>
+
+          <div class="h-px bg-gray-200 my-2"></div>
+
           {{-- Payment Dashboard Links --}}
           <a href="{{ route('parent.payments.index') }}" class="sidebar-subitem {{ request()->routeIs('parent.payments.index') ? 'active' : '' }}">
             <span class="text-xs">{{ __('Tableau de Bord') }}</span>
@@ -361,19 +376,19 @@
         </a>
 
         {{-- Quiz Management --}}
-        <div class="sidebar-item {{ request()->routeIs(student.quiz.'*') ? 'active open' : '' }}" data-toggle="sub-quiz">
+        <div class="sidebar-item {{ request()->routeIs('student.quiz.*') ? 'active open' : '' }}" data-toggle="sub-quiz">
           <span class="sidebar-icon"><i data-lucide="help-circle"></i></span>
-          <span class="sidebar-label">{{ __('Quiz) }}</span>
+          <span class="sidebar-label">{{ __('Quiz') }}</span>
           <svg class="sidebar-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="9 18 15 12 9 6"/>
           </svg>
         </div>
-        <div class="sidebar-submenu {{ request()->routeIs(student.quiz.'*') ? (active open) : '' }}" id="sub-quiz">
-          <a href="{{ route(student.quiz-take.index) }}" class="sidebar-subitem {{ request()->routeIs(student.quiz-take.'*') ? (active) : '' }}">
+        <div class="sidebar-submenu {{ request()->routeIs('student.quiz.*') ? 'active open' : '' }}" id="sub-quiz">
+          <a href="{{ route('student.quiz-take.index') }}" class="sidebar-subitem {{ request()->routeIs('student.quiz-take.*') ? 'active' : '' }}">
             <i class="fas fa-clipboard-list me-2"></i>{{ __('Passer Quiz') }}
           </a>
-          <a href="{{ route(student.quiz-result.index) }}" class="sidebar-subitem {{ request()->routeIs(student.quiz-result.,*') ? (active) : '' }}">
+          <a href="{{ route('student.quiz-result.index') }}" class="sidebar-subitem {{ request()->routeIs('student.quiz-result.*') ? 'active' : '' }}">
             <i class="fas fa-chart-bar me-2"></i>{{ __('Résultats Quiz') }}
           </a>
         </div>

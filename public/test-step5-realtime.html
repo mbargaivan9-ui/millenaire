@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Real-Time Step 5</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .info {
+            background: #eef2ff;
+            border-left: 4px solid #4f46e5;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .warning {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #1f2937;
+            border-bottom: 2px solid #4f46e5;
+            padding-bottom: 10px;
+        }
+        button {
+            background: #4f46e5;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #4338ca;
+        }
+        button.secondary {
+            background: #6b7280;
+        }
+        button.secondary:hover {
+            background: #4b5563;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #374151;
+        }
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        .output {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .output-line {
+            margin: 2px 0;
+        }
+        .output-info {
+            color: #60a5fa;
+        }
+        .output-success {
+            color: #10b981;
+        }
+        .output-error {
+            color: #f87171;
+        }
+        .output-warn {
+            color: #fcd34d;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background: #f3f4f6;
+            font-weight: 600;
+        }
+        tr:hover {
+            background: #f9fafb;
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6b7280;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        .tab-button.active {
+            color: #4f46e5;
+            border-bottom-color: #4f46e5;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status.ok {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Real-Time Step 5 - Diagnostic Complet</h1>
+        <p>Ce test va vérifier si votre Step 5 fonctionne correctement en temps réel.</p>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="showStep(1)">1. Configuration</button>
+            <button class="tab-button" onclick="showStep(2)">2. Vérification API</button>
+            <button class="tab-button" onclick="showStep(3)">3. Test Simulé</button>
+            <button class="tab-button" onclick="showStep(4)">4. Résultats</button>
+        </div>
+
+        <!-- STEP 1: Configuration -->
+        <div id="step1" class="step active">
+            <div class="section">
+                <h2>Étape 1: Configuration</h2>
+                <p>Entrez l'ID de votre configuration bulletin pour commencer les tests.</p>
+
+                <div class="form-group">
+                    <label for="configId">ID Configuration (depuis l'URL Step 5)</label>
+                    <input type="text" id="configId" placeholder="ex: session_1234567890_123 ou 1" 
+                           value="">
+                    <p style="font-size: 12px; color: #6b7280; margin-top: 5px;">
+                        Trouvez-le dans l'URL de Step 5: /bulletin-ng/<strong>CECI_ICI</strong>/step5
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="csrf">Token CSRF (depuis le formulaire)</label>
+                    <input type="text" id="csrf" placeholder="Depuis meta[name=csrf-token]" value="">
+                    <p style="font-size: 12px; color: #6b7280; margin-top: 5px;">
+                        Ouvrez la console (F12) et tapez: 
+                        <code>document.querySelector('meta[name=csrf-token]').content</code>
+                    </p>
+                </div>
+
+                <button onclick="goToStep(2)">Continuer vers Étape 2 →</button>
+            </div>
+        </div>
+
+        <!-- STEP 2: Vérification API -->
+        <div id="step2" class="step">
+            <div class="section">
+                <h2>Étape 2: Vérification API Debug</h2>
+                <p>Vérifions d'abord que le serveur a les bonnes données.</p>
+
+                <button onclick="testDebugAPI()">🔍 Tester l'API Debug</button>
+                <button onclick="goToStep(1)" class="secondary">← Retour</button>
+
+                <div id="debugOutput" class="output" style="margin-top: 20px; display: none;"></div>
+            </div>
+        </div>
+
+        <!-- STEP 3: Test Simulé -->
+        <div id="step3" class="step">
+            <div class="section">
+                <h2>Étape 3: Test de Saisie de Note</h2>
+                <p>Simule l'entrée d'une note et vérifiez la réponse du serveur.</p>
+
+                <div class="form-group">
+                    <label for="studentId">ID Élève</label>
+                    <input type="text" id="studentId" placeholder="s'affichera après l'étape 2">
+                </div>
+
+                <div class="form-group">
+                    <label for="subjectId">ID Matière</label>
+                    <input type="text" id="subjectId" placeholder="s'affichera après l'étape 2">
+                </div>
+
+                <div class="form-group">
+                    <label for="noteValue">Note à tester</label>
+                    <input type="number" id="noteValue" placeholder="15" min="0" max="20" step="0.25" value="15">
+                </div>
+
+                <button onclick="testSaveNote()">💾 Envoyer la Note</button>
+                <button onclick="goToStep(2)" class="secondary">← Retour</button>
+
+                <div id="noteOutput" class="output" style="margin-top: 20px; display: none;"></div>
+            </div>
+        </div>
+
+        <!-- STEP 4: Résultats -->
+        <div id="step4" class="step">
+            <div class="section">
+                <h2>Étape 4: Résultats et Diagnostic</h2>
+
+                <div id="resultsContainer"></div>
+
+                <button onclick="goToStep(1)" class="secondary">← Recommencer depuis le début</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let testData = {
+            configId: null,
+            csrf: null,
+            debugInfo: null,
+            saveNoteResponse: null,
+        };
+
+        function log(output, message, type = 'info') {
+            const elem = document.getElementById(output);
+            if (!elem.style.display || elem.style.display === 'none') {
+                elem.style.display = 'block';
+            }
+
+            const line = document.createElement('div');
+            line.className = `output-line output-${type}`;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            elem.appendChild(line);
+            elem.scrollTop = elem.scrollHeight;
+        }
+
+        function clearLog(output) {
+            const elem = document.getElementById(output);
+            elem.innerHTML = '';
+        }
+
+        function showStep(n) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + n).classList.add('active');
+            
+            document.querySelectorAll('.tab-button').forEach((b, i) => {
+                b.classList.toggle('active', i + 1 === n);
+            });
+        }
+
+        function goToStep(n) {
+            const configId = document.getElementById('configId').value;
+            const csrf = document.getElementById('csrf').value;
+
+            if (!configId || !csrf) {
+                alert('⚠️ Veuillez remplir l\'ID Configuration et le Token CSRF d\'abord!');
+                showStep(1);
+                return;
+            }
+
+            testData.configId = configId;
+            testData.csrf = csrf;
+            showStep(n);
+        }
+
+        async function testDebugAPI() {
+            const configId = document.getElementById('configId').value;
+            const csrf = document.getElementById('csrf').value;
+
+            if (!configId || !csrf) {
+                alert('⚠️ Veuillez remplir tous les champs de l\'étape 1');
+                return;
+            }
+
+            testData.configId = configId;
+            testData.csrf = csrf;
+
+            clearLog('debugOutput');
+            log('debugOutput', '🔄 Appel de l\'API Debug...', 'info');
+
+            try {
+                const response = await fetch(`/teacher/bulletin-ng/${configId}/debug`);
+                const data = await response.json();
+
+                if (response.status !== 200) {
+                    log('debugOutput', `❌ Erreur HTTP ${response.status}`, 'error');
+                    log('debugOutput', JSON.stringify(data, null, 2), 'error');
+                    return;
+                }
+
+                testData.debugInfo = data;
+
+                log('debugOutput', '✅ Debug API répondu avec succès', 'success');
+                log('debugOutput', '', 'info');
+
+                // Informations de base
+                const debug = data.debug || {};
+                log('debugOutput', `📊 Session:`, 'info');
+                log('debugOutput', `   - Clé: ${debug.sessionKey}`, 'info');
+                log('debugOutput', `   - Existe: ${debug.sessionExists ? 'OUI' : 'NON'}`, debug.sessionExists ? 'success' : 'error');
+                log('debugOutput', `   - Élèves: ${debug.studentCount}`, 'info');
+                log('debugOutput', `   - Matières: ${debug.subjectCount}`, 'info');
+                log('debugOutput', `   - Notes: ${debug.noteCount}`, 'info');
+                log('debugOutput', '', 'info');
+
+                // IDs des élèves
+                log('debugOutput', `👤 IDs Élèves trouvés:`, 'info');
+                (debug.studentIds || []).forEach((id, i) => {
+                    const status = id === 'NO_ID' ? 'error' : 'success';
+                    log('debugOutput', `   ${i + 1}. ${id.substring(0, 30)}...`, status);
+                });
+                log('debugOutput', '', 'info');
+
+                // IDs des matières
+                log('debugOutput', `📚 IDs Matières trouvés:`, 'info');
+                (debug.subjectIds || []).forEach((id, i) => {
+                    const status = id === 'NO_ID' ? 'error' : 'success';
+                    log('debugOutput', `   ${i + 1}. ${id.substring(0, 30)}...`, status);
+                });
+                log('debugOutput', '', 'info');
+
+                // Clés de notes
+                log('debugOutput', `📝 Clés de Notes trouvées:`, 'info');
+                if (debug.noteCount === 0) {
+                    log('debugOutput', `   ⚠️ Aucune note trouvée (séance vide)`, 'warn');
+                } else {
+                    (debug.noteKeys || []).forEach((key, i) => {
+                        log('debugOutput', `   ${i + 1}. ${key}`, 'info');
+                    });
+                    if (debug.noteCount > 5) {
+                        log('debugOutput', `   ... et ${debug.totalNoteKeys - 5} autres`, 'info');
+                    }
+                }
+                log('debugOutput', '', 'info');
+
+                // Stats calculées
+                const stats = data.stats || {};
+                log('debugOutput', `📈 Statistiques calculées:`, 'info');
+                log('debugOutput', `   - Moyenne classe: ${stats.avg}`, stats.avgs && Object.keys(stats.avgs).length > 0 ? 'success' : 'warn');
+                log('debugOutput', `   - % Réussite: ${stats.pct}%`, 'info');
+                log('debugOutput', `   - Max: ${stats.max}`, 'info');
+                log('debugOutput', `   - Min: ${stats.min}`, 'info');
+                log('debugOutput', `   - Réussis: ${stats.passing}`, 'info');
+                log('debugOutput', `   - Moyennes par élève: ${Object.keys(stats.avgs || {}).length}`, 'info');
+                log('debugOutput', `   - Classements: ${Object.keys(stats.ranks || {}).length}`, 'info');
+                log('debugOutput', '', 'info');
+
+                // Données brutes
+                log('debugOutput', `🔍 Données brutes (premier élément):`, 'info');
+                if (data.rawSession.firstStudent) {
+                    log('debugOutput', `   Élève: ${JSON.stringify(data.rawSession.firstStudent)}`, 'info');
+                    const sid = data.rawSession.firstStudent.id;
+                    document.getElementById('studentId').value = sid;
+                }
+                if (data.rawSession.firstSubject) {
+                    log('debugOutput', `   Matière: ${JSON.stringify(data.rawSession.firstSubject)}`, 'info');
+                    const subid = data.rawSession.firstSubject.id;
+                    document.getElementById('subjectId').value = subid;
+                }
+                if (data.rawSession.firstNote) {
+                    log('debugOutput', `   Note: ${JSON.stringify(data.rawSession.firstNote)}`, 'info');
+                }
+                log('debugOutput', '', 'info');
+
+                // Checksum
+                log('debugOutput', '✅ API Debug terminé avec succès', 'success');
+            } catch (e) {
+                log('debugOutput', `❌ Erreur: ${e.message}`, 'error');
+                console.error(e);
+            }
+        }
+
+        async function testSaveNote() {
+            const configId = document.getElementById('configId').value;
+            const csrf = document.getElementById('csrf').value;
+            const studentId = document.getElementById('studentId').value;
+            const subjectId = document.getElementById('subjectId').value;
+            const noteValue = parseFloat(document.getElementById('noteValue').value);
+
+            if (!configId || !csrf || !studentId || !subjectId || isNaN(noteValue)) {
+                alert('⚠️ Veuillez remplir tous les champs');
+                return;
+            }
+
+            clearLog('noteOutput');
+            log('noteOutput', `💾 Envoi de la note...`, 'info');
+            log('noteOutput', `   Config: ${configId}`, 'info');
+            log('noteOutput', `   Élève: ${studentId.substring(0, 30)}...`, 'info');
+            log('noteOutput', `   Matière: ${subjectId.substring(0, 30)}...`, 'info');
+            log('noteOutput', `   Note: ${noteValue}`, 'info');
+            log('noteOutput', '', 'info');
+
+            try {
+                const response = await fetch(`/teacher/bulletin-ng/${configId}/save-note`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrf,
+                    },
+                    body: JSON.stringify({
+                        ng_student_id: studentId,
+                        ng_subject_id: subjectId,
+                        note: noteValue,
+                    }),
+                });
+
+                const data = await response.json();
+                testData.saveNoteResponse = data;
+
+                if (response.status !== 200) {
+                    log('noteOutput', `❌ Erreur HTTP ${response.status}`, 'error');
+                    log('noteOutput', JSON.stringify(data, null, 2), 'error');
+                    return;
+                }
+
+                log('noteOutput', '✅ Réponse reçue', 'success');
+                log('noteOutput', '', 'info');
+
+                if (data.success) {
+                    log('noteOutput', '✅ Succès: true', 'success');
+                } else {
+                    log('noteOutput', '❌ Succès: false', 'error');
+                }
+
+                log('noteOutput', `   Note retournée: ${data.note}`, 'info');
+                log('noteOutput', '', 'info');
+
+                if (data.stats) {
+                    log('noteOutput', '📊 Statistiques reçues:', 'info');
+                    log('noteOutput', `   - Moyenne classe: ${data.stats.avg}`, 'info');
+                    log('noteOutput', `   - % Réussite: ${data.stats.pct}%`, 'info');
+                    log('noteOutput', `   - Max: ${data.stats.max}`, 'info');
+                    log('noteOutput', `   - Min: ${data.stats.min}`, 'info');
+                    log('noteOutput', `   - Réussis: ${data.stats.passing}`, 'info');
+                    log('noteOutput', `   - Moyennes: ${Object.keys(data.stats.avgs || {}).length} élèves`, 'info');
+                    log('noteOutput', `   - Classements: ${Object.keys(data.stats.ranks || {}).length} élèves`, 'info');
+
+                    const currentStudentAvg = data.stats.avgs[studentId];
+                    const currentStudentRank = data.stats.ranks[studentId];
+                    if (currentStudentAvg !== undefined) {
+                        log('noteOutput', `   - Moyenne de cet élève: ${currentStudentAvg}`, 'success');
+                    } else {
+                        log('noteOutput', `   - ⚠️ Moyenne de cet élève: NON TROUVÉE`, 'warn');
+                    }
+                    if (currentStudentRank !== undefined) {
+                        log('noteOutput', `   - Rang de cet élève: ${currentStudentRank}`, 'success');
+                    } else {
+                        log('noteOutput', `   - ⚠️ Rang de cet élève: NON TROUVÉ`, 'warn');
+                    }
+                } else {
+                    log('noteOutput', '❌ Pas de stats dans la réponse!', 'error');
+                }
+
+                log('noteOutput', '', 'info');
+                log('noteOutput', '✅ Test de saisie terminé', 'success');
+                showResults();
+            } catch (e) {
+                log('noteOutput', `❌ Erreur: ${e.message}`, 'error');
+                console.error(e);
+            }
+        }
+
+        function showResults() {
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = '';
+
+            const h3 = document.createElement('h3');
+            h3.textContent = '✅ Résumé du Diagnostic';
+            container.appendChild(h3);
+
+            const results = [];
+
+            if (testData.debugInfo) {
+                const debug = testData.debugInfo.debug;
+                results.push({
+                    check: 'Session Chargée',
+                    result: debug.sessionExists,
+                    details: debug.sessionExists ? 'Session trouvée' : 'Session missing'
+                });
+                results.push({
+                    check: 'Élèves',
+                    result: debug.studentCount > 0,
+                    details: `${debug.studentCount} élèves`
+                });
+                results.push({
+                    check: 'Matières',
+                    result: debug.subjectCount > 0,
+                    details: `${debug.subjectCount} matières`
+                });
+                results.push({
+                    check: 'IDs Valides',
+                    result: !debug.studentIds.includes('NO_ID') && !debug.subjectIds.includes('NO_ID'),
+                    details: 'Tous les IDs sont valides'
+                });
+            }
+
+            if (testData.saveNoteResponse && testData.saveNoteResponse.stats) {
+                results.push({
+                    check: 'Statistiques Calculées',
+                    result: testData.saveNoteResponse.stats.avg !== undefined,
+                    details: `Moyenne: ${testData.saveNoteResponse.stats.avg}`
+                });
+                results.push({
+                    check: 'Données Disponibles',
+                    result: Object.keys(testData.saveNoteResponse.stats.avgs || {}).length > 0,
+                    details: `${Object.keys(testData.saveNoteResponse.stats.avgs || {}).length} moyennes`
+                });
+            }
+
+            const table = document.createElement('table');
+            const thead = table.createTHead();
+            const headerRow = thead.insertRow();
+            ['Vérification', 'Résultat', 'Détails'].forEach(h => {
+                const th = document.createElement('th');
+                th.textContent = h;
+                headerRow.appendChild(th);
+            });
+
+            const tbody = table.createTBody();
+            results.forEach(r => {
+                const row = tbody.insertRow();
+                const statusSpan = document.createElement('span');
+                statusSpan.className = `status ${r.result ? 'ok' : 'error'}`;
+                statusSpan.textContent = r.result ? '✅ OK' : '❌ ERREUR';
+
+                row.insertCell(0).textContent = r.check;
+                row.insertCell(1).appendChild(statusSpan);
+                row.insertCell(2).textContent = r.details;
+            });
+
+            container.appendChild(table);
+
+            // Recommandations
+            const allOk = results.every(r => r.result);
+            const rec = document.createElement('div');
+            if (allOk) {
+                rec.className = 'success';
+                rec.innerHTML = '<strong>✅ Tous les tests passent!</strong> Votre Step 5 devrait fonctionner correctement en temps réel dans le navigateur.';
+            } else {
+                rec.className = 'warning';
+                rec.innerHTML = '<strong>⚠️ Certains tests échoient.</strong> Consultez les détails ci-dessus pour identifier le problème.';
+            }
+            container.appendChild(rec);
+        }
+
+        // Auto-fill from URL if exist
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('configId')) {
+                document.getElementById('configId').value = urlParams.get('configId');
+            }
+            if (urlParams.has('csrf')) {
+                document.getElementById('csrf').value = urlParams.get('csrf');
+            }
+        });
+    </script>
+</body>
+</html>

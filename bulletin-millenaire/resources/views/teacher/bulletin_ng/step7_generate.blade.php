@@ -79,7 +79,7 @@
                     <span style="font-size:12px;color:var(--bng-text-sec);">{{ $isEN ? 'Appreciation' : 'Appréciation' }}</span>
                     <span class="bng-app-badge {{ $appClass }}">{{ $app }}</span>
                 </div>
-                @if($student->conduite && $student->conduite->tableau_honneur)
+                @if($student->conduite?->tableau_honneur)
                     <div style="background:#fef9c3;border-radius:8px;padding:4px 10px;font-size:11px;color:#a16207;font-weight:600;margin-top:8px;">
                         🏅 {{ $isEN ? 'Honor Roll' : "Tableau d'Honneur" }}
                     </div>

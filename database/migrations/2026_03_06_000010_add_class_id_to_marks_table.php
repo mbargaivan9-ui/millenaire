@@ -39,7 +39,7 @@ return new class extends Migration
     {
         if (Schema::hasTable('marks') && Schema::hasColumn('marks', 'class_id')) {
             Schema::table('marks', function (Blueprint $table) {
-                $table->dropForeignIdFor('classes', 'class_id');
+                $table->dropForeign(['class_id']);
                 $table->dropIndex(['class_id']);
                 $table->dropColumn('class_id');
             });

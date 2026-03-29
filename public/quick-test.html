@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Modal Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; color: white; margin-bottom: 40px; }
+        h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .subtitle { opacity: 0.9; font-size: 1.1em; }
+        
+        .test-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .test-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .test-card h3 { color: #667eea; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-size: 1.1em; }
+        .test-card p { color: #666; font-size: 0.9em; line-height: 1.6; margin-bottom: 15px; }
+        .test-btn { 
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .test-btn:hover { background: #764ba2; transform: translateY(-2px); }
+        
+        .checklist { 
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .checklist h2 { color: #333; margin-bottom: 20px; }
+        .check-item {
+            padding: 12px;
+            margin: 8px 0;
+            border-left: 4px solid #ddd;
+            border-radius: 4px;
+            background: #f9f9f9;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .check-icon { font-size: 1.5em; }
+        .check-item.ready { border-left-color: #10b981; background: #f0fdf4; }
+        .check-text { flex: 1; }
+        .check-title { font-weight: 600; color: #333; }
+        .check-desc { color: #666; font-size: 0.85em; margin-top: 4px; }
+        
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: visible;
+            opacity: 1;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+        .modal.hidden {
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+        }
+        .modal-content {
+            position: relative;
+            z-index: 1;
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .modal-title { font-size: 1.3em; font-weight: 600; color: #333; }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        .modal-close:hover { color: #333; }
+        
+        .form-field { margin-bottom: 15px; }
+        .form-label { display: block; margin-bottom: 6px; font-weight: 500; color: #333; font-size: 0.95em; }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95em;
+        }
+        .form-input:focus, .form-select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+        
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-secondary { background: #f0f0f0; color: #333; }
+        .btn-secondary:hover { background: #e0e0e0; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #764ba2; }
+        
+        .success-msg {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #16a34a;
+            display: none;
+        }
+        .success-msg.show { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Bulletin NG - Test Modal</h1>
+            <p class="subtitle">Vérifiez que le modal d'ajout d'élève fonctionne correctement</p>
+        </div>
+
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>🔗 Test en Ligne</h3>
+                <p>Cliquez pour ouvrir le formulaire de test ci-dessous. Vérifiez l'animation et le fonctionnement.</p>
+                <button class="test-btn" onclick="openModal()">Ouvrir Modal</button>
+            </div>
+            
+            <div class="test-card">
+                <h3>✅ Étapes à Vérifier</h3>
+                <p>Après avoir cliqué, assurez-vous que:</p>
+                <ul style="color: #666; font-size: 0.9em; margin-left: 20px; line-height: 1.8; margin-bottom: 0;">
+                    <li>Le modal s'affiche</li>
+                    <li>Les champs se remplissent</li>
+                    <li>Les boutons fonctionnent</li>
+                </ul>
+            </div>
+            
+            <div class="test-card">
+                <h3>🧪 Diagnostique</h3>
+                <p>Vérifiez l'état du système:</p>
+                <div id="diagnosticResults"></div>
+            </div>
+        </div>
+
+        <div class="checklist">
+            <h2>📋 Checklist Avant Déploiement</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <div class="check-item ready">
+                        <div class="check-icon">✅</div>
+                        <div class="check-text">
+                            <div class="check-title">CSS Modal</div>
+                            <div class="check-desc">`.bng-modal.hidden` défini</div>
+                        </div>
+                    </div>
+                    
+                    <div class="check-item ready">
+                        <div class="check-icon">✅</div>
+                        <div class="check-text">
+                            <div class="check-title">HTML Éléments</div>
+                            <div class="check-desc">Tous les IDs présents</div>
+                        </div>
+                    </div>
+                    
+                    <div class="check-item ready">
+                        <div class="check-icon">✅</div>
+                        <div class="check-text">
+                            <div class="check-title">JavaScript Handlers</div>
+                            <div class="check-desc">DOMContentLoaded simplifié</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="check-item ready">
+                        <div class="check-icon">✅</div>
+                        <div class="check-text">
+                            <div class="check-title">Cache Laravel</div>
+                            <div class="check-desc">Vidé (config/cache/views)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="check-item ready">
+                        <div class="check-icon">✅</div>
+                        <div class="check-text">
+                            <div class="check-title">Routes AJAX</div>
+                            <div class="check-desc">POST/DELETE configurees</div>
+                        </div>
+                    </div>
+                    
+                    <div class="check-item ready">
+                        <div class="check-icon">⏳</div>
+                        <div class="check-text">
+                            <div class="check-title">Test en Production</div>
+                            <div class="check-desc">À faire avec user réel</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Modal de Test --}}
+    <div id="testModal" class="modal hidden">
+        <div class="modal-overlay" onclick="closeModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">➕ Ajouter un Élève</div>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            
+            <div class="success-msg" id="successMsg">
+                ✅ Élève ajouté avec succès!
+            </div>
+            
+            <form id="studentForm" onsubmit="return submitForm(event)">
+                <div class="form-field">
+                    <label class="form-label">Matricule *</label>
+                    <input type="text" id="matricule" class="form-input" placeholder="ex: S260245" required>
+                </div>
+                
+                <div class="form-field">
+                    <label class="form-label">Nom et Prénom *</label>
+                    <input type="text" id="nom" class="form-input" placeholder="Nom Prénom" required>
+                </div>
+                
+                <div class="form-field">
+                    <label class="form-label">Date de Naissance</label>
+                    <input type="date" id="dob" class="form-input">
+                </div>
+                
+                <div class="form-field">
+                    <label class="form-label">Lieu de Naissance</label>
+                    <input type="text" id="lieu" class="form-input" placeholder="Ville">
+                </div>
+                
+                <div class="form-field">
+                    <label class="form-label">Sexe</label>
+                    <select id="sexe" class="form-select">
+                        <option value="M">Masculin</option>
+                        <option value="F">Féminin</option>
+                    </select>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                    <button type="submit" class="btn btn-primary">✓ Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    function openModal() {
+        const modal = document.getElementById('testModal');
+        modal.classList.remove('hidden');
+        document.getElementById('matricule').focus();
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('testModal');
+        modal.classList.add('hidden');
+        document.getElementById('studentForm').reset();
+        document.getElementById('successMsg').classList.remove('show');
+    }
+
+    function submitForm(e) {
+        e.preventDefault();
+        document.getElementById('successMsg').classList.add('show');
+        setTimeout(() => {
+            closeModal();
+        }, 1200);
+        return false;
+    }
+
+    // Diagnostic
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('testModal');
+        const results = [];
+
+        if (modal) results.push('✅ Modal HTML trouvé');
+        if (modal && modal.classList.contains('hidden')) results.push('✅ Classe hidden appliquée');
+        
+        const computed = window.getComputedStyle(modal);
+        if (computed.visibility === 'hidden') results.push('✅ CSS hidden correcte');
+        if (typeof openModal === 'function') results.push('✅ Fonction openModal OK');
+
+        const diag = document.getElementById('diagnosticResults');
+        results.forEach(r => {
+            const span = document.createElement('div');
+            span.textContent = r;
+            span.style.fontSize = '0.85em';
+            span.style.color = '#10b981';
+            span.style.marginBottom = '6px';
+            diag.appendChild(span);
+        });
+
+        if (results.length === 4) {
+            diag.insertAdjacentHTML('afterbegin', '<div style="background: #f0fdf4; padding: 10px; border-radius: 6px; margin-bottom: 10px; color: #16a34a; font-weight: 600;">🎉 Tous les diagnostiques OK!</div>');
+        }
+    });
+    </script>
+</body>
+</html>

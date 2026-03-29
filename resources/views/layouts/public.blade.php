@@ -36,9 +36,12 @@
         <div class="container-fluid container-xl position-relative d-flex align-items-center">
 
             <a href="{{ route('home') }}" class="logo d-flex align-items-center me-auto">
-                @php $settings = $globalSettings ?? App\Models\EstablishmentSetting::getInstance(); @endphp
-                @if($settings->logo_path)
-                    <img src="{{ asset($settings->logo_path) }}" alt="{{ $settings->platform_name ?? 'Millénaire Connect' }}" height="40" class="me-2">
+                @php 
+                    $settings = $globalSettings ?? App\Models\EstablishmentSetting::getInstance();
+                    $logoUrl = \App\Helpers\SettingsHelper::logoUrl();
+                @endphp
+                @if($logoUrl)
+                    <img src="{{ $logoUrl }}" alt="{{ $settings->platform_name ?? 'Millénaire Connect' }}" height="40" class="me-2">
                 @endif
                 <h1 class="sitename">{{ $settings->platform_name ?? 'Millénaire Connect' }}</h1>
             </a>
@@ -46,22 +49,17 @@
             <nav id="navmenu" class="navmenu">
                 <ul>
                     <li><a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">
-                        {{ app()->getLocale() === 'fr' ? 'Accueil' : 'Home' }}
+                         Accueil
                     </a></li>
                     <li><a href="{{ route('public.about') }}" class="{{ request()->routeIs('public.about') ? 'active' : '' }}">
-                        {{ app()->getLocale() === 'fr' ? 'À Propos' : 'About' }}
+                         À Propos
                     </a></li>
                     <li><a href="{{ route('public.instructors') }}" class="{{ request()->routeIs('public.instructors') ? 'active' : '' }}">
-                        {{ app()->getLocale() === 'fr' ? 'Enseignants' : 'Instructors' }}
+                         Enseignants
                     </a></li>
                     <li><a href="{{ route('public.staff') }}" class="{{ request()->routeIs('public.staff') ? 'active' : '' }}">
-                        {{ app()->getLocale() === 'fr' ? 'Corps Administratif' : 'Staff' }}
+                         Corps Administratif
                     </a></li>
-
-                    {{-- Language Switcher --}}
-                    <li class="lang-switcher">
-                        <x-language-switcher />
-                    </li>
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>

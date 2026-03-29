@@ -9,13 +9,13 @@
 
 @extends('layouts.public')
 
-@section('title', __('home') . ' — ' . (isset($settings) ? ($settings->platform_name ?? 'Millénaire Connect') : 'Millénaire Connect'))
+@section('title', 'Accueil — Millénaire Connect')
 
 @section('content')
 
 @php
     $settings = $settings ?? App\Models\EstablishmentSetting::getInstance();
-    $locale   = app()->getLocale();
+    $logoUrl = \App\Helpers\SettingsHelper::logoUrl();
 @endphp
 
 {{-- ════════════════════════════════════════════════════════════
@@ -29,16 +29,16 @@
 
                 <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
                     <div class="hero-text">
-                        @if($settings->logo_path)
+                        @if($logoUrl)
                         <div style="margin-bottom: 1.5rem;">
-                            <img src="{{ asset($settings->logo_path) }}" alt="{{ $settings->platform_name ?? 'Logo' }}" style="max-height: 80px; object-fit: contain;">
+                            <img src="{{ $logoUrl }}" alt="{{ $settings->platform_name ?? 'Logo' }}" style="max-height: 80px; object-fit: contain;">
                         </div>
                         @endif
                         <h1>
-                            {{ $settings->hero_title ?? __('Welcome to millénaire  connect') }}
+                            Bienvenue à Millénaire Connect
                         </h1>
                         <p>
-                            {{ $settings->hero_subtitle ?? __('For a better world') }}
+                            La plateforme digitale complète de votre établissement scolaire
                         </p>
 
                         
@@ -46,10 +46,10 @@
                         <div class="hero-buttons">
                             <a href="{{ route('login') }}" class="btn btn-primary">
                                 <i class="bi bi-box-arrow-in-right me-2"></i>
-                                {{ __('Login') }}
+                                Se connecter
                             </a>
-                            <a href="#about" class="btn btn-outline">
-                                {{ __('Learn more') }}
+                            <a href="#featured-courses" class="btn btn-outline">
+                                En savoir plus
                             </a>
                         </div>
 
@@ -57,15 +57,15 @@
                         <div class="hero-features">
                             <div class="feature">
                                 <i class="bi bi-shield-check"></i>
-                                <span>{{ __('Security') ?? (app()->getLocale() === 'fr' ? 'Sécurisé & Fiable' : 'Secure & Reliable') }}</span>
+                                <span>Sécurisé & Fiable</span>
                             </div>
                             <div class="feature">
                                 <i class="bi bi-phone"></i>
-                                <span>{{ __('Mobile payments') }}</span>
+                                <span>Paiements Mobile Money</span>
                             </div>
                             <div class="feature">
                                 <i class="bi bi-translate"></i>
-                                <span>{{ __('Language') }}</span>
+                                <span>Bilingue — FR & EN</span>
                             </div>
                         </div>
                     </div>
@@ -137,8 +137,8 @@
                     <img src="{{ asset('images/Capture d’écran 2026-02-16 160044.png') }}" class="d-block w-100" alt="Excellence Académique" 
                         style="width: 100%; height: 100%; object-fit: cover;">
                     <div class="carousel-caption d-none d-md-block" style="background: rgba(13, 148, 136, 0.85); padding: 2rem; border-radius: 10px; bottom: 30px;">
-                        <h5 style="font-size: 2rem; font-weight: 700; margin-bottom: .5rem;">{{ __('public.carousel_academic_excellence') }}</h5>
-                        <p style="font-size: 1.1rem; margin-bottom: 0;">{{ __('public.carousel_academic_excellence_desc') }}</p>
+                        <h5 style="font-size: 2rem; font-weight: 700; margin-bottom: .5rem;">Excellence Académique</h5>
+                        <p style="font-size: 1.1rem; margin-bottom: 0;">Une formation rigou reuse et innovante pour l'excellence de vos enfants.</p>
                     </div>
                 </div>
 
@@ -147,8 +147,8 @@
                     <img src="{{ asset('images/images (1).png') }}" class="d-block w-100" alt="Communication Sécurisée" 
                         style="width: 100%; height: 100%; object-fit: cover;">
                     <div class="carousel-caption d-none d-md-block" style="background: rgba(13, 148, 136, 0.85); padding: 2rem; border-radius: 10px; bottom: 30px;">
-                        <h5 style="font-size: 2rem; font-weight: 700; margin-bottom: .5rem;">{{ __('public.carousel_secure_communication') }}</h5>
-                        <p style="font-size: 1.1rem; margin-bottom: 0;">{{ __('public.carousel_secure_communication_desc') }}</p>
+                        <h5 style="font-size: 2rem; font-weight: 700; margin-bottom: .5rem;">Communication Sécurisée</h5>
+                        <p style="font-size: 1.1rem; margin-bottom: 0;">Messagerie et notifications temps réel entre parents, enseignants et direction.</p>
                     </div>
                 </div>
 
@@ -157,8 +157,8 @@
                     <img src="{{ asset('images/carousel-3.svg') }}" class="d-block w-100" alt="Gestion Complète" 
                         style="width: 100%; height: 100%; object-fit: cover;">
                     <div class="carousel-caption d-none d-md-block" style="background: rgba(13, 148, 136, 0.85); padding: 2rem; border-radius: 10px; bottom: 30px;">
-                        <h5 style="font-size: 2rem; font-weight: 700; margin-bottom: .5rem;">{{ __('public.carousel_complete_management') }}</h5>
-                        <p style="font-size: 1.1rem; margin-bottom: 0;">{{ __('public.carousel_complete_management_desc') }}</p>
+                        <h5 style="font-size: 2rem; font-weight: 700; margin-bottom: .5rem;">Gestion Complète</h5>
+                        <p style="font-size: 1.1rem; margin-bottom: 0;">Bulletins, présences, paiements et ressources pédagogiques intégrés.</p>
                     </div>
                 </div>
             </div>
@@ -168,10 +168,10 @@
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">{{ __('public.carousel_previous') }}</span>
             </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" 
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next"
                 style="background: rgba(13, 148, 136, 0.6); width: 60px; border-radius: 5px; right: 20px;">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">{{ __('public.carousel_next') }}</span>
+                <span class="visually-hidden">Slide suivant</span>
             </button>
         @endif
     </div>
@@ -250,8 +250,8 @@
 <section id="featured-courses" class="featured-courses section">
 
     <div class="container section-title" data-aos="fade-up">
-        <h2>{{ __('public.announcements_title') }}</h2>
-        <p>{{ __('public.announcements_subtitle') }}</p>
+        <h2>Dernières Annonces</h2>
+        <p>Informations importantes de votre établissement scolaire</p>
     </div>
 
     <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -297,7 +297,7 @@
                 <div class="col-12 text-center py-5" data-aos="fade-up">
                     <div class="empty-announcements">
                         <i class="bi bi-megaphone" style="font-size:3rem;color:#0d9488;opacity:.4;"></i>
-                        <p class="mt-3 text-muted">{{ __('No announcements') }}</p>
+                        <p class="mt-3 text-muted">Aucune annonce pour le moment</p>
                     </div>
                 </div>
                 @endforelse
@@ -307,7 +307,7 @@
 
         <div class="more-courses text-center" data-aos="fade-up" data-aos-delay="500">
             <a href="{{ route('announcements.index') }}" class="btn-more">
-                {{ __('View all announcements') }}
+                Voir toutes les annonces
             </a>
         </div>
 
@@ -319,8 +319,8 @@
 <section id="course-categories" class="course-categories section">
 
     <div class="container section-title" data-aos="fade-up">
-        <h2>{{ __('Features') }}</h2>
-        <p>{{ __('Features subtitle') }}</p>
+        <h2>Nos Services et Fonctionalités</h2>
+        <p>Découvrez tous les outils disponibles sur Millénaire Connect</p>
     </div>
 
     <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -328,75 +328,13 @@
 
             @php
             $features = [
-                [
-                    'icon'  => 'bi-bar-chart-line-fill',
-                    'color' => '#0d9488',
-                    'title_fr' => __('report_cards'),
-                    'title_en' => __('preport_cards'),
-                    'desc_fr'  => __('report cards desc'),
-                    'desc_en'  => __('report cards count'),
-                    'count_en' => __('report cardscount'),
-                ],
-                [
-                    'icon'  => 'bi-calendar3',
-                    'color' => '#3b82f6',
-                    'title_fr' => __('public.feature_schedule_title'),
-                    'title_en' => __('public.feature_schedule_title'),
-                    'desc_fr'  => __('public.feature_schedule_title_desc'),
-                    'desc_en'  => __('public.feature_schedule_title_desc'),
-                    'count_fr' => __('public.feature_schedule_count'),
-                    'count_en' => __('public.feature_schedule_count'),
-                ],
-                [
-                    'icon'  => 'bi-list-task',
-                    'color' => '#8b5cf6',
-                    'title_fr' => 'Gestion des Classes',
-                    'title_en' => 'Classes Management',
-                    'desc_fr'  => 'Organisation et suivi des classes avec gestion des emplois du temps.',
-                    'desc_en'  => 'Interactive schedules with real-time conflict detection.',
-                    'count_fr' => 'Classes gérées',
-                    'count_en' => 'Classes managed',
-                ],
-                [
-                    'icon'  => 'bi-person-check-fill',
-                    'color' => '#10b981',
-                    'title_fr' => 'Absences & Présences',
-                    'title_en' => 'Attendance',
-                    'desc_fr'  => 'Suivi quotidien des présences avec notification automatique aux parents.',
-                    'desc_en'  => 'Daily attendance tracking with automatic parent notifications.',
-                    'count_fr' => 'Absences traitées',
-                    'count_en' => 'Absences handled',
-                ],
-                [
-                    'icon'  => 'bi-phone-fill',
-                    'color' => '#f59e0b',
-                    'title_fr' => 'Paiement Mobile Money',
-                    'title_en' => 'Mobile Money Payment',
-                    'desc_fr'  => 'Orange Money & MTN MoMo intégrés pour le paiement des frais scolaires.',
-                    'desc_en'  => 'Orange Money & MTN MoMo integrated for school fee payments.',
-                    'count_fr' => 'Paiements traités',
-                    'count_en' => 'Payments processed',
-                ],
-                [
-                    'icon'  => 'bi-book-fill',
-                    'color' => '#8b5cf6',
-                    'title_fr' => 'E-Learning',
-                    'title_en' => 'E-Learning',
-                    'desc_fr'  => 'Cours en ligne, PDF, vidéos et quiz interactifs accessibles partout.',
-                    'desc_en'  => 'Online courses, PDFs, videos and interactive quizzes accessible anywhere.',
-                    'count_fr' => 'Ressources disponibles',
-                    'count_en' => 'Resources available',
-                ],
-                [
-                    'icon'  => 'bi-chat-dots-fill',
-                    'color' => '#ef4444',
-                    'title_fr' => 'Communication Sécurisée',
-                    'title_en' => 'Secure Communication',
-                    'desc_fr'  => 'Chat interne, appels audio/vidéo et notifications push en temps réel.',
-                    'desc_en'  => 'Internal chat, audio/video calls and real-time push notifications.',
-                    'count_fr' => 'Messages envoyés',
-                    'count_en' => 'Messages sent',
-                ],
+                ['icon' => 'bi-bar-chart-line-fill', 'color' => '#0d9488', 'title' => 'Bulletins Numériques', 'desc' => 'Générés automatiquement avec signature et QR code.'],
+                ['icon' => 'bi-calendar3', 'color' => '#3b82f6', 'title' => 'Emplois du Temps', 'desc' => 'Gestion complète des horaires pour toutes les classes.'],
+                ['icon' => 'bi-list-task', 'color' => '#8b5cf6', 'title' => 'Gestion des Classes', 'desc' => 'Organisation et suivi des classes avec les emplois du temps.'],
+                ['icon' => 'bi-person-check-fill', 'color' => '#10b981', 'title' => 'Absences & Présences', 'desc' => 'Suivi quotidien avec notifications parents en temps réel.'],
+                ['icon' => 'bi-phone-fill', 'color' => '#f59e0b', 'title' => 'Paiement Mobile Money', 'desc' => 'Orange Money & MTN MoMo intégrés pour les paiements.'],
+                ['icon' => 'bi-book-fill', 'color' => '#8b5cf6', 'title' => 'E-Learning', 'desc' => 'Cours en ligne, PDF, vidéos et quiz interactifs partout.'],
+                ['icon' => 'bi-chat-dots-fill', 'color' => '#ef4444', 'title' => 'Communication Sécurisée', 'desc' => 'Chat, appels audio/vidéo et notifications temps réel.'],
             ];
             @endphp
 
@@ -407,10 +345,10 @@
                         <i class="{{ $feature['icon'] }}" style="font-size:1.6rem;color:{{ $feature['color'] }}"></i>
                     </div>
                     <h5 class="mb-1" style="font-size:.9rem;font-weight:600;color:#223a58">
-                        {{ $feature['title_en'] }}
+                        {{ $feature['title'] }}
                     </h5>
                     <p style="font-size:.78rem;color:#64748b;line-height:1.4">
-                        {{ $feature['desc_en'] }}
+                        {{ $feature['desc'] }}
                     </p>
                 </div>
             </div>
@@ -428,8 +366,8 @@
 <section id="featured-instructors" class="featured-instructors section">
 
     <div class="container section-title" data-aos="fade-up">
-        <h2>{{ __('public.teachers_title') }}</h2>
-        <p>{{ __('public.teachers_subtitle') }}</p>
+        <h2>Nos Enseignants</h2>
+        <p>Une équipe pédagogique qualifiée et dédiée à votre réussite</p>
     </div>
 
     <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -453,7 +391,7 @@
                         <div class="overlay-content">
                             <div class="course-count">
                                 <i class="bi bi-book"></i>
-                                <span>{{ $teacher->subjects_count ?? $teacher->subjects()->count() }} {{ __('public.teacher_subjects_label') }}</span>
+                                <span>{{ $teacher->subjects_count ?? $teacher->subjects()->count() }} matières</span>
                             </div>
                         </div>
                     </div>
@@ -465,13 +403,13 @@
                         @if($teacher->is_prof_principal)
                         <p class="description">
                             <span class="badge" style="background:#0d9488;font-size:.7rem">
-                                {{ __('public.teacher_head') }}
+                                Chef de classe
                             </span>
                         </p>
                         @endif
                         <div class="action-buttons">
                             <a href="{{ route('public.teacher.profile', $teacher->id) }}" class="btn-view">
-                                {{ __('public.teacher_view_profile') }}
+                                Voir le profil
                             </a>
                         </div>
                     </div>
@@ -479,7 +417,7 @@
             </div>
             @empty
             <div class="col-12 text-center py-4">
-                <p class="text-muted">{{ __('public.teachers_empty') }}</p>
+                <p class="text-muted">Aucun enseignant disponible</p>
             </div>
             @endforelse
 
@@ -487,7 +425,7 @@
 
         <div class="more-courses text-center mt-5" data-aos="fade-up">
             <a href="{{ route('public.instructors') }}" class="btn-more">
-                {{ __('public.teachers_view_all') }}
+                Voir tous les enseignants
             </a>
         </div>
     </div>
@@ -501,8 +439,8 @@
 <section id="testimonials" class="testimonials section">
 
     <div class="container section-title" data-aos="fade-up">
-        <h2>{{ __('public.testimonials_title') }}</h2>
-        <p>{{ __('public.testimonials_subtitle') }}</p>
+        <h2>Ce qu'en disent les utilisateurs</h2>
+        <p>Avis et témoignages de nos utilisateurs satisfaits</p>
     </div>
 
     <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -552,9 +490,9 @@
                             {{-- Témoignages par défaut --}}
                             @php
                             $defaultTestimonials = [
-                                ['name' => 'Marie Nguema', 'role' => __('public.testimonial_parent_role'), 'content' => __('public.testimonial_parent_content')],
-                                ['name' => 'Prof. Etoga Jean', 'role' => __('public.testimonial_teacher_role'), 'content' => __('public.testimonial_teacher_content')],
-                                ['name' => 'Amina Bello', 'role' => __('public.testimonial_student_role'), 'content' => __('public.testimonial_student_content')],
+                                ['name' => 'Marie Nguema', 'role' => 'Parent d\'élève', 'content' => 'Millénaire Connect a transformé la communication avec l\'école. Je reçois les bulletins et les informations instantanément.'],
+                                ['name' => 'Prof. Etoga Jean', 'role' => 'Enseignant', 'content' => 'Une plateforme précieuse qui facilite la gestion des classes et le suivi des élèves. Très intuitive !'],
+                                ['name' => 'Amina Bello', 'role' => 'Élève', 'content' => 'L\'E-Learning sur Millerénaire Connect me permet d\' étudier depuis chez moi avec tous les ressources nécessaires.'],
                             ];
                             @endphp
                             @foreach($defaultTestimonials as $defTest)
@@ -600,16 +538,16 @@
 
             <div class="col-lg-6" data-aos="fade-right" data-aos-delay="200">
                 <div class="cta-content">
-                    <h2>{{ __('public.personal_space_title') }}</h2>
-                    <p>{{ __('public.personal_space_subtitle') }}</p>
+                    <h2>Espace Personnel Millénaire Connect</h2>
+                    <p>Accédez à votre espace personalisé selon votre rôle</p>
 
                     <div class="features-list">
                         @php
                         $roleitems = [
-                            ['icon' => 'bi-person-badge', 'text' => 'Admin — ' . __('public.role_admin')],
-                            ['icon' => 'bi-person-workspace', 'text' => 'Enseignants — ' . __('public.role_teacher')],
-                            ['icon' => 'bi-people', 'text' => 'Parents — ' . __('public.role_parent')],
-                            ['icon' => 'bi-mortarboard', 'text' => 'Élèves — ' . __('public.role_student')],
+                            ['icon' => 'bi-person-badge', 'text' => 'Admin — Gestion complète de la plateforme'],
+                            ['icon' => 'bi-person-workspace', 'text' => 'Enseignants — Suivi des classe et bulletins'],
+                            ['icon' => 'bi-people', 'text' => 'Parents — Bulletins et absences de l\' enfant'],
+                            ['icon' => 'bi-mortarboard', 'text' => 'Élèves — E-Learning et ressources pédagogiques'],
                         ];
                         @endphp
                         @foreach($roleitems as $item)
@@ -623,10 +561,10 @@
                     <div class="cta-actions" data-aos="fade-up" data-aos-delay="500">
                         <a href="{{ route('login') }}" class="btn btn-primary">
                             <i class="bi bi-box-arrow-in-right me-2"></i>
-                            {{ __('public.sign_in') }}
+                            Se connecter
                         </a>
                         <a href="{{ route('public.about') }}" class="btn btn-outline">
-                            {{ __('public.learn_more_detail') }}
+                            En savoir plus
                         </a>
                     </div>
                 </div>
@@ -639,24 +577,24 @@
                         <div class="stats-row d-flex justify-content-around flex-wrap gap-3 mt-3">
                             <div class="stat-item text-center">
                                 <h3 class="mb-0" style="color:#0d9488">
-                                    <span data-purecounter-start="0" data-purecounter-end="{{ $stats['students'] ?? 500 }}"
+                                    <span data-purecounter-start="0" data-purecounter-end="{{ $stats['students'] ?? 600 }}"
                                           data-purecounter-duration="2" class="purecounter"></span>+
                                 </h3>
-                                <p class="mb-0 small">{{ __('public.stat_students') }}</p>
+                                <p class="mb-0 small">Elèves</p>
                             </div>
                             <div class="stat-item text-center">
                                 <h3 class="mb-0" style="color:#0d9488">
-                                    <span data-purecounter-start="0" data-purecounter-end="{{ $stats['teachers'] ?? 40 }}"
+                                    <span data-purecounter-start="0" data-purecounter-end="{{ $stats['teachers'] ?? 45 }}"
                                           data-purecounter-duration="2" class="purecounter"></span>+
                                 </h3>
-                                <p class="mb-0 small">{{ __('public.stat_teachers') }}</p>
+                                <p class="mb-0 small">Enseignants</p>
                             </div>
                             <div class="stat-item text-center">
                                 <h3 class="mb-0" style="color:#0d9488">
-                                    <span data-purecounter-start="0" data-purecounter-end="{{ $stats['classes'] ?? 15 }}"
+                                    <span data-purecounter-start="0" data-purecounter-end="{{ $stats['classes'] ?? 18 }}"
                                           data-purecounter-duration="2" class="purecounter"></span>
                                 </h3>
-                                <p class="mb-0 small">{{ __('public.stat_classes') }}</p>
+                                <p class="mb-0 small">Classes</p>
                             </div>
                         </div>
 
@@ -667,7 +605,7 @@
                                 </div>
                                 <div class="text-start">
                                     <strong style="color:#0f172a">Orange Money & MTN MoMo</strong>
-                                    <p class="mb-0 small text-muted">{{ __('public.payment_description') }}</p>
+                                    <p class="mb-0 small text-muted">Paiement sécurisé des frais scolaires en ligne</p>
                                 </div>
                             </div>
                             <div class="d-flex gap-2">

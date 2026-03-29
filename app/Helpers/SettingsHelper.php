@@ -23,19 +23,32 @@ class SettingsHelper
     }
 
     /**
-     * Obtient l'URL du logo
+     * Obtient l'URL du logo avec fallback
      */
     public static function logoUrl(): ?string
     {
         $settings = self::getSettings();
+        $logoPath = $settings->logo_path ?? 'icons/icon-512.png';
         
-        if (!$settings->logo_path) {
-            return null;
+        // Clean up the path
+        if (stripos($logoPath, '/') === 0) {
+            $logoPath = ltrim($logoPath, '/');
         }
-
-        // Le logo est stocké en "settings/XXX.png"
-        // asset() retourne la bonne URL
-        return asset($settings->logo_path);
+        
+        // Check if file exists - try both direct path and with storage prefix
+        $fullPath = public_path($logoPath);
+        $exists = file_exists($fullPath);
+        
+        // If logo path doesn't have storage prefix, try adding it
+        if (!$exists && stripos($logoPath, 'storage/') !== 0) {
+            $storageLogoPath = 'storage/' . $logoPath;
+            if (file_exists(public_path($storageLogoPath))) {
+                $logoPath = $storageLogoPath;
+                $exists = true;
+            }
+        }
+        
+        return $exists ? asset($logoPath) : null;
     }
 
     /**

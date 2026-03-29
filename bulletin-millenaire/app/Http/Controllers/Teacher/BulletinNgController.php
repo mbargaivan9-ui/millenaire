@@ -140,9 +140,9 @@ class BulletinNgController extends Controller
     /**
      ÉTAPE 5 — Grille de saisie des notes
      */
-    public function step5Notes(string $config)
+    public function step5Notes(string $configId)
     {
-        $config = $this->getConfig($config);
+        $config = $this->getConfig($configId);
         
         // Redirect if config not found
         if (!$config) {
@@ -153,16 +153,32 @@ class BulletinNgController extends Controller
         $subjects = collect();
         $students = collect();
         $notes = collect();
-        $stats = [];
         
         if (property_exists($config, 'subjects') && $config->subjects) {
-            // Ensure it's always a Collection, not an array
-            $subjects = collect($config->subjects);
+            // Ensure it's always a Collection of objects with required properties
+            $subjects = collect($config->subjects)->map(function($item) {
+                return $this->ensureObjectProperties($item, 'subject');
+            });
         }
         if (property_exists($config, 'students') && $config->students) {
-            // Ensure it's always a Collection, not an array
-            $students = collect($config->students);
+            // Ensure it's always a Collection of objects with required properties
+            $students = collect($config->students)->map(function($item) {
+                return $this->ensureObjectProperties($item, 'student');
+            });
         }
+        
+        // Get session data to calculate initial stats and load notes
+        $sessionKey = 'bulletin_ng_config_' . $configId;
+        $sessionData = session($sessionKey, []);
+        
+        // Load notes from session data
+        $notesArray = $sessionData['notes'] ?? [];
+        $notes = collect($notesArray)->mapWithKeys(function($value, $key) {
+            return [$key => (object) ['note' => $value]];
+        });
+        
+        // Calculate stats from session data
+        $stats = $this->calculateStats($sessionData);
 
         return view('teacher.bulletin_ng.step5_notes', compact(
             'config', 'subjects', 'students', 'notes', 'stats'
@@ -220,6 +236,14 @@ class BulletinNgController extends Controller
         if (property_exists($config, 'students') && $config->students) {
             // Ensure it's always a Collection, not an array
             $students = collect($config->students);
+            
+            // Ensure each student has a conduite property (may be null)
+            $students = $students->map(function($student) {
+                if (!property_exists($student, 'conduite')) {
+                    $student->conduite = null;
+                }
+                return $student;
+            });
         }
 
         return view('teacher.bulletin_ng.step7_generate', compact(
@@ -301,10 +325,20 @@ class BulletinNgController extends Controller
             'subjects.*.nom_prof'   => 'nullable|string|max:150',
         ]);
 
-        // Store subjects in session
+        // Store subjects in session with IDs
         $sessionKey = 'bulletin_ng_config_' . $config;
         $sessionData = session($sessionKey, []);
-        $sessionData['subjects'] = $request->input('subjects');
+        
+        // Generate IDs for each subject if they don't exist
+        $subjects = $request->input('subjects', []);
+        foreach ($subjects as &$subject) {
+            if (!isset($subject['id'])) {
+                $subject['id'] = uniqid('subject_');
+            }
+        }
+        unset($subject); // unset reference to avoid side effects
+        
+        $sessionData['subjects'] = $subjects;
         session([$sessionKey => $sessionData]);
 
         return redirect()->route('teacher.bulletin_ng.step4', $config)
@@ -395,9 +429,13 @@ class BulletinNgController extends Controller
         $sessionData['notes'][$noteKey] = $request->note;
         session([$sessionKey => $sessionData]);
 
+        // Calculate and return updated stats
+        $stats = $this->calculateStats($sessionData);
+
         return response()->json([
             'success' => true,
             'note'    => $request->note,
+            'stats'   => $stats,
         ]);
     }
 
@@ -458,21 +496,65 @@ class BulletinNgController extends Controller
     /**
      * Génère le PDF du bulletin d'un élève
      */
-    public function pdfStudent(int $configId, int $studentId)
+    public function pdfStudent(string $configId, string $studentId)
     {
-        $config  = $this->findConfig($configId);
-        $student = BulletinNgStudent::where('config_id', $configId)
-            ->with(['notes.subject', 'conduite'])
-            ->findOrFail($studentId);
+        // Get config from session or database
+        $config = $this->getConfig($configId);
+        if (!$config) {
+            abort(404, 'Configuration not found');
+        }
+        
+        // Try database first, fall back to session
+        $student = null;
+        
+        // If config is an object with students array (session-based)
+        if (property_exists($config, 'students') && $config->students) {
+            $students = collect($config->students);
+            $student = $students->firstWhere('id', $studentId);
+            
+            if ($student) {
+                // Ensure student has required properties
+                $student = (object) $student;
+                // Load conduite if available
+                if (!property_exists($student, 'conduite')) {
+                    $student->conduite = null;
+                }
+                // Load notes if available
+                if (!property_exists($student, 'notes')) {
+                    $student->notes = collect();
+                }
+            }
+        }
+        
+        // Fall back to database query if session-based lookup failed
+        if (!$student) {
+            if (is_numeric($configId) && is_numeric($studentId)) {
+                $student = BulletinNgStudent::where('config_id', (int)$configId)
+                    ->with(['notes.subject', 'conduite'])
+                    ->findOrFail((int)$studentId);
+            } else {
+                abort(404, 'Student not found');
+            }
+        }
 
-        $subjects  = $config->subjects()->orderBy('ordre')->get();
-        $allStats  = $config->computeClassStats();
+        // Get subjects
+        $subjects = collect();
+        if (property_exists($config, 'subjects') && $config->subjects) {
+            $subjects = collect($config->subjects)->sortBy('ordre');
+        } else {
+            $subjects = $config->subjects()->orderBy('ordre')->get();
+        }
+        
+        // Compute stats
+        $stats = property_exists($config, 'computeClassStats') 
+            ? $config->computeClassStats() 
+            : [];
 
         $pdf = Pdf::loadView('teacher.bulletin_ng.pdf.bulletin', [
             'config'   => $config,
             'student'  => $student,
             'subjects' => $subjects,
-            'stats'    => $allStats,
+            'stats'    => $stats,
         ])->setPaper('a4', 'portrait');
 
         $filename = "bulletin_{$student->matricule}_{$config->trimestre}T_{$config->annee_academique}.pdf";
@@ -502,15 +584,59 @@ class BulletinNgController extends Controller
     /**
      * Prévisualisation HTML d'un bulletin individuel
      */
-    public function previewStudent(int $configId, int $studentId)
+    public function previewStudent(string $configId, string $studentId)
     {
-        $config  = $this->findConfig($configId);
-        $student = BulletinNgStudent::where('config_id', $configId)
-            ->with(['notes.subject', 'conduite'])
-            ->findOrFail($studentId);
+        // Get config from session or database
+        $config = $this->getConfig($configId);
+        if (!$config) {
+            abort(404, 'Configuration not found');
+        }
+        
+        // Try database first, fall back to session
+        $student = null;
+        
+        // If config is an object with students array (session-based)
+        if (property_exists($config, 'students') && $config->students) {
+            $students = collect($config->students);
+            $student = $students->firstWhere('id', $studentId);
+            
+            if ($student) {
+                // Ensure student has required properties
+                $student = (object) $student;
+                // Load conduite if available
+                if (!property_exists($student, 'conduite')) {
+                    $student->conduite = null;
+                }
+                // Load notes if available
+                if (!property_exists($student, 'notes')) {
+                    $student->notes = collect();
+                }
+            }
+        }
+        
+        // Fall back to database query if session-based lookup failed
+        if (!$student) {
+            if (is_numeric($configId) && is_numeric($studentId)) {
+                $student = BulletinNgStudent::where('config_id', (int)$configId)
+                    ->with(['notes.subject', 'conduite'])
+                    ->findOrFail((int)$studentId);
+            } else {
+                abort(404, 'Student not found');
+            }
+        }
 
-        $subjects = $config->subjects()->orderBy('ordre')->get();
-        $stats    = $config->computeClassStats();
+        // Get subjects
+        $subjects = collect();
+        if (property_exists($config, 'subjects') && $config->subjects) {
+            $subjects = collect($config->subjects)->sortBy('ordre');
+        } else {
+            $subjects = $config->subjects()->orderBy('ordre')->get();
+        }
+        
+        // Compute stats
+        $stats = property_exists($config, 'computeClassStats') 
+            ? $config->computeClassStats() 
+            : [];
 
         return view('teacher.bulletin_ng.pdf.bulletin', [
             'config'   => $config,
@@ -646,5 +772,134 @@ class BulletinNgController extends Controller
         }
 
         return 0; // Fallback
+    }
+
+    /**
+     * Helper: Calculate stats from session data
+     */
+    private function calculateStats(array $sessionData): array
+    {
+        $notes = $sessionData['notes'] ?? [];
+        $students = $sessionData['students'] ?? [];
+        $subjects = $sessionData['subjects'] ?? [];
+
+        \Log::info('📊 CalculateStats invoked', [
+            'notesCount' => count($notes),
+            'studentsCount' => count($students),
+            'subjectsCount' => count($subjects),
+            'firstSubject' => isset($subjects[0]) ? (is_array($subjects[0]) ? $subjects[0] : (array) $subjects[0]) : null,
+            'firstStudent' => isset($students[0]) ? (is_array($students[0]) ? $students[0] : (array) $students[0]) : null,
+            'firstNote' => $notes ? array_slice($notes, 0, 1) : null,
+        ]);
+
+        // Default empty stats if no data
+        if (empty($students) || empty($subjects) || empty($notes)) {
+            \Log::warning('⚠️ CalculateStats: Missing data', [
+                'studentsEmpty' => empty($students),
+                'subjectsEmpty' => empty($subjects),
+                'notesEmpty' => empty($notes),
+            ]);
+            return [
+                'avg'      => 0,
+                'pct'      => 0,
+                'max'      => 0,
+                'min'      => 0,
+                'passing'  => 0,
+                'avgs'     => [],
+                'ranks'    => [],
+            ];
+        }
+
+        $studentAverages = [];
+        $allNotes = [];
+
+        // Calculate average for each student
+        foreach ($students as $student) {
+            $studentId = is_array($student) ? ($student['id'] ?? null) : ($student?->id ?? null);
+            if (!$studentId) continue;
+
+            $totalCoef = 0;
+            $totalWeighted = 0;
+            $hasNotes = false;
+
+            foreach ($subjects as $subject) {
+                $subjectId = is_array($subject) ? ($subject['id'] ?? null) : ($subject?->id ?? null);
+                $coef = is_array($subject) ? ($subject['coefficient'] ?? 1) : ($subject?->coefficient ?? 1);
+                
+                if (!$subjectId) continue;
+
+                $noteKey = "{$studentId}_{$subjectId}";
+                $note = $notes[$noteKey] ?? null;
+
+                if ($note !== null && $note !== '') {
+                    $note = (float) $note;
+                    $allNotes[] = $note;
+                    $totalCoef += $coef;
+                    $totalWeighted += $note * $coef;
+                    $hasNotes = true;
+                }
+            }
+
+            // Calculate weighted average
+            if ($hasNotes && $totalCoef > 0) {
+                $avg = $totalWeighted / $totalCoef;
+                $studentAverages[$studentId] = round($avg, 2);
+            } else {
+                $studentAverages[$studentId] = 0;
+            }
+        }
+
+        // Calculate rank for each student
+        $rankedAverages = collect($studentAverages)
+            ->filter(fn($avg) => $avg > 0)
+            ->sortDesc()
+            ->keys()
+            ->toArray();
+
+        $ranks = [];
+        foreach ($rankedAverages as $rank => $studentId) {
+            $ranks[$studentId] = $rank + 1;
+        }
+
+        // Calculate class-wide stats
+        $classAvg = count($allNotes) > 0 ? array_sum($allNotes) / count($allNotes) : 0;
+        $classMax = count($allNotes) > 0 ? max($allNotes) : 0;
+        $classMin = count($allNotes) > 0 ? min($allNotes) : 0;
+        $passing = count(array_filter($studentAverages, fn($avg) => $avg >= 10));
+        $totalStudents = max(1, count($students));
+        $pct = $totalStudents > 0 ? round(($passing / $totalStudents) * 100) : 0;
+
+        return [
+            'avg'      => round($classAvg, 2),
+            'pct'      => (int)$pct,
+            'max'      => round($classMax, 2),
+            'min'      => round($classMin, 2),
+            'passing'  => $passing,
+            'avgs'     => $studentAverages,
+            'ranks'    => $ranks,
+        ];
+    }
+
+    /**
+     * Helper: Ensure object has all required properties with defaults
+     */
+    private function ensureObjectProperties($item, $type = 'subject'): object
+    {
+        $obj = is_array($item) ? (object) $item : $item;
+        
+        if ($type === 'subject') {
+            // Required subject properties
+            if (!isset($obj->id)) $obj->id = uniqid('subject_');
+            if (!isset($obj->nom)) $obj->nom = 'N/A';
+            if (!isset($obj->coefficient)) $obj->coefficient = 1;
+            if (!isset($obj->nom_prof)) $obj->nom_prof = null;
+        } elseif ($type === 'student') {
+            // Required student properties
+            if (!isset($obj->id)) $obj->id = uniqid('student_');
+            if (!isset($obj->nom)) $obj->nom = 'N/A';
+            if (!isset($obj->matricule)) $obj->matricule = 'N/A';
+        }
+        
+        return $obj;
     }
 }

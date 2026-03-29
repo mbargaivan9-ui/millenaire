@@ -41,6 +41,7 @@ use App\Http\Controllers\Teacher\AttendanceController as TeacherAttendanceContro
 use App\Http\Controllers\Teacher\StudentAbsenceController;
 use App\Http\Controllers\Teacher\PrincipalStudentAbsenceController;
 use App\Http\Controllers\Teacher\BulletinNgController;
+use App\Http\Controllers\Teacher\TeacherGradeEntryController;
 
 use App\Http\Controllers\Teacher\ParentManagementController;
 // Parent
@@ -51,8 +52,9 @@ use App\Http\Controllers\Parent\ParentMonitoringController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\StudentProgressController;
 use App\Http\Controllers\Student\CourseController as StudentCourseController;
-// Phase 4
+// Phase 4 - Payment
 use App\Http\Controllers\Payment\MobileMoneyController;
+use App\Http\Controllers\Payment\SchoolPayController;
 use App\Http\Controllers\Notification\PushNotificationController;
 
 // ═══════════════════════════════════════
@@ -95,6 +97,9 @@ Route::prefix('webhooks')->name('webhooks.')->group(function () {
     Route::post('payment/orange', [PaymentWebhookController::class, 'handleOrangeMoneyWebhook'])->name('payment.orange');
     Route::post('payment/mtn', [PaymentWebhookController::class, 'handleMTNMoneyWebhook'])->name('payment.mtn');
     Route::get('payment/health', [PaymentWebhookController::class, 'webhookHealth'])->name('payment.health');
+    // SchoolPay Webhooks
+    Route::post('schoolpay/orange', [SchoolPayController::class, 'webhookOrange'])->name('schoolpay.orange');
+    Route::post('schoolpay/mtn', [SchoolPayController::class, 'webhookMtn'])->name('schoolpay.mtn');
 });
 
 // QR Code Verification (public)
@@ -478,6 +483,16 @@ Route::middleware('auth')->group(function () {
         // Quick access to bulletin/grades for a specific class
         Route::get('bulletin/{class}', [TeacherDashboardController::class, 'bulletinDashboard'])->name('bulletin.dashboard');
 
+        // ── Bulletin NG — Enseignants (Grade Entry) ──
+        // Interface de saisie des notes pour enseignants affiliés
+        // Accessible à tous les enseignants qui ont une matière dans une session visible
+        Route::prefix('grades/bulletin-ng')->name('grades.bulletin_ng.')->group(function () {
+            Route::get('/', [TeacherGradeEntryController::class, 'index'])->name('index');
+            Route::get('/{session}/form', [TeacherGradeEntryController::class, 'editForm'])->name('form');
+            Route::post('/{session}/save', [TeacherGradeEntryController::class, 'saveGrade'])->name('save');
+            Route::get('/{session}/progress', [TeacherGradeEntryController::class, 'getProgress'])->name('progress');
+        });
+
         // ── Bulletin NG (Système de génération de bulletins) ──
         // Accessible uniquement aux professeurs principaux et admins
         Route::middleware('role:prof_principal,admin')
@@ -497,17 +512,15 @@ Route::middleware('auth')->group(function () {
             // ── Actions POST (formulaires)
             Route::post('store-config',                  [BulletinNgController::class, 'storeConfig'])->name('store-config');
             Route::post('{config}/store-subjects',       [BulletinNgController::class, 'storeSubjects'])->name('store-subjects');
-            Route::post('{config}/finaliser-conduite',   [BulletinNgController::class, 'finaliserConduite'])->name('finaliser-conduite');
+            Route::post('{config}/finalize-conduct',      [BulletinNgController::class, 'finalizeConduite'])->name('finaliser-conduite');
 
             // ── API JSON (AJAX - temps réel)
             Route::post('{config}/students',             [BulletinNgController::class, 'storeStudent'])->name('students.store');
             Route::delete('{config}/students/{student}', [BulletinNgController::class, 'deleteStudent'])->name('students.delete');
-            Route::post('{config}/ouvrir-saisie',        [BulletinNgController::class, 'ouvrirSaisie'])->name('ouvrir-saisie');
             Route::post('{config}/save-note',            [BulletinNgController::class, 'saveNote'])->name('save-note');
-            Route::post('{config}/verrouiller',          [BulletinNgController::class, 'verrouillerNotes'])->name('verrouiller');
-            Route::post('{config}/students/{student}/conduite', [BulletinNgController::class, 'saveConduite'])->name('save-conduite');
-            Route::get('{config}/api/stats',             [BulletinNgController::class, 'apiStats'])->name('api.stats');
-            Route::get('{config}/students/{student}/notes', [BulletinNgController::class, 'apiStudentNotes'])->name('api.student-notes');
+            Route::post('{session}/lock',                [BulletinNgController::class, 'lockNotes'])->name('lock-notes');
+            Route::post('{session}/publish',             [BulletinNgController::class, 'publishToTeachers'])->name('publish');
+            Route::post('{config}/students/{student}/conduite', [BulletinNgController::class, 'saveConduite'])->name('save-conduite ');
 
             // ── PDF & Export
             Route::get('{config}/students/{student}/pdf',  [BulletinNgController::class, 'pdfStudent'])->name('pdf.student');
@@ -560,9 +573,31 @@ Route::middleware('auth')->group(function () {
             Route::post('/', [\App\Http\Controllers\Parent\AppointmentController::class, 'store'])->name('store');
             Route::delete('{appointment}', [\App\Http\Controllers\Parent\AppointmentController::class, 'destroy'])->name('destroy');
         });
-
-       
     });
+
+    // ════════════════════════════════════════════════
+    //  SCHOOLPAY — Payment Module (Admin & Parent)
+    // ════════════════════════════════════════════════
+    
+    // Admin Dashboard
+    Route::middleware(['auth', 'role:admin,intendant,censeur'])
+        ->prefix('admin/schoolpay')
+        ->name('schoolpay.admin.')
+        ->group(function () {
+            Route::get('/', [SchoolPayController::class, 'adminDashboard'])->name('dashboard');
+            Route::get('stats', [SchoolPayController::class, 'adminStats'])->name('stats');
+        });
+
+    // Parent Payment Interface
+    Route::middleware(['auth', 'role:parent,admin,intendant'])
+        ->prefix('parent/schoolpay')
+        ->name('schoolpay.parent.')
+        ->group(function () {
+            Route::get('/', [SchoolPayController::class, 'parentIndex'])->name('index');
+            Route::post('initiate', [SchoolPayController::class, 'initiate'])->name('initiate');
+            Route::get('poll/{transactionRef}', [SchoolPayController::class, 'poll'])->name('poll');
+            Route::get('student/{student}/fees', [SchoolPayController::class, 'studentFees'])->name('student.fees');
+        });
 
     // ════════════════════════════════════════════════
     //  STUDENT SPACE

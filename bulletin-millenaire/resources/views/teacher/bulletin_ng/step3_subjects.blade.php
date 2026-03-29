@@ -120,62 +120,111 @@
 
 @push('scripts')
 <script>
-(function () {
-    const tbody    = document.getElementById('subjectsBody');
-    const tpl      = document.getElementById('subjectRowTpl').innerHTML;
-    const addBtn   = document.getElementById('addSubjectBtn');
-    const applyBtn = document.getElementById('applyNb');
-    const nbInput  = document.getElementById('nbSubjects');
+// Initialize table management
+const tbody    = document.getElementById('subjectsBody');
+const tpl      = document.getElementById('subjectRowTpl').innerHTML;
+const addBtn   = document.getElementById('addSubjectBtn');
+const applyBtn = document.getElementById('applyNb');
+const nbInput  = document.getElementById('nbSubjects');
 
-    function rowCount() { return tbody.querySelectorAll('.bng-subject-row').length; }
+function rowCount() { return tbody.querySelectorAll('.bng-subject-row').length; }
 
-    function buildRow(idx) {
-        return tpl.replace(/__IDX__/g, idx).replace(/__NUM__/g, idx + 1);
-    }
+function buildRow(idx) {
+    return tpl.replace(/__IDX__/g, idx).replace(/__NUM__/g, idx + 1);
+}
 
-    function reindex() {
-        tbody.querySelectorAll('.bng-subject-row').forEach((row, i) => {
-            row.dataset.index = i;
-            row.querySelectorAll('[name]').forEach(el => {
-                el.name = el.name.replace(/\[\d+\]/, `[${i}]`);
-            });
-            row.querySelector('.bng-badge').textContent = i + 1;
+function reindex() {
+    tbody.querySelectorAll('.bng-subject-row').forEach((row, i) => {
+        row.dataset.index = i;
+        row.querySelectorAll('[name]').forEach(el => {
+            el.name = el.name.replace(/\[\d+\]/, `[${i}]`);
         });
-        document.getElementById('subjectCount').textContent =
-            rowCount() + ' {{ $isEN ? "subject(s) configured" : "matière(s) configurée(s)" }}';
+        row.querySelector('.bng-badge').textContent = i + 1;
+    });
+    document.getElementById('subjectCount').textContent =
+        rowCount() + ' {{ $isEN ? "subject(s) configured" : "matière(s) configurée(s)" }}';
+}
+
+function addRow() {
+    const idx = rowCount();
+    tbody.insertAdjacentHTML('beforeend', buildRow(idx));
+    tbody.lastElementChild.querySelector('input[type=text]').focus();
+    document.getElementById('subjectCount').textContent =
+        rowCount() + ' {{ $isEN ? "subject(s)" : "matière(s)" }}';
+}
+
+addBtn.addEventListener('click', addRow);
+
+applyBtn.addEventListener('click', () => {
+    const target = parseInt(nbInput.value) || 1;
+    const current = rowCount();
+    if (target > current) {
+        for (let i = current; i < target; i++) addRow();
+    } else if (target < current) {
+        const rows = tbody.querySelectorAll('.bng-subject-row');
+        for (let i = rows.length - 1; i >= target; i--) rows[i].remove();
+        reindex();
     }
+});
 
-    function addRow() {
-        const idx = rowCount();
-        tbody.insertAdjacentHTML('beforeend', buildRow(idx));
-        tbody.lastElementChild.querySelector('input[type=text]').focus();
-        document.getElementById('subjectCount').textContent =
-            rowCount() + ' {{ $isEN ? "subject(s)" : "matière(s)" }}';
-    }
-
-    addBtn.addEventListener('click', addRow);
-
-    applyBtn.addEventListener('click', () => {
-        const target = parseInt(nbInput.value) || 1;
-        const current = rowCount();
-        if (target > current) {
-            for (let i = current; i < target; i++) addRow();
-        } else if (target < current) {
-            const rows = tbody.querySelectorAll('.bng-subject-row');
-            for (let i = rows.length - 1; i >= target; i--) rows[i].remove();
+tbody.addEventListener('click', e => {
+    if (e.target.classList.contains('remove-row-btn')) {
+        if (rowCount() > 1) {
+            e.target.closest('tr').remove();
             reindex();
         }
-    });
+    }
+});
 
-    tbody.addEventListener('click', e => {
-        if (e.target.classList.contains('remove-row-btn')) {
-            if (rowCount() > 1) {
-                e.target.closest('tr').remove();
-                reindex();
+// Handle form submission via AJAX - MUST attach BEFORE ANY REDIRECT
+const form = document.getElementById('subjectsForm');
+if (form) {
+    form.addEventListener('submit', function(e) {
+        console.log('📤 Form submitted - intercepting with AJAX...');
+        e.preventDefault();
+        e.stopPropagation();
+
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = '{{ $isEN ? "Saving..." : "Enregistrement..." }}';
+
+        console.log('🔄 AJAX POST to:', form.action);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             }
-        }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('📥 Response:', data);
+            if (data.success) {
+                console.log('✅ Success! Redirecting to step4...');
+                setTimeout(() => {
+                    window.location.href = '/teacher/bulletin-ng/{{ $config->id }}/step4';
+                }, 100);
+            } else {
+                alert('{{ $isEN ? "Error" : "Erreur" }}: ' + (data.message || '{{ $isEN ? "An error occurred" : "Une erreur est survenue" }}'));
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error:', error);
+            alert('{{ $isEN ? "Error sending form" : "Erreur lors de l\'envoi du formulaire" }}: ' + error);
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        });
     });
-})();
+    console.log('✅ Form event listener attached successfully');
+} else {
+    console.error('❌ Form #subjectsForm not found in DOM');
+}
 </script>
 @endpush
 
